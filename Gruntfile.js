@@ -369,6 +369,8 @@ module.exports = function (grunt) {
       }
     },
 
+
+
     buildcontrol: {
       options: {
         dir: 'dist',
@@ -492,7 +494,7 @@ module.exports = function (grunt) {
           ]
         }
       }
-    },
+    }
   });
 
   // Used for delaying livereload until after server has restarted
