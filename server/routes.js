@@ -23,6 +23,6 @@ module.exports = function(app) {
   app.route('/*')
     .get(function(req, res) {
      // res.sendfile(app.get('appPath') + '/index.html');
-      res.sendfile(  express.static(__dirname + '/public/index.html'));
+      res.sendfile(  express.static(__dirname + '/index.html'));
     });
 };
