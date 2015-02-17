@@ -22,6 +22,6 @@ module.exports = function(app) {
   app.route('/*')
     .get(function(req, res) {
      // res.sendfile(app.get('appPath') + '/index.html');
-      res.sendfile( express.static(__dirname + '/dist/public/index.html') );
+      res.sendfile( __dirname + '/dist/public/index.html' );
     });
 };
