@@ -5,6 +5,7 @@
 'use strict';
 
 var errors = require('./components/errors');
+var express = require('express');
 
 module.exports = function(app) {
 
@@ -22,6 +23,6 @@ module.exports = function(app) {
   app.route('/*')
     .get(function(req, res) {
      // res.sendfile(app.get('appPath') + '/index.html');
-      res.sendfile(  app.get('appPath') + '/index.html' );
+      res.sendfile(  express.static(__dirname + '/public'));
     });
 };
