@@ -12,12 +12,20 @@ var UserSchema = new Schema({
     type: String,
     default: 'user'
   },
+  isVerified: Boolean,
+  hasCompleteApp: Boolean,
+  isApproved: Boolean,
+  isActive: Boolean,
+  funds: [],
+  bankAccounts: [],
   hashedPassword: String,
   provider: String,
   salt: String,
   google: {},
   github: {}
 });
+
+
 
 /**
  * Virtuals
@@ -143,5 +151,8 @@ UserSchema.methods = {
     return crypto.pbkdf2Sync(password, salt, 10000, 64).toString('base64');
   }
 };
+
+
+
 
 module.exports = mongoose.model('User', UserSchema);
