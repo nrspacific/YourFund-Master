@@ -19,5 +19,7 @@ module.exports = {
             process.env.MONGOHQ_URL ||
             process.env.OPENSHIFT_MONGODB_DB_URL+process.env.OPENSHIFT_APP_NAME ||
             'mongodb://kbanashek:Password#1@ds043991.mongolab.com:43991/heroku_app34057425'
-  }
+  },
+
+  seedDB: true
 };
