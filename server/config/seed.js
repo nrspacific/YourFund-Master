@@ -12,22 +12,35 @@ var funds = require('../api/fund/fund.model');
 funds.find({}).remove(function() {
   funds.create({
       name: 'Test Fund 1',
-      goal: 1,
-      cash: 1,
+      "cash" : 4000.00,
+      "goal" : 34344,
       accountId: '1',
       stocks: [], //ticker symbol, purchase price, date, # of shares
       finalized:  false,
-      user_id: User.Id,
       created:  Date()
     },{
       name: 'Test Fund 2',
-      goal: 1,
-      cash: 1,
+      "cash" : 8000,
+      "goal" : 34344,
       accountId: '1',
       stocks: [], //ticker symbol, purchase price, date, # of shares
       finalized:  false,
-      user_id: User.Id,
       created:  Date()
+    }, {
+    "cash" : 13737.600000000004,
+    "goal" : 34344,
+    "name" : "Test Fund 3",
+    "finalized" : true,
+      "stocks" : [{
+        "numberOfShares" : 65.334178820545333,
+        "action" : "Buy",
+        "price" : "157.70",
+        "exchange" : "NYSE",
+        "originalPercentOfFund" : "30",
+        "explanation" : "",
+        "symbol" : "IBM (International Business Machines Corporation)",
+        "created" :Date()
+      }]
     },
     function() {
       console.log('finished populating funds');
