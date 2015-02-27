@@ -38,10 +38,30 @@ exports.show = function(req, res) {
 
 // Creates a new thing in the DB.
 exports.create = function(req, res) {
+
+  var user = req.user;
+
   fund.create(req.body, function(err, fund) {
-    if(err) { return handleError(res, err); }
-    return res.json(201, fund);
+    if(err) {
+        return handleError(res, err);
+    }
+
+    console.log("create fund");
+
+    user.funds.push(fund);
+
+    user.save(function (errs) {
+      if (errs) {
+        console.log(errs);
+        return res.render('500');
+      }
+
+      console.log('saving user with fund')
+    });
+
+    return res.json(201,  user.funds);
   });
+
 };
 
 // Updates an existing thing in the DB.
@@ -65,9 +85,23 @@ exports.destroy = function(req, res) {
     if(!fund) { return res.send(404); }
     fund.remove(function(err) {
       if(err) { return handleError(res, err); }
+
+    });
+  });
+  var user = req.user;
+  var userFunds =  user.funds;
+
+  user.funds.findById(req.params.id, function (err, fund) {
+    if(err) { return handleError(res, err); }
+    if(!fund) { return res.send(404); }
+    user.funds.remove(function(err) {
+      if(err) { return handleError(res, err); }
       return res.send(204);
     });
   });
+
+
+
 };
 
 function handleError(res, err) {
