@@ -11,13 +11,11 @@
 
 var _ = require('lodash');
 var fund = require('./fund.model');
-
-
+var userModel = require('../user/user.model');
+var mongoose = require('mongoose');
 
 // Get list of things
 exports.index = function(req, res) {
-
-  var user = req.user;
 
   fund.find( function (err, fund)
   {
@@ -78,34 +76,24 @@ exports.update = function(req, res) {
   });
 };
 
-// Deletes a thing from the DB.
+// Deletes a fund from the users fund collection.
 exports.destroy = function(req, res) {
-  fund.findById(req.params.id, function (err, fund) {
-    if(err) { return handleError(res, err); }
-    if(!fund) { return res.send(404); }
-    fund.remove(function(err) {
-      if(err) { return handleError(res, err); }
 
-    });
-  });
   var user = req.user;
-  var userFunds =  user.funds;
 
-  user.funds.findById(req.params.id, function (err, fund) {
-    if(err) { return handleError(res, err); }
-    if(!fund) { return res.send(404); }
-    user.funds.remove(function(err) {
-      if(err) { return handleError(res, err); }
-      return res.send(204);
-    });
-  });
-
-
-
+  userModel.update({'_id': user._id},
+                   { $pull: { "funds" : { _id :  mongoose.Types.ObjectId(req.params.id) }}},
+                    function (err, result) {
+                      if (err) {
+                        return handleError(result, err);
+                      }
+                      else{
+                        return res.send(204);
+                        console.log(result);
+                      }
+                    });
 };
 
 function handleError(res, err) {
   return res.send(500, err);
-}/**
- * Created by kyleb_000 on 2/24/2015.
- */
+}
