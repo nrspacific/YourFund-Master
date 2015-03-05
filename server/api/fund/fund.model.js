@@ -10,7 +10,8 @@ var fundSchema = new Schema({
   accountId: "string",
   stocks: [], //ticker symbol, purchase price, date, # of shares
   finalized: { type: Boolean, default: false },
-  created: Date
+  created: Date,
+  selectedFund :"string"
 });
 
 module.exports = mongoose.model('Funds', fundSchema);

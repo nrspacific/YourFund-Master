@@ -12,6 +12,7 @@ var UserSchema = new Schema({
     type: String,
     default: 'user'
   },
+  selectedFund: String,
   isVerified: Boolean,
   hasCompleteApp: Boolean,
   isApproved: Boolean,

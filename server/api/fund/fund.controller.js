@@ -27,14 +27,29 @@ exports.index = function(req, res) {
 
 // Get a single thing
 exports.show = function(req, res) {
+
+  var user = req.user;
+
   fund.findById(req.params.id, function (err, fund) {
     if(err) { return handleError(res, err); }
     if(!fund) { return res.send(404); }
+    user.selectedFund = fund._id;
+
+    user.save(function (errs) {
+      if (errs) {
+        console.log(errs);
+        return res.render('500');
+      }
+
+      console.log('saving user selectedFund');
+    });
+
+
     return res.json(fund);
   });
 };
 
-// Creates a new thing in the DB.
+// Creates a new fund in the DB.
 exports.create = function(req, res) {
 
   var user = req.user;
@@ -47,6 +62,7 @@ exports.create = function(req, res) {
     console.log("create fund");
 
     user.funds.push(fund);
+    user.selectedFund = fund._id;
 
     user.save(function (errs) {
       if (errs) {
@@ -54,10 +70,10 @@ exports.create = function(req, res) {
         return res.render('500');
       }
 
-      console.log('saving user with fund')
+      console.log('saving user with fund');
     });
 
-    return res.json(201,  user.funds);
+    return res.json(201, user);
   });
 
 };
