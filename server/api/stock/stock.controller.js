@@ -116,6 +116,9 @@ exports.update = function (req, res) {
 
 // Deletes a stock from the DB.
 exports.destroy = function (req, res) {
+  var user = req.user;
+  var selectedStock;
+
   Stock.findById(req.params.id, function (err, stock) {
     if (err) {
       return handleError(res, err);
@@ -123,13 +126,47 @@ exports.destroy = function (req, res) {
     if (!stock) {
       return res.send(404);
     }
-    stock.remove(function (err) {
+
+    console.log(stock);
+
+    fund.update({'_id': user.selectedFund},
+      { $pull: { "stocks" : { _id :  mongoose.Types.ObjectId(req.params.id) }} },
+      function (err, result) {
+        if (err) {
+          return handleError(result, err);
+        }
+        else{
+         // return res.send(204);
+          console.log(result);
+        }
+      });
+
+    fund.findById(user.selectedFund, function (err, fund) {
       if (err) {
         return handleError(res, err);
       }
+      if (!stock) {
+        return res.send(404);
+      }
+
+      var updatedCash = fund.cash + (stock.price * stock.numberOfShares);
+
+      fund.set({ "cash" : updatedCash});
+      fund.save();
+
       return res.send(204);
+
     });
+
+
+
+
   });
+
+
+
+
+
 };
 
 function handleError(res, err) {
