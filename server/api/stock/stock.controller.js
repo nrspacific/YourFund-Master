@@ -158,15 +158,7 @@ exports.destroy = function (req, res) {
 
     });
 
-
-
-
   });
-
-
-
-
-
 };
 
 function handleError(res, err) {

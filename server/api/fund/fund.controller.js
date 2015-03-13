@@ -13,7 +13,7 @@ var _ = require('lodash');
 var fund = require('./fund.model');
 var userModel = require('../user/user.model');
 var mongoose = require('mongoose');
-
+var userModel = require('../user/user.model');
 // Get list of things
 exports.index = function(req, res) {
 
@@ -109,6 +109,40 @@ exports.destroy = function(req, res) {
                       }
                     });
 };
+
+// Get list of things
+exports.finalize = function(req, res) {
+
+  var user = req.user;
+  var selectedStock;
+
+  fund.findById(user.selectedFund, function (err, fund) {
+    if (err) {
+      return handleError(res, err);
+    }
+    if (!fund) {
+      return res.send(404);
+    }
+
+    fund.set({ "finalized" : true});
+    fund.save();
+
+    userModel.update(
+        {'_id': user._id , 'funds._id' : mongoose.Types.ObjectId(req.params.id) },
+        {$set : {'funds.$.finalized': 'true'} } ,
+        function (err, result) {
+          if (err) {
+            return handleError(result, err);
+          }
+          else{
+            console.log(result);
+            return res.send(204);
+          }
+        });
+  });
+
+};
+
 
 function handleError(res, err) {
   return res.send(500, err);
