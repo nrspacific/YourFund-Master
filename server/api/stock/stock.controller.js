@@ -60,7 +60,7 @@ exports.create = function (req, res) {
         req.body.price = result[0].l;
         var cashForPurchase = (selectedFund.goal * (req.body.originalPercentOfFund / 100));
         req.body.numberOfShares = cashForPurchase / req.body.price;
-        req.body.change =  result[0].c;
+        req.body.change = result[0].c;
 
         Stock.create(req.body, function (err, stock) {
           if (err) {
@@ -94,24 +94,75 @@ exports.create = function (req, res) {
 
 // Updates an existing stock in the DB.
 exports.update = function (req, res) {
+
+  var user = req.user;
+
+  if (!req.body) {
+    return res.send(400);
+  }
+
   if (req.body._id) {
     delete req.body._id;
   }
-  Stock.findById(req.params.id, function (err, stock) {
+
+  fund.findById(user.selectedFund, function (err, selectedFund) {
     if (err) {
       return handleError(res, err);
     }
-    if (!stock) {
+    if (!selectedFund) {
       return res.send(404);
     }
-    var updated = _.merge(stock, req.body);
-    updated.save(function (err) {
+
+    Stock.findById(req.params.id, function (err, stock) {
       if (err) {
         return handleError(res, err);
       }
-      return res.json(200, stock);
+      if (!stock) {
+        return res.send(404);
+      }
+
+      var cashForPurchase = (selectedFund.goal * (req.body.originalPercentOfFund / 100));
+      var existingcashForPurchase = (selectedFund.goal * (stock.originalPercentOfFund / 100));
+      req.body.numberOfShares = cashForPurchase / req.body.price;
+
+      selectedFund.cash = selectedFund.cash + existingcashForPurchase;
+      selectedFund.cash = selectedFund.cash - cashForPurchase;
+
+      selectedFund.save(function (e) {
+        if (e) {
+          return handleError(res, err);
+        }
+      });
+
+      var updatedStock = _.merge(stock, req.body);
+
+      updatedStock.save(function (err) {
+        if (err) {
+          return handleError(res, err);
+        }
+      });
+
+      console.log('Updating fund:' + selectedFund.name + ' stock: ' + updatedStock.symbol);
+
+      fund.update(
+        {'_id': user.selectedFund, 'stocks._id': mongoose.Types.ObjectId(updatedStock._id)},
+        {$set: {'stocks.$.originalPercentOfFund': updatedStock.originalPercentOfFund,
+                'stocks.$.numberOfShares': updatedStock.numberOfShares
+                }},
+        function (err, result) {
+          if (err) {
+            return handleError(result, err);
+          }
+          else {
+            console.log('Updating fund:' + user.selectedFund + ' stock: ' + updatedStock.symbol);
+            return res.send(204);
+          }
+        });
+
     });
+
   });
+
 };
 
 // Deletes a stock from the DB.
@@ -130,13 +181,13 @@ exports.destroy = function (req, res) {
     console.log(stock);
 
     fund.update({'_id': user.selectedFund},
-      { $pull: { "stocks" : { _id :  mongoose.Types.ObjectId(req.params.id) }} },
+      {$pull: {"stocks": {_id: mongoose.Types.ObjectId(req.params.id)}}},
       function (err, result) {
         if (err) {
           return handleError(result, err);
         }
-        else{
-         // return res.send(204);
+        else {
+          // return res.send(204);
           console.log(result);
         }
       });
@@ -151,7 +202,7 @@ exports.destroy = function (req, res) {
 
       var updatedCash = fund.cash + (stock.price * stock.numberOfShares);
 
-      fund.set({ "cash" : updatedCash});
+      fund.set({"cash": updatedCash});
       fund.save();
 
       return res.send(204);

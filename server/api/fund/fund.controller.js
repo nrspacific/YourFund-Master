@@ -110,7 +110,7 @@ exports.destroy = function(req, res) {
                     });
 };
 
-// Get list of things
+
 exports.finalize = function(req, res) {
 
   var user = req.user;
