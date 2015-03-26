@@ -14,7 +14,8 @@ var fund = require('./fund.model');
 var userModel = require('../user/user.model');
 var mongoose = require('mongoose');
 var userModel = require('../user/user.model');
-// Get list of things
+
+// Get list of funds
 exports.index = function(req, res) {
 
   fund.find( function (err, fund)
@@ -25,7 +26,7 @@ exports.index = function(req, res) {
   });
 };
 
-// Get a single thing
+// Get a single fund
 exports.show = function(req, res) {
 
   var user = req.user;
@@ -33,6 +34,18 @@ exports.show = function(req, res) {
   fund.findById(req.params.id, function (err, fund) {
     if(err) { return handleError(res, err); }
     if(!fund) { return res.send(404); }
+
+    var percentLeftToInvest = 0;
+    var remainingInvestment = 100;
+
+    if(fund.stocks.length > 0){
+      fund.stocks.forEach(function(s) {
+        remainingInvestment-= s.originalPercentOfFund;
+      }) ;
+    }
+
+    fund.percentLeftToInvest = remainingInvestment;
+
     user.selectedFund = fund._id;
 
     user.save(function (errs) {
@@ -40,10 +53,8 @@ exports.show = function(req, res) {
         console.log(errs);
         return res.render('500');
       }
-
       console.log('saving user selectedFund');
     });
-
 
     return res.json(fund);
   });
@@ -78,13 +89,15 @@ exports.create = function(req, res) {
 
 };
 
-// Updates an existing thing in the DB.
+// Updates an existing fund in the DB.
 exports.update = function(req, res) {
   if(req.body._id) { delete req.body._id; }
   fund.findById(req.params.id, function (err, fund) {
     if (err) { return handleError(res, err); }
     if(!fund) { return res.send(404); }
+
     var updated = _.merge(fund, req.body);
+
     updated.save(function (err) {
       if (err) { return handleError(res, err); }
       return res.json(200, fund);
@@ -109,7 +122,6 @@ exports.destroy = function(req, res) {
                       }
                     });
 };
-
 
 exports.finalize = function(req, res) {
 

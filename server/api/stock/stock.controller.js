@@ -125,8 +125,11 @@ exports.update = function (req, res) {
       var existingcashForPurchase = (selectedFund.goal * (stock.originalPercentOfFund / 100));
       req.body.numberOfShares = cashForPurchase / req.body.price;
 
-      selectedFund.cash = selectedFund.cash + existingcashForPurchase;
-      selectedFund.cash = selectedFund.cash - cashForPurchase;
+      var purchasePrice = req.body.numberOfShares * req.body.price;
+      var amountTOputBack = stock.numberOfShares * req.body.price;
+
+      selectedFund.cash = selectedFund.cash + amountTOputBack;
+      selectedFund.cash = selectedFund.cash - purchasePrice;
 
       selectedFund.save(function (e) {
         if (e) {

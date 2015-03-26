@@ -11,7 +11,8 @@ var fundSchema = new Schema({
   stocks: [], //ticker symbol, purchase price, date, # of shares
   finalized: { type: Boolean, default: false },
   created: Date,
-  selectedFund :"string"
+  selectedFund :"string",
+  percentLeftToInvest: Number
 });
 
 module.exports = mongoose.model('Funds', fundSchema);
