@@ -11,7 +11,6 @@
 
 var _ = require('lodash');
 var fund = require('./fund.model');
-var userModel = require('../user/user.model');
 var mongoose = require('mongoose');
 var userModel = require('../user/user.model');
 
