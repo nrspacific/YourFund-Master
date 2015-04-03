@@ -168,6 +168,55 @@ exports.update = function (req, res) {
 
 };
 
+
+// Updates an existing stock in the DB.
+exports.trade = function (req, res) {
+
+  var user = req.user;
+
+  if (!req.body) {
+    return res.send(400);
+  }
+
+  if (req.body._id) {
+    delete req.body._id;
+  }
+
+    Stock.findById(req.params.id, function (err, stock) {
+      if (err) {
+        return handleError(res, err);
+      }
+      if (!stock) {
+        return res.send(404);
+      }
+
+      fund.findById(user.selectedFund, function (err, selectedFund) {
+        if (err) {
+          return handleError(res, err);
+        }
+        if (!selectedFund) {
+          return res.send(404);
+        }
+          if(req.params.action == 'buy'){
+
+            var amountToPurchase = req.params.amount * stock.price;
+            stock.originalPercentOfFund  = parseInt(stock.originalPercentOfFund) + parseInt(req.params.amount);
+            selectedFund.cash = selectedFund.cash - amountToPurchase;
+
+            stock.save();
+            selectedFund.save();
+          }
+          else{
+
+          }
+      });
+
+
+
+  });
+
+};
+
 // Deletes a stock from the DB.
 exports.destroy = function (req, res) {
   var user = req.user;
