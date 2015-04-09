@@ -95,7 +95,7 @@ exports.create = function(req, res) {
           }, function (errs) {
           if (err) { return handleError(res, err); }
 
-          console.log('saving fund transaction');
+          console.log('fund.controller: saving fund transaction');
         });
 
 
@@ -115,10 +115,10 @@ exports.update = function(req, res) {
     if(!fund) { return res.send(404); }
 
     var cashDifference = req.body.cash - fund.cash ;
-    var action = 'add';
+    var action = 'Add';
 
     if(req.body.cash < fund.cash){
-      action = 'remove';
+      action = 'Sell';
     }
 
     var updated = _.merge(fund, req.body);
@@ -131,7 +131,7 @@ exports.update = function(req, res) {
           fundId: fund._id,
           date: new Date(),
           symbol: 'YMMF',
-          description: 'Add/remove funds from YMMF',
+          description: action + ' funds from YMMF',
           price: 1,
           action: action,
           numberOfShares: cashDifference,
@@ -142,7 +142,7 @@ exports.update = function(req, res) {
           if (err) {
             return handleError(result, err);
           }
-          console.log('Updating YMMF transaction for stock purchase');
+          console.log('fund.controller: Updating YMMF transaction');
         });
 
       return res.json(200, fund);

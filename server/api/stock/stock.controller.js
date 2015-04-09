@@ -214,17 +214,18 @@ exports.update = function (req, res) {
                   symbol: 'YMMF',
                   description: updatedStock.action + ' ' + updatedStock.description + ' ' + req.body.numberOfShares + ' at $' +  req.body.price,
                   price: 1,
+                  action: updatedStock.action,
                   numberOfShares: req.body.numberOfShares,
                   total: req.body.price * req.body.numberOfShares,
                   company: 'Your Money Market Fund',
                   active: true
-                }),
+                },
                 function (err, result) {
                   if (err) {
                     return handleError(result, err);
                   }
-                  console.log('saving fund transaction for stock purchase');
-              };
+                  console.log('saving YMMF fund transaction for stock purchase');
+                });
 
               var datePlusOneSecond = new Date();
               datePlusOneSecond.setSeconds(datePlusOneSecond.getSeconds() + 1);
@@ -236,20 +237,17 @@ exports.update = function (req, res) {
                     symbol: updatedStock.symbol,
                     description: updatedStock.action + ' ' + updatedStock.description + ' ' + req.body.numberOfShares + ' at $' +  req.body.price,
                     price: req.body.price,
+                    action: updatedStock.action,
                     numberOfShares: req.body.numberOfShares,
                     total: req.body.price * req.body.numberOfShares,
                     company: updatedStock.description,
                     active: true
-                  }),
-                  function (err, result) {
-                    if (err) {
-                      return handleError(result, err);
-                    }
-                    console.log('saving fund transaction for stock purchase');
-                };
-
-
-
+                  },function (err, result) {
+                  if (err) {
+                    return handleError(result, err);
+                  }
+                  console.log('saving fund transaction for stock purchase');
+                });
 
             console.log('Updating fund:' + user.selectedFund + ' stock: ' + updatedStock.symbol);
             return res.send(204);
