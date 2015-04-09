@@ -88,6 +88,7 @@ exports.create = function(req, res) {
             symbol: 'YMMF',
             description: 'Add money to YMMF',
             price: 1,
+            action: 'Buy',
             numberOfShares: fund.cash,
             total: fund.cash,
             company: 'Your Money Market Fund',

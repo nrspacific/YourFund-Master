@@ -41,6 +41,7 @@ funds.find({}).remove(function () {
                 symbol: 'YMMF',
                 description: 'Add money to YMMF',
                 price: 1,
+                action: 'Buy',
                 numberOfShares: defaultFunds[0].cash,
                 total: defaultFunds[0].cash,
                 company: 'Your Money Market Fund',

@@ -206,6 +206,11 @@ exports.update = function (req, res) {
               return handleError(result, err);
             }
             else {
+              var action = 'Buy';
+
+              if(updatedStock.action == 'buy'){
+                action = 'Sell';
+              }
 
               transaction.create(
                 {
@@ -214,7 +219,7 @@ exports.update = function (req, res) {
                   symbol: 'YMMF',
                   description: updatedStock.action + ' ' + updatedStock.description + ' ' + req.body.numberOfShares + ' at $' +  req.body.price,
                   price: 1,
-                  action: updatedStock.action,
+                  action: action,
                   numberOfShares: req.body.numberOfShares,
                   total: req.body.price * req.body.numberOfShares,
                   company: 'Your Money Market Fund',
