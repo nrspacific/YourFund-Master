@@ -131,7 +131,7 @@ exports.update = function(req, res) {
           fundId: fund._id,
           date: new Date(),
           symbol: 'YMMF',
-          description: action + ' funds from YMMF',
+          description: action + ' funds to/from YMMF',
           price: 1,
           action: action,
           numberOfShares: cashDifference,
