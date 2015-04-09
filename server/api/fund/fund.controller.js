@@ -13,6 +13,7 @@ var _ = require('lodash');
 var fund = require('./fund.model');
 var mongoose = require('mongoose');
 var userModel = require('../user/user.model');
+var transaction = require('../transaction/transaction.model');
 
 // Get list of funds
 exports.index = function(req, res) {
@@ -80,7 +81,25 @@ exports.create = function(req, res) {
         return res.render('500');
       }
 
-      console.log('saving user with fund');
+      transaction.create(
+          {
+            fundId: fund._id,
+            date: new Date(),
+            symbol: 'YMMF',
+            description: 'Add money to YMMF',
+            price: 1,
+            numberOfShares: fund.cash,
+            total: fund.cash,
+            company: 'Your Money Market Fund',
+            active: true
+          }, function (errs) {
+          if (err) { return handleError(res, err); }
+
+          console.log('saving fund transaction');
+        });
+
+
+      console.log('saving user fund');
     });
 
     return res.json(201, user);
@@ -95,10 +114,37 @@ exports.update = function(req, res) {
     if (err) { return handleError(res, err); }
     if(!fund) { return res.send(404); }
 
+    var cashDifference = req.body.cash - fund.cash ;
+    var action = 'add';
+
+    if(req.body.cash < fund.cash){
+      action = 'remove';
+    }
+
     var updated = _.merge(fund, req.body);
 
     updated.save(function (err) {
       if (err) { return handleError(res, err); }
+
+      transaction.create(
+        {
+          fundId: fund._id,
+          date: new Date(),
+          symbol: 'YMMF',
+          description: 'Add/remove funds from YMMF',
+          price: 1,
+          action: action,
+          numberOfShares: cashDifference,
+          total: fund.cash,
+          company: 'Your Money Market Fund',
+          active: true
+        }, function (err, result) {
+          if (err) {
+            return handleError(result, err);
+          }
+          console.log('Updating YMMF transaction for stock purchase');
+        });
+
       return res.json(200, fund);
     });
   });
@@ -116,8 +162,8 @@ exports.destroy = function(req, res) {
                         return handleError(result, err);
                       }
                       else{
-                        return res.send(204);
                         console.log(result);
+                        return res.send(204);
                       }
                     });
 };

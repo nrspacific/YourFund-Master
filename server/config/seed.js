@@ -7,51 +7,74 @@
 
 var User = require('../api/user/user.model');
 var funds = require('../api/fund/fund.model');
+var transcations = require('../api/transaction/transaction.model');
 
-
-funds.find({}).remove(function() {
+funds.find({}).remove(function () {
   funds.create({
       name: 'Default Fund',
-      cash : 4000,
-      goal : 4000,
+      cash: 4000,
+      goal: 4000,
       accountId: '1',
       stocks: [], //ticker symbol, purchase price, date, # of shares
-      finalized:  false,
-      created:  Date()
+      finalized: false,
+      created: Date()
     },
-    function() {
+    function () {
       console.log('finished populating funds');
 
       var defaultFunds = [];
 
-      funds.find(function (err, fund)
-      {
-        if(err) { return handleError(res, err); }
-        if(!fund) { return res.send(404); }
-        defaultFunds = fund;
+      funds.find(function (err, fund) {
+          if (err) {
+            return handleError(res, err);
+          }
+          if (!fund) {
+            return res.send(404);
+          }
+          defaultFunds = fund;
 
-      });
+          transcations.find({}).remove(function () {
+            transcations.create(
+              {
+                fundId: defaultFunds[0]._id,
+                date: new Date(),
+                symbol: 'YMMF',
+                description: 'Add money to YMMF',
+                price: 1,
+                numberOfShares: defaultFunds[0].cash,
+                total: defaultFunds[0].cash,
+                company: 'Your Money Market Fund',
+                active: true
+              }), function () {
+              console.log('finished populating transactions');
+            };
+          });
+        }
+      );
 
 
-      User.find({}).remove(function() {
+      User.find({}).remove(function () {
         User.create({
             provider: 'local',
             name: 'Test User',
             email: 'test@test.com',
             password: 'test'
-          }, {
+          },
+          {
             provider: 'local',
             role: 'admin',
             name: 'Admin',
             email: 'admin@admin.com',
             password: 'admin',
-            funds : defaultFunds,
-            selectedFund : defaultFunds[0]._id
-          }, function() {
+            funds: defaultFunds,
+            selectedFund: defaultFunds[0]._id
+          }, function () {
             console.log('finished populating users');
           }
         );
       });
+
+
     }
   )
 });
