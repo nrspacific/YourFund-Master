@@ -48,6 +48,8 @@ exports.create = function (req, res) {
     if (!error && response.statusCode === 200) {
       var result = JSON.parse(body.replace("//", ""));
 
+      console.log("stockConroller.add - returning result for symbol:" + symbol + " ["  + JSON.stringify(body) + "]");
+
       fund.findById(user.selectedFund, function (err, selectedFund) {
         if (err) {
           return handleError(res, err);
