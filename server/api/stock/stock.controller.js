@@ -188,6 +188,14 @@ exports.update = function (req, res) {
         }
       });
 
+      var stockStatus = true;
+
+      if(req.body.originalPercentOfFund == 0){
+        stockStatus = false;
+      }
+
+      req.body.active = stockStatus;
+
       var updatedStock = _.merge(stock, req.body);
 
       updatedStock.save(function (err) {
@@ -201,7 +209,8 @@ exports.update = function (req, res) {
       fund.update(
         {'_id': user.selectedFund, 'stocks._id': mongoose.Types.ObjectId(updatedStock._id)},
         {$set: {'stocks.$.originalPercentOfFund': updatedStock.originalPercentOfFund,
-                'stocks.$.numberOfShares': updatedStock.numberOfShares
+                'stocks.$.numberOfShares': updatedStock.numberOfShares,
+                'stocks.$.active': updatedStock.active
                 }},
           function (err, result) {
             if (err) {
