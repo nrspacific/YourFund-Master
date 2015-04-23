@@ -14,6 +14,8 @@ var fund = require('./fund.model');
 var mongoose = require('mongoose');
 var userModel = require('../user/user.model');
 var transaction = require('../transaction/transaction.model');
+var Request = require('request');
+var Stock = require('../stock/stock.model');
 
 // Get list of funds
 exports.index = function(req, res) {
@@ -31,6 +33,37 @@ exports.show = function(req, res) {
 
   var user = req.user;
 
+  function GetStockCurrentPrice(stock, selectedFund) {
+    var stockRequestOptions = {
+      url: 'http://finance.google.com/finance/info?q=' + stock.symbol,
+      json: true
+    };
+
+    Request(stockRequestOptions, function (error, response, body) {
+        if (!error && response.statusCode === 200) {
+          var result = JSON.parse(body.replace("//", ""));
+
+          var cashForPurchase = (selectedFund.goal * (stock.originalPercentOfFund / 100));
+          var currentPrice = result[0].l;
+
+          fund.update(
+            {'_id': user.selectedFund, 'stocks._id': mongoose.Types.ObjectId(stock._id)},
+            {
+              $set: {
+                'stocks.$.currentPrice': currentPrice,
+                'stocks.$.currentNumberOfShares': cashForPurchase/currentPrice
+              }
+            },
+            function (err, result) {
+              if (err) {
+                return handleError(result, err);
+              }
+            });
+        }
+      }
+    );
+  }
+
   fund.findById(req.params.id, function (err, fund) {
     if(err) { return handleError(res, err); }
     if(!fund) { return res.send(404); }
@@ -39,8 +72,9 @@ exports.show = function(req, res) {
     var remainingInvestment = 100;
 
     if(fund.stocks.length > 0){
-      fund.stocks.forEach(function(s) {
-        remainingInvestment-= s.originalPercentOfFund;
+      fund.stocks.forEach(function(stock) {
+        GetStockCurrentPrice(stock,fund);
+        remainingInvestment-= stock.originalPercentOfFund;
       }) ;
     }
 
