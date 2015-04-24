@@ -14,7 +14,8 @@ var transactionSchema = new Schema({
   numberOfShares : Number,
   total: Number,
   company : String,
-  active: Boolean
+  active: Boolean,
+  renderOnPreInit: Boolean
 });
 
 module.exports = mongoose.model('transaction', transactionSchema);

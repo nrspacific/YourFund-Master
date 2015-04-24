@@ -132,7 +132,8 @@ exports.create = function(req, res) {
             numberOfShares: fund.cash,
             total: fund.cash,
             company: 'Your Money Market Fund',
-            active: true
+            active: true,
+            renderOnPreInit: true
           }, function (errs) {
           if (err) { return handleError(res, err); }
 
@@ -178,7 +179,8 @@ exports.update = function(req, res) {
           numberOfShares: cashDifference,
           total: fund.cash,
           company: 'Your Money Market Fund',
-          active: true
+          active: true,
+          renderOnPreInit: true
         }, function (err, result) {
           if (err) {
             return handleError(result, err);

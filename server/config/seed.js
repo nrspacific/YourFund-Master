@@ -45,7 +45,8 @@ funds.find({}).remove(function () {
                 numberOfShares: defaultFunds[0].cash,
                 total: defaultFunds[0].cash,
                 company: 'Your Money Market Fund',
-                active: true
+                active: true,
+                renderOnPreInit: true
               }), function () {
               console.log('finished populating transactions');
             };
