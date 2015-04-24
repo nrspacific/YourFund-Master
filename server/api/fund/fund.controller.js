@@ -31,6 +31,8 @@ exports.index = function(req, res) {
 // Get a single fund
 exports.show = function(req, res) {
 
+  console.log('fund.controller: init');
+
   var user = req.user;
 
   function GetStockCurrentPrice(stock, selectedFund) {
@@ -39,12 +41,16 @@ exports.show = function(req, res) {
       json: true
     };
 
+    console.log('GetStockCurrentPrice: getting current price for: ' +  stock.symbol );
+
     Request(stockRequestOptions, function (error, response, body) {
         if (!error && response.statusCode === 200) {
           var result = JSON.parse(body.replace("//", ""));
 
           var cashForPurchase = (selectedFund.goal * (stock.originalPercentOfFund / 100));
           var currentPrice = result[0].l;
+
+          console.log('GetStockCurrentPrice: current price for: ' +  stock.symbol + ' - ' +  currentPrice);
 
           fund.update(
             {'_id': user.selectedFund, 'stocks._id': mongoose.Types.ObjectId(stock._id)},

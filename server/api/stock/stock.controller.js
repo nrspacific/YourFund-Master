@@ -89,6 +89,7 @@ exports.create = function (req, res) {
             console.log('stock:' + req.body.symbol + ' has been added to fund: ' + req.body.fundId);
             var description = stock.action + ' ' + stock.description + ' ' + stock.numberOfShares + ' at $' +  stock.price;
 
+
             transaction.create(
               {
                 fundId: selectedFund._id,
