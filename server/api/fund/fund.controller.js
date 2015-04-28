@@ -152,21 +152,40 @@ exports.create = function(req, res) {
 // Updates an existing fund in the DB.
 exports.update = function(req, res) {
   if(req.body._id) { delete req.body._id; }
-  fund.findById(req.params.id, function (err, fund) {
-    if (err) { return handleError(res, err); }
-    if(!fund) { return res.send(404); }
 
-    var cashDifference = req.body.cash - fund.cash ;
+  fund.findById(req.params.id, function (err, selectedFund) {
+    if (err) { return handleError(res, err); }
+    if(!selectedFund) { return res.send(404); }
+
+    var cashDifference = req.body.cash - selectedFund.cash ;
     var action = 'Add';
 
-    if(req.body.cash < fund.cash){
+    if(req.body.cash < selectedFund.cash){
       action = 'Sell';
     }
 
-    var updated = _.merge(fund, req.body);
+
+
+    var updated = _.merge(selectedFund, req.body);
+
+    if(updated.stocks.length > 0){
+      updated.stocks.forEach(function(stock) {
+        fund.update(
+          {'_id': selectedFund._id, 'stocks._id': mongoose.Types.ObjectId(stock._id)},
+          {$set: {'stocks.$.originalPercentOfFund': ((stock.numberOfShares * stock.price) / selectedFund.goal) * 100
+          }},function (err, result) {
+            if (err) {
+              return handleError(result, err);
+            }
+          }
+        );
+      }) ;
+    }
 
     updated.save(function (err) {
       if (err) { return handleError(res, err); }
+
+
 
       transaction.create(
         {
@@ -188,7 +207,7 @@ exports.update = function(req, res) {
           console.log('fund.controller: Updating YMMF transaction');
         });
 
-      return res.json(200, fund);
+      return res.json(200, selectedFund);
     });
   });
 };
