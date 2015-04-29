@@ -153,6 +153,25 @@ exports.create = function(req, res) {
 exports.update = function(req, res) {
   if(req.body._id) { delete req.body._id; }
 
+  function updateFundInvestementPercentages(updatedFund, selectedFund) {
+    if (updatedFund.stocks.length > 0) {
+      updatedFund.stocks.forEach(function (stock) {
+        fund.update(
+          {'_id': updatedFund._id, 'stocks._id': mongoose.Types.ObjectId(stock._id)},
+          {
+            $set: {
+              'stocks.$.originalPercentOfFund': ((stock.numberOfShares * stock.price) / selectedFund.goal) * 100
+            }
+          }, function (err, result) {
+            if (err) {
+              return handleError(result, err);
+            }
+          }
+        );
+      });
+    }
+  }
+
   fund.findById(req.params.id, function (err, selectedFund) {
     if (err) { return handleError(res, err); }
     if(!selectedFund) { return res.send(404); }
@@ -164,28 +183,12 @@ exports.update = function(req, res) {
       action = 'Sell';
     }
 
+    var updatedFund = _.merge(selectedFund, req.body);
 
+    updateFundInvestementPercentages(updatedFund, selectedFund);
 
-    var updated = _.merge(selectedFund, req.body);
-
-    if(updated.stocks.length > 0){
-      updated.stocks.forEach(function(stock) {
-        fund.update(
-          {'_id': selectedFund._id, 'stocks._id': mongoose.Types.ObjectId(stock._id)},
-          {$set: {'stocks.$.originalPercentOfFund': ((stock.numberOfShares * stock.price) / selectedFund.goal) * 100
-          }},function (err, result) {
-            if (err) {
-              return handleError(result, err);
-            }
-          }
-        );
-      }) ;
-    }
-
-    updated.save(function (err) {
+    updatedFund.save(function (err) {
       if (err) { return handleError(res, err); }
-
-
 
       transaction.create(
         {
@@ -207,7 +210,7 @@ exports.update = function(req, res) {
           console.log('fund.controller: Updating YMMF transaction');
         });
 
-      return res.json(200, selectedFund);
+      return res.json(200, updatedFund);
     });
   });
 };
