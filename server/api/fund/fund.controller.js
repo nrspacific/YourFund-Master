@@ -41,6 +41,29 @@ exports.show = function(req, res) {
       json: true
     };
 
+    //function updateCurrentFundInvestementPercentages(selectedFund) {
+    //
+    //  if (selectedFund.stocks.length > 0) {
+    //    selectedFund.stocks.forEach(function (stock) {
+    //
+    //
+    //
+    //      fund.update(
+    //        {'_id': mongoose.Types.ObjectId(selectedFund._id), 'stocks._id': mongoose.Types.ObjectId(stock._id)},
+    //        {
+    //          $set: {
+    //
+    //          }
+    //        }, function (err, result) {
+    //          if (err) {
+    //            return handleError(result, err);
+    //          }
+    //        }
+    //      );
+    //    });
+    //  }
+    //}
+
     console.log('GetStockCurrentPrice: getting current price for: ' +  stock.symbol );
 
     Request(stockRequestOptions, function (error, response, body) {
@@ -51,19 +74,26 @@ exports.show = function(req, res) {
           var currentPrice = result[0].l;
 
           console.log('GetStockCurrentPrice: current price for: ' +  stock.symbol + ' - ' +  currentPrice);
+          var currentPercentOfFund = (((cashForPurchase/currentPrice) * currentPrice) / selectedFund.goal) * 100;
 
           fund.update(
-            {'_id': user.selectedFund, 'stocks._id': mongoose.Types.ObjectId(stock._id)},
+            {'_id':  mongoose.Types.ObjectId(selectedFund._id), 'stocks._id': mongoose.Types.ObjectId(stock._id)},
             {
               $set: {
                 'stocks.$.currentPrice': currentPrice,
-                'stocks.$.currentNumberOfShares': cashForPurchase/currentPrice
+                'stocks.$.currentNumberOfShares': cashForPurchase/currentPrice,
+                'stocks.$.currentPercentOfFund': currentPercentOfFund.toString()
               }
             },
             function (err, result) {
               if (err) {
                 return handleError(result, err);
               }
+
+              console.log('GetStockCurrentPrice: updating DB current price for: ' +  stock.symbol + ' - ' +  currentPrice);
+
+             // updateCurrentFundInvestementPercentages(selectedFund);
+
             });
         }
       }

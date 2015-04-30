@@ -89,6 +89,10 @@ exports.create = function (req, res) {
             console.log('stock:' + req.body.symbol + ' has been added to fund: ' + req.body.fundId);
             var description = stock.action + ' ' + stock.description + ' ' + stock.numberOfShares + ' at $' +  stock.price;
 
+            if(!selectedFund.finalized){
+              transaction.remove( { fundId:selectedFund._id, symbol: req.body.symbol } );
+            }
+
 
             transaction.create(
               {
@@ -113,6 +117,8 @@ exports.create = function (req, res) {
 
             var datePlusOneSecond = new Date();
             datePlusOneSecond.setSeconds(datePlusOneSecond.getSeconds() + 1);
+
+
 
             transaction.create(
               {
@@ -246,6 +252,8 @@ exports.update = function (req, res) {
 
               var datePlusOneSecond = new Date();
               datePlusOneSecond.setSeconds(datePlusOneSecond.getSeconds() + 1);
+
+
 
               transaction.create(
                   {

@@ -13,6 +13,7 @@ var StockSchema = new Schema({
   originalPercentOfFund: "string",
   numberOfShares: Number,
   currentNumberOfShares: Number,
+  currentPercentOfFund: "string",
   change: "string",
   explanation: "string",
   finalized: Boolean,
