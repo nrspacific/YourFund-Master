@@ -71,6 +71,11 @@ exports.create = function (req, res) {
             return handleError(res, err);
           }
 
+
+          stock.currentPrice = '0';
+          stock.currentNumberOfShares = 0;
+          stock.currentPercentOfFund = '0';
+
           console.log('stock:' + req.body.symbol + ' has been created');
 
           selectedFund.stocks.push(stock);

@@ -28,10 +28,6 @@ exports.index = function(req, res) {
   });
 };
 
-function GetStockCurrentPrice(stock, selectedFund) {
-
-}
-
 
 // Get a single fund
 exports.show = function(req, res) {
@@ -47,7 +43,7 @@ exports.show = function(req, res) {
     var percentLeftToInvest = 0;
     var remainingInvestment = 100;
 
-    if(selectedFund.stocks.length > 0 && selectedFund.finalized){
+    if(selectedFund.stocks.length > 0 ){
       selectedFund.stocks.forEach(function(stock) {
 
         var stockRequestOptions = {
@@ -111,20 +107,20 @@ exports.show = function(req, res) {
 
     }
     else{
-
-      selectedFund.stocks.forEach(function(stock) {
-        remainingInvestment-= stock.originalPercentOfFund;
-      }) ;
-
-      selectedFund.set({ "percentLeftToInvest" : remainingInvestment});
-      selectedFund.save(function (errs) {
-        if (errs) {
-          console.log(errs);
-          return res.render('500');
-        }
-        return res.json(selectedFund);
-        console.log('saving user selectedFund');
-      });
+      return res.json(selectedFund);
+      //selectedFund.stocks.forEach(function(stock) {
+      //  remainingInvestment-= stock.originalPercentOfFund;
+      //}) ;
+      //
+      //selectedFund.set({ "percentLeftToInvest" : remainingInvestment});
+      //selectedFund.save(function (errs) {
+      //  if (errs) {
+      //    console.log(errs);
+      //    return res.render('500');
+      //  }
+      //  return res.json(selectedFund);
+      //  console.log('saving user selectedFund');
+      //});
 
     }
 
@@ -347,7 +343,7 @@ exports.finalize = function(req, res) {
   var user = req.user;
   var selectedStock;
 
-  fund.findById(user.selectedFund, function (err, fund) {
+  fund.findById(req.params.id, function (err, fund) {
     if (err) {
       return handleError(res, err);
     }
