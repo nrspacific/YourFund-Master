@@ -50,7 +50,7 @@ exports.create = function (req, res) {
 
       console.log("stockConroller.add - returning result for symbol:" + symbol + " ["  + JSON.stringify(body) + "]");
 
-      fund.findById(user.selectedFund, function (err, selectedFund) {
+      fund.findById(req.body.fundId, function (err, selectedFund) {
         if (err) {
           return handleError(res, err);
         }
@@ -163,7 +163,7 @@ exports.update = function (req, res) {
     delete req.body._id;
   }
 
-  fund.findById(user.selectedFund, function (err, selectedFund) {
+  fund.findById(req.body.fundId, function (err, selectedFund) {
     if (err) {
       return handleError(res, err);
     }
