@@ -13,6 +13,9 @@ var _ = require('lodash');
 var fund = require('./fund.model');
 var mongoose = require('mongoose');
 var userModel = require('../user/user.model');
+var transaction = require('../transaction/transaction.model');
+var Request = require('request');
+var Stock = require('../stock/stock.model');
 
 // Get list of funds
 exports.index = function(req, res) {
@@ -25,28 +28,104 @@ exports.index = function(req, res) {
   });
 };
 
+
 // Get a single fund
 exports.show = function(req, res) {
 
+  console.log('fund.controller: init');
+
   var user = req.user;
 
-  fund.findById(req.params.id, function (err, fund) {
+  fund.findById(req.params.id, function (err, selectedFund) {
     if(err) { return handleError(res, err); }
     if(!fund) { return res.send(404); }
 
     var percentLeftToInvest = 0;
     var remainingInvestment = 100;
 
-    if(fund.stocks.length > 0){
-      fund.stocks.forEach(function(s) {
-        remainingInvestment-= s.originalPercentOfFund;
+    if(selectedFund.stocks.length > 0 ){
+      selectedFund.stocks.forEach(function(stock) {
+
+        var stockRequestOptions = {
+          url: 'http://finance.google.com/finance/info?q=' + stock.symbol,
+          json: true
+        };
+
+        console.log('GetStockCurrentPrice: getting current price for: ' +  stock.symbol );
+
+        Request(stockRequestOptions, function (error, response, body) {
+            if (!error && response.statusCode === 200) {
+              var result = JSON.parse(body.replace("//", ""));
+
+
+              var currentPrice = result[0].l;
+
+              console.log('GetStockCurrentPrice: current price for: ' +  stock.symbol + ' - ' +  currentPrice);
+              var currentPercentOfFund = ((stock.numberOfShares * currentPrice) / selectedFund.goal) * 100;
+              var cashForPurchase = (selectedFund.goal * (currentPercentOfFund / 100));
+              console.log('stock.currentPrice: ' + currentPrice);
+              console.log('stock.currentNumberOfShares: ' + cashForPurchase/currentPrice);
+              console.log('stock.currentPercentOfFund: ' +  currentPercentOfFund);
+
+
+              fund.update(
+                {'_id':  mongoose.Types.ObjectId(selectedFund._id), 'stocks._id': mongoose.Types.ObjectId(stock._id)},
+                {
+                  $set: {
+                    'stocks.$.currentPrice': currentPrice,
+                    'stocks.$.currentNumberOfShares': cashForPurchase/currentPrice,
+                    'stocks.$.currentPercentOfFund': currentPercentOfFund.toString()
+                  }
+                },
+                function (err, result) {
+                  if (err) {
+                    return handleError(result, err);
+                  }
+
+                  console.log('GetStockCurrentPrice: updating DB with current price for: ' +  stock.symbol);
+                });
+
+
+            }
+          }
+        );
+
+        remainingInvestment-= stock.currentPercentOfFund;
+
       }) ;
+
+
+      selectedFund.set({ "percentLeftToInvest" : remainingInvestment});
+      selectedFund.save(function (errs) {
+        if (errs) {
+          console.log(errs);
+          return res.render('500');
+        }
+        return res.json(selectedFund);
+        console.log('saving user selectedFund');
+      });
+
+    }
+    else{
+      return res.json(selectedFund);
+      //selectedFund.stocks.forEach(function(stock) {
+      //  remainingInvestment-= stock.originalPercentOfFund;
+      //}) ;
+      //
+      //selectedFund.set({ "percentLeftToInvest" : remainingInvestment});
+      //selectedFund.save(function (errs) {
+      //  if (errs) {
+      //    console.log(errs);
+      //    return res.render('500');
+      //  }
+      //  return res.json(selectedFund);
+      //  console.log('saving user selectedFund');
+      //});
+
     }
 
-    fund.percentLeftToInvest = remainingInvestment;
 
     user.selectedFund = fund._id;
-
     user.save(function (errs) {
       if (errs) {
         console.log(errs);
@@ -55,7 +134,11 @@ exports.show = function(req, res) {
       console.log('saving user selectedFund');
     });
 
-    return res.json(fund);
+
+
+
+
+
   });
 };
 
@@ -80,7 +163,27 @@ exports.create = function(req, res) {
         return res.render('500');
       }
 
-      console.log('saving user with fund');
+      transaction.create(
+          {
+            fundId: fund._id,
+            date: new Date(),
+            symbol: 'YMMF',
+            description: 'Add money to YMMF',
+            price: 1,
+            action: 'Buy',
+            numberOfShares: fund.cash,
+            total: fund.cash,
+            company: 'Your Money Market Fund',
+            active: true,
+            renderOnPreInit: true
+          }, function (errs) {
+          if (err) { return handleError(res, err); }
+
+          console.log('fund.controller: saving fund transaction');
+        });
+
+
+      console.log('saving user fund');
     });
 
     return res.json(201, user);
@@ -91,15 +194,128 @@ exports.create = function(req, res) {
 // Updates an existing fund in the DB.
 exports.update = function(req, res) {
   if(req.body._id) { delete req.body._id; }
-  fund.findById(req.params.id, function (err, fund) {
+
+  function updateFundInvestementPercentages(updatedFund, selectedFund) {
+    if (updatedFund.stocks.length > 0) {
+      updatedFund.stocks.forEach(function (stock) {
+        fund.update(
+          {'_id': updatedFund._id, 'stocks._id': mongoose.Types.ObjectId(stock._id)},
+          {
+            $set: {
+              'stocks.$.originalPercentOfFund': ((stock.numberOfShares * stock.price) / selectedFund.goal) * 100
+            }
+          }, function (err, result) {
+            if (err) {
+              return handleError(result, err);
+            }
+          }
+        );
+      });
+    }
+  }
+
+  fund.findById(req.params.id, function (err, selectedFund) {
     if (err) { return handleError(res, err); }
-    if(!fund) { return res.send(404); }
+    if(!selectedFund) { return res.send(404); }
 
-    var updated = _.merge(fund, req.body);
+    var cashDifference = req.body.cash - selectedFund.cash ;
+    var action = 'Add';
 
-    updated.save(function (err) {
+    if(req.body.cash < selectedFund.cash){
+      action = 'Sell';
+    }
+
+    var updatedFund = _.merge(selectedFund, req.body);
+    var remainingInvestment = 100;
+
+    if(!updatedFund.finalized){
+      updateFundInvestementPercentages(updatedFund, selectedFund);
+    }
+    else{
+      if(updatedFund.stocks.length > 0){
+        updatedFund.stocks.forEach(function(stock) {
+          if(selectedFund.stocks.length > 0 && selectedFund.finalized){
+            selectedFund.stocks.forEach(function(stock) {
+
+              var stockRequestOptions = {
+                url: 'http://finance.google.com/finance/info?q=' + stock.symbol,
+                json: true
+              };
+
+              console.log('GetStockCurrentPrice: getting current price for: ' +  stock.symbol );
+
+              Request(stockRequestOptions, function (error, response, body) {
+                  if (!error && response.statusCode === 200) {
+                    var result = JSON.parse(body.replace("//", ""));
+
+
+                    var currentPrice = result[0].l;
+
+                    console.log('GetStockCurrentPrice: current price for: ' +  stock.symbol + ' - ' +  currentPrice);
+                    var currentPercentOfFund = ((stock.numberOfShares * currentPrice) / selectedFund.goal) * 100;
+                    var cashForPurchase = (selectedFund.goal * (currentPercentOfFund / 100));
+                    console.log('stock.currentPrice: ' + currentPrice);
+                    console.log('stock.currentNumberOfShares: ' + cashForPurchase/currentPrice);
+                    console.log('stock.currentPercentOfFund: ' +  currentPercentOfFund);
+
+
+                    fund.update(
+                      {'_id':  mongoose.Types.ObjectId(selectedFund._id), 'stocks._id': mongoose.Types.ObjectId(stock._id)},
+                      {
+                        $set: {
+                          'stocks.$.currentPrice': currentPrice,
+                          'stocks.$.currentNumberOfShares': cashForPurchase/currentPrice,
+                          'stocks.$.currentPercentOfFund': currentPercentOfFund.toString()
+                        }
+                      },
+                      function (err, result) {
+                        if (err) {
+                          return handleError(result, err);
+                        }
+
+                        console.log('GetStockCurrentPrice: updating DB with current price for: ' +  stock.symbol);
+                      });
+
+
+                  }
+                }
+              );
+
+              remainingInvestment-= stock.originalPercentOfFund;
+            }) ;
+          }
+          remainingInvestment-= stock.currentPercentOfFund;
+        }) ;
+      }
+    }
+
+    updatedFund.percentLeftToInvest = remainingInvestment;
+
+    updatedFund.save(function (err) {
       if (err) { return handleError(res, err); }
-      return res.json(200, fund);
+
+      transaction.create(
+        {
+          fundId: fund._id,
+          date: new Date(),
+          symbol: 'YMMF',
+          description: action + ' funds to/from YMMF',
+          price: 1,
+          action: action,
+          numberOfShares: cashDifference,
+          total: fund.cash,
+          company: 'Your Money Market Fund',
+          active: true,
+          renderOnPreInit: true
+        }, function (err, result) {
+          if (err) {
+            return handleError(result, err);
+          }
+
+          return res.json(200, updatedFund);
+
+          console.log('fund.controller: Updating YMMF transaction');
+        });
     });
   });
 };
@@ -116,8 +332,8 @@ exports.destroy = function(req, res) {
                         return handleError(result, err);
                       }
                       else{
-                        return res.send(204);
                         console.log(result);
+                        return res.send(204);
                       }
                     });
 };
@@ -127,7 +343,7 @@ exports.finalize = function(req, res) {
   var user = req.user;
   var selectedStock;
 
-  fund.findById(user.selectedFund, function (err, fund) {
+  fund.findById(req.params.id, function (err, fund) {
     if (err) {
       return handleError(res, err);
     }

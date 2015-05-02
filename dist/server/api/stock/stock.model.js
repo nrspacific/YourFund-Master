@@ -7,10 +7,13 @@ var StockSchema = new Schema({
   symbol: "string",
   exchange: "string",
   price: "string",
+  currentPrice: "string",
   description: "string",
   action: "string", //Buy or Sell
   originalPercentOfFund: "string",
   numberOfShares: Number,
+  currentNumberOfShares: Number,
+  currentPercentOfFund: "string",
   change: "string",
   explanation: "string",
   finalized: Boolean,
