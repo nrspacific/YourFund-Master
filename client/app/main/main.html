@@ -1,0 +1,664 @@
+<div id="page-wrapper">
+  <div class="row">
+    <div class="col-lg-12">
+      <h1 class="page-header">Manage Your Funds</h1>
+    </div>
+  </div>
+
+  <div class="row">
+
+    <!-- Begin: Fund List -->
+    <div class="col-lg-2 sidebar-offcanvas" id="sidebar" style="max-width:190px">
+      <button type="button" class="btn btn-primary"
+              data-toggle="modal" style="width:180px;"
+              ng-click="clearFundCreateVals()"
+              data-target="#myModal"><i class="glyphicon glyphicon-plus"></i> Create New Fund
+      </button>
+      <p></p>
+      <ul class="list-group list-unstyled">
+        <li>
+
+          <a href="#" ng-repeat="fund in getCurrentUser().funds"
+             class="list-group-item"
+             ng-click="setSelectedFund(fund)"
+             style="width:180px;active:background:#dff0d8">
+            <i ng-show="fund.finalized" class="glyphicon glyphicon-saved"></i>
+            <i ng-show="!fund.finalized" class=" glyphicon glyphicon-open"></i>
+            &nbsp;{{fund.name}}
+          </a>
+        </li>
+      </ul>
+
+
+
+    </div>
+    <!-- End: Fund List -->
+
+    <!-- Begin: Fund Content -->
+    <div class="col-lg-10">
+
+      <div class="panel panel-green" ng-show="selectedFundName != null ">
+
+        <!-- Begin: Panel Header -->
+        <div class="panel-heading">
+          <i class="fa fa-line-chart fa-fw"></i> {{selectedFundName}}
+          <div class="pull-right">
+            <div class="btn-group">
+              <button type="button" class="btn btn-xs dropdown-toggle" data-toggle="dropdown" style="color:#000000">
+                Actions
+                <span class="caret"></span>
+              </button>
+              <ul class="dropdown-menu pull-right" role="menu" style="width:200px;">
+                <li><a href="#" ng-click="deleteFund(fund)">Delete</a></li>
+                <li><a href="#" data-toggle="modal" style="width:180px;"
+                       data-target="#addCashToFundModal">Add Cash to Fund</a></li>
+                <li><a href="#" data-toggle="modal" style="width:180px;"
+                       data-target="#withDrawlCashFromFundModal">Withdraw Cash from Fund</a></li>
+              </ul>
+            </div>
+          </div>
+        </div>
+        <!-- End: Panel Header -->
+
+        <!-- Begin: Fund Header Info-->
+        <div class="panel-body">
+          <div class="row alert alert-success" style="color:#2f4f4f; font-size:12pt;margin:5px;">
+            <div class="col-md-3">
+              Total Invested: {{totalInvested | currency}}
+            </div>
+            <div class="col-md-3">
+              Amount Left To Invest: {{amountLeftToInvest | currency}}
+            </div>
+            <div class="col-md-3">
+              Percent Left To Invest: {{percentLeftToInvest}}%
+            </div>
+            <div class="col-md-3">
+              Create Date: {{selectedFund.created | date : format : timezone}}
+            </div>
+          </div>
+
+
+          <!-- Fund empty, invest button -->
+          <div class="row alert alert-danger" style="color:#2f4f4f; font-size:12pt;margin:5px"
+               ng-show="!selectedFund.stocks.length">
+
+            <div class="col-lg-7">
+              <table  style="border:0px;">
+                <tr  style="border:0px;">
+                  <td  style="border:0px;">
+                    This fund is empty.
+                  </td>
+                  <td  style="border:0px;">
+                    <button class="btn btn-primary pull-left" type="Click to Invest"
+                               data-toggle="modal"
+                               data-target="#investModal">
+                    <i class="glyphicon glyphicon-plus"></i> Add Investments
+                  </button></td>
+                  <td  style="border:0px;">  <button class="btn btn-primary pull-left"
+                                type="Investment Selector"
+                                data-toggle="modal" style="margin-left:20px;"
+                                data-target="#investSelectorModal"><i class="glyphicon glyphicon-signal"></i>
+                    Investment Selector
+                  </button></td>
+                  <td  style="border:0px;">
+                    <button class="btn btn-primary pull-left "
+                            type="Click to Invest"
+                            data-toggle="modal" style="margin-left:20px;"
+                            data-target="#investResearchModal"><i class="glyphicon glyphicon-education"></i>
+                      Investment Research
+                    </button>
+                  </td>
+                </tr>
+              </table>
+
+
+
+
+            </div>
+          </div>
+          <!-- End:Fund empty, invest button -->
+
+          <!-- Begin: Tabs -->
+          <div class="row"
+               ng-show="selectedFund.stocks.length">
+            <div class="col-lg-12 tab-container">
+              <!-- Nav tabs -->
+              <ul class="nav nav-tabs" role="tablist">
+                <li role="presentation" class="active"><a href="#home" aria-controls="home" role="tab"
+                                                          data-toggle="tab">View/Change</a></li>
+                <li role="presentation"><a href="#transactionhistory" aria-controls="transactionhistory" role="tab" data-toggle="tab">Transaction
+                  History</a></li>
+                <li role="presentation"><a href="#graphView" aria-controls="profile" role="tab" data-toggle="tab" onclick="return false;">Graph
+                  View</a></li>
+              </ul>
+              <!-- Tab panes -->
+              <div class="tab-content tab-container">
+                <div role="tabpanel" class="tab-pane active" id="home">
+                  <div class="row">
+                    <div class="col-lg-12">
+                      <div class="panel">
+                        <div class="panel-body">
+
+                          <!-- Initial Table -->
+                          <table class="row-border hover" ng-table="tableParams"  ng-show="!selectedFund.finalized">
+                            <tr ng-repeat="stock in selectedFund.stocks">
+                              <td data-title="'Symbol'" style="width:20%">{{stock.description }}</td>
+                              <td data-title="'% Allocated'">
+                                <span ng-show="editMode">
+                                    <input type="text" ng-model="stock.originalPercentOfFund"   style="width:55px;text-align:center">
+                                    <input type="button"  ng-click="updateAllocationAmount(stock)" value="Update" >
+                                </span>
+                                <span ng-hide="editMode">{{ stock.originalPercentOfFund }}%</span>
+                              </td>
+                              <td data-title="'Money Invested'">{{ stock.numberOfShares * stock.price | currency }}</td>
+                              <td data-title="'Current Bought'">{{ stock.price | currency }}</td>
+                              <td data-title="'# Of Shares'">{{ stock.numberOfShares | number:4}}</td>
+                              <td>
+                                <div class="btn-group" >
+                                  <button type="button" class="btn btn-xs dropdown-toggle" data-toggle="dropdown">
+                                    Actions
+                                    <span class="caret"></span>
+                                  </button>
+                                  <ul class="dropdown-menu pull-right" role="menu">
+                                    <li><a href="#" ng-click="deleteStock(stock)">Delete</a></li>
+                                    <li><a href="#" ng-click="modifyStockAlloction(stock)">Change %</a></li>
+                                  </ul>
+                                </div>
+                              </td>
+                            </tr>
+                            <tr style="background:#fffee;font-weight: 700">
+                              <td style="text-align: right;padding-right:5px">Totals:</td>
+                              <td  ng-show="!selectedFund.finalized">{{totalStockAllocated}}%</td>
+                              <td  ng-show="!selectedFund.finalized">{{totalCashInvestedInFund | currency}}</td>
+                              <td colspan="6" ng-show="!selectedFund.finalized"></td>
+                              <td colspan="12" ng-show="selectedFund.finalized"></td>
+                            </tr>
+                          </table>
+
+                          <!-- Finalized Table -->
+                          <table class="row-border hover" ng-table="tableParams" ng-show="selectedFund.finalized">
+                            <tr ng-repeat="stock in selectedFund.stocks | filter: { active: true}">
+                              <td data-title="'Symbol'" style="width:20%">{{ stock.description }}</td>
+                              <td data-title="'Current % Allocated'">{{ stock.currentPercentOfFund }}%</td>
+                              <td data-title="'Current Money Invested'">{{ stock.numberOfShares * stock.currentPrice | currency }}</td>
+                              <td data-title="'Current Price'">{{ stock.currentPrice | currency }}</td>
+                              <td data-title="'# Of Shares'" >{{ stock.numberOfShares | number:4}}</td>
+                              <td data-title="'Original % Allocated'">{{ stock.originalPercentOfFund }}%</td>
+                              <td data-title="'Original Money Invested'">{{ stock.numberOfShares * stock.price | currency }}</td>
+                              <td data-title="'Original Price'">{{ stock.price | currency }}</td>
+                              <td data-title="'Gain/Loss $'" >{{ stock.numberOfShares * stock.currentPrice  - stock.numberOfShares * stock.price | currency }}</td>
+                              <td data-title="'Gain/Loss %'"  >{{ ((stock.numberOfShares * stock.currentPrice) - (stock.numberOfShares * stock.price)) / (stock.numberOfShares * stock.price) | number:4 }} </td>
+
+                              <td>
+                                <div class="btn-group" >
+                                  <button type="button" class="btn btn-xs dropdown-toggle" data-toggle="dropdown">
+                                    Actions
+                                    <span class="caret"></span>
+                                  </button>
+                                  <ul class="dropdown-menu pull-right" role="menu">
+                                    <li><a href="#" data-toggle="modal" style="width:180px;"
+                                           data-target="#tradeStockModal"
+                                           ng-click="setSelectedStock(stock)">Trade</a></li>
+                                  </ul>
+                                </div>
+                              </td>
+                            </tr>
+
+                            <tr ng-show="amountLeftToInvest > 0" style="background:#ffffcc">
+                              <td>Cash Money Market Fund</td>
+                              <td>{{selectedFund.percentLeftToInvest}}%</td>
+                              <td>{{amountLeftToInvest | currency}}</td>
+                              <td>$1.00</td>
+                              <td>{{amountLeftToInvest| number:4}}</td>
+                              <td>{{selectedFund.percentLeftToInvest}}%</td>
+                              <td>{{amountLeftToInvest | currency}}</td>
+                              <td colspan="4"></td>
+                            </tr>
+
+                            <tr style="background:#fffee;font-weight: 700">
+                              <td style="text-align: right;padding-right:5px">Totals:</td>
+                              <td  ng-show="selectedFund.finalized">100%</td>
+                              <td  ng-show="selectedFund.finalized">{{selectedFund.goal | currency}}</td>
+                              <td colspan="5" ></td>
+                              <td>{{gainLossCash | currency}}</td>
+                              <td>{{gainLossPercent}} %</td>
+                              <td></td>
+                            </tr>
+                          </table>
+
+                          <!-- Non-Finalized Cash Available-->
+                          <div class="row" style="color:#2f4f4f; font-size:11pt;margin:5px" ng-show="!selectedFund.finalized">
+                            <div class="col-md-6">
+                              *The remaining Cash ({{amountLeftToInvest | currency}}) will be in a cash fund once invested.
+                            </div>
+                          </div>
+
+                        </div>
+                      </div>
+                    </div>
+                  </div>
+
+                  <!-- Begin: Fund Actions -->
+                  <div class="row">
+                    <div class="col-lg-6">
+                      <table style="border:0px">
+                        <tr style="border:0px">
+                          <td style="border:0px">
+                            <button class="btn btn-primary pull-left "
+                                    type="Click to Invest"
+                                    data-toggle="modal" style="margin-left:20px;"
+                                    data-target="#investModal"
+                                    ng-click="clearInvestmentVals()">
+                              <i class="glyphicon glyphicon-plus"></i> Add Investments
+                            </button>
+                          </td>
+                          <td style="border:0px">
+                            <button class="btn btn-primary pull-left "
+                                    type="Investment Selector"
+                                    data-toggle="modal" style="margin-left:20px;"
+                                    data-target="#investSelectorModal"><i class="glyphicon glyphicon-signal"></i>
+                              Investment Selector
+                            </button>
+                          </td>
+                          <td style="border:0px">
+                            <button class="btn btn-primary pull-left "
+                                    type="Click to Invest"
+                                    data-toggle="modal" style="margin-left:20px;"
+                                    data-target="#investResearchModal"><i class="glyphicon glyphicon-education"></i>
+                              Investment Research
+                            </button>
+                          <td style="border:0px">
+                            <button class="btn btn-primary pull-left"
+                                    type="Click to Invest"
+                                    data-toggle="modal" style="margin-left:10px;"
+                                    ng-show="!selectedFund.finalized"
+                                    data-target="#finalizeModal"><i class="glyphicon glyphicon-save"></i> Initialize Investment(s)
+                            </button>
+                          </td>
+                        </tr>
+                      </table>
+                    </div>
+                  </div>
+                  <!-- End: Fund actions -->
+
+                </div>
+                <div role="tabpanel" class="tab-pane" id="transactionhistory">
+                  <div ng-include="'app/transactionhistory/transactionhistory.html'"></div>
+                </div>
+                <div role="tabpanel" class="tab-pane" id="graphView">
+                  <div ng-include="'app/graphview/graphview.html'"></div>
+                </div>
+                <div role="tabpanel" class="tab-pane" id="settings">...</div>
+              </div>
+            </div>
+            <!-- End: Tabs -->
+          </div>
+
+        </div>
+      </div>
+    </div>
+  </div>
+
+
+  <div>
+
+    <p id="exceptions" class="warning"></p>
+
+  </div>
+  <!-- Begin: Fund Content -->
+
+  <!-- Begin: MODALS -->
+
+  <div class="modal fade" id="tradeStockModal" tabindex="-1" role="dialog" aria-labelledby="tradeStockModal" aria-hidden="true">
+    <div class="modal-dialog">
+      <div class="modal-content">
+        <div class="modal-header panel-green-bg">
+          <button type="button" class="close" data-dismiss="modal" aria-hidden="true">&times;</button>
+          <h4 class="modal-title">Trade Investment</h4>
+        </div>
+        <div class="modal-body">
+          <form role="form">
+            <div class="form-group">
+                Your available cash purchasing: <b>{{amountLeftToInvest | currency}}</b><br>
+                Enter the percent you wish to trade of: <b>{{selectedStock.description}}</b>.
+              <div>
+                  <input type="radio" ng-model="investmentAction" value="sell">Sell&nbsp;
+                  <input type="radio" ng-model="investmentAction" value="sellall">Sell All&nbsp;
+                  <input type="radio" ng-model="investmentAction" value="buy">Buy<br/>
+                  <input class="form-control" ng-model="tradeAmount">
+                </div>
+            </div>
+          </form>
+        </div>
+        <div class="modal-footer">
+          <button type="button" class="btn btn-default" data-dismiss="modal">Cancel</button>
+          <button type="button" class="btn btn-primary" ng-click="performTradeOnInvestment()" data-dismiss="modal">
+            <i class="glyphicon glyphicon-plus"></i> Trade
+          </button>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Add cash to Fund Modal -->
+  <div class="modal fade" id="addCashToFundModal" tabindex="-1" role="dialog" aria-labelledby="myModalLabel" aria-hidden="true">
+    <div class="modal-dialog">
+      <div class="modal-content">
+        <div class="modal-header panel-green-bg">
+          <button type="button" class="close" data-dismiss="modal" aria-hidden="true">&times;</button>
+          <h4 class="modal-title" id="myModalLabel">Add Cash to Fund</h4>
+        </div>
+        <div class="modal-body">
+          <form role="form">
+            <div class="form-group">
+              <label>Enter the amount you wish to add to the fund.</label>
+              <input class="form-control" ng-model="additionalInvestment">
+              <p></p>
+              <div>
+                <input type="radio" ng-model="addFundOption" value="disperse">Disperse amongst existing investments&nbsp;<br>
+                <input type="radio" ng-model="addFundOption" value="CMMF">Deposit into Cash Money Market Fund&nbsp;<br>
+              </div>
+            </div>
+          </form>
+        </div>
+        <div class="modal-footer">
+          <button type="button" class="btn btn-default" data-dismiss="modal">Cancel</button>
+          <button type="button" class="btn btn-primary" ng-click="addCashToFund()" data-dismiss="modal">
+            <i class="glyphicon glyphicon-plus"></i> Add Amount to Fund
+          </button>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Remove cash from Fund Modal -->
+  <div class="modal fade" id="withDrawlCashFromFundModal" tabindex="-1" role="dialog" aria-labelledby="myModalLabel" aria-hidden="true">
+    <div class="modal-dialog">
+      <div class="modal-content">
+        <div class="modal-header panel-green-bg">
+          <button type="button" class="close" data-dismiss="modal" aria-hidden="true">&times;</button>
+          <h4 class="modal-title" id="myModalLabel">Remove Cash from Fund</h4>
+        </div>
+        <div class="modal-body">
+          <form role="form">
+            <div class="form-group">
+              <label>Enter the amount you wish to withdraw from the fund.</label>
+              <input class="form-control" ng-model="investmentWithdraw">
+              <p></p>
+              <div>
+                <input type="radio" ng-model="addFundOption" value="disperse">Withdraw from existing investments&nbsp;<br>
+                <input type="radio" ng-model="addFundOption" value="CMMF">Withdraw from Cash Money Market Fund&nbsp;<br>
+              </div>
+            </div>
+          </form>
+        </div>
+        <div class="modal-footer">
+          <button type="button" class="btn btn-default" data-dismiss="modal">Cancel</button>
+          <button type="button" class="btn btn-primary" ng-click="withDrawlCashFromFund()" data-dismiss="modal">
+            <i class="glyphicon glyphicon-minus"></i> Withdraw Funds
+          </button>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Create Fund Modal -->
+  <div class="modal fade" id="myModal" tabindex="-1" role="dialog" aria-labelledby="myModalLabel"
+       aria-hidden="true">
+    <div class="modal-dialog">
+      <div class="modal-content">
+        <div class="modal-header panel-green-bg">
+          <button type="button" class="close" data-dismiss="modal" aria-hidden="true">&times;</button>
+          <h4 class="modal-title" id="myModalLabel">Create Fund</h4>
+        </div>
+        <div class="modal-body">
+          <form role="form" name="createFundForm">
+            <div class="form-group">
+              <label>Fund Name</label>
+              <input class="form-control" ng-model="fundName">
+
+              <p class="help-block">Enter the name of the fund.</p>
+              <label>Initial Investment</label>
+              <input class="form-control" name="initialInvestment" ng-model="initialInvestment" required min="1" max="1000000" type="number">
+              <p class="help-block">Enter the initial investment amount for the fund.</p>
+              <div role="alert">
+                <span class="error" ng-show="createFundForm.initialInvestment.$error.number">Not valid number.</span>
+                <span class="error" ng-show="createFundForm.initialInvestment.$error.required">Please enter a dollar amount.</span>
+              </div>
+            </div>
+          </form>
+        </div>
+        <div class="modal-footer">
+          <button type="button" class="btn btn-default" data-dismiss="modal">Cancel</button>
+          <button type="button" class="btn btn-primary" ng-click="addFund()"
+                  ng-disabled="!enableCreateFund()"
+
+                  data-dismiss="modal">
+            <i class="glyphicon glyphicon-plus"></i> Add Fund
+          </button>
+        </div>
+      </div>
+      <!-- /.modal-content -->
+    </div>
+    <!-- /.modal-dialog -->
+  </div>
+
+  <div class="modal fade" id="investModal"
+       tabindex="-1" role="dialog"
+       aria-labelledby="myModalLabel"
+       aria-hidden="true">
+    <div class="modal-dialog">
+      <div class="modal-content">
+        <div class="modal-header panel-green-bg">
+          <button type="button" class="close" data-dismiss="modal" aria-hidden="true">&times;</button>
+          <h4 class="modal-title">Add Investment to Fund</h4>
+        </div>
+        <div class="modal-body">
+          <form role="form" name="addInvestmentForm" >
+            <div class="form-group">
+              <label>Symbol</label>
+              <input type="text" ng-model="stock" id="symbolName"
+                     placeholder="Enter the stock symbol..."
+                     typeahead="stock.symbol + ' - (' + stock.name + ')' for stock in getSuggestedStocks($viewValue)"
+                      typeahead-on-select="setSelectedStockFromSuggested($item.symbol)"
+                     class="form-control">
+
+              <p class="help-block">Enter the name of the investment you wish to add to the fund.</p>
+              <i ng-show="loadingLocations" class="glyphicon glyphicon-refresh"></i>
+
+              <label>Percentage</label>
+              <input class="form-control" ng-model="stockPercentage" name="stockPercentage"  required min="1" max="100" type="number" >
+              <p class="help-block">Enter the percentage of the fund which you would like to allocate to this investment.</p>
+              <div role="alert">
+                <span class="error" ng-show="addInvestmentForm.stockPercentage.$error.number">Not valid number.</span>
+                <span class="error" ng-show="addInvestmentForm.stockPercentage.$error.required" >Please enter a percentage value from 1-100</span>
+              </div>
+            </div>
+          </form>
+        </div>
+        <div class="modal-footer">
+          <button type="button" class="btn btn-default" data-dismiss="modal">Cancel</button>
+          <button type="button" class="btn btn-primary"
+                  ng-click="addStockToFund()"
+                  ng-disabled="!enableInvest()"
+                  data-dismiss="modal">
+            <i class="glyphicon glyphicon-plus"></i>
+            Add Investment
+          </button>
+        </div>
+      </div>
+      <!-- /.modal-content -->
+    </div>
+    <!-- /.modal-dialog -->
+  </div></div>
+
+<div class="modal fade" id="finalizeModal"
+     tabindex="-1" role="dialog"
+     aria-labelledby="finalizeModal"
+     aria-hidden="true">
+  <div class="modal-dialog">
+    <div class="modal-content">
+      <div class="modal-header panel-green-bg">
+        <button type="button" class="close" data-dismiss="modal" aria-hidden="true">&times;</button>
+        <h4 class="modal-title">Do you wish to initialize this fund?</h4>
+      </div>
+      <div class="modal-body">
+        You are about to purchase {{ (selectedFund.goal - amountLeftToInvest) | currency}} in investments and the remaining {{amountLeftToInvest | currency}} will be placed in a Money Market Fund.
+      </div>
+      <div class="modal-footer">
+        <button type="button" class="btn btn-default" data-dismiss="modal">Cancel</button>
+        <button type="button" class="btn btn-primary" ng-click="finalizeFund(selectedFund)" data-dismiss="modal"><i
+          class="glyphicon glyphicon-save"></i>Initialize Fund
+        </button>
+      </div>
+    </div>
+    <!-- /.modal-content -->
+  </div>
+  <!-- /.modal-dialog -->
+</div></div>
+
+<div class="modal fade" id="investSelectorModal"
+     tabindex="-1" role="dialog"
+     aria-labelledby="investSelectorModal"
+     aria-hidden="true">
+  <div class="modal-dialog">
+    <div class="modal-content">
+      <div class="modal-header panel-green-bg">
+        <button type="button" class="close" data-dismiss="modal" aria-hidden="true">&times;</button>
+        <h4 class="modal-title">Investment Selector</h4>
+      </div>
+      <div class="modal-body">
+        <form class="form-horizontal" role="form">
+          <div class="form-group" style="padding:10px;">
+            <div class="row">
+              <div class="col-sm-6">
+                <label class="control-label" for="inputIndustry">Industry</label>
+                <input class="form-control" type="select" id="inputIndustry" placeholder="Industry" name="industry">
+              </div>
+              <div class="col-sm-6">
+                <label  class="control-label" for="inputSize">Company Size</label>
+                 <input class="form-control" type="select" id="inputSize" placeholder="Size" name="size">
+              </div>
+            </div>
+
+            <div class="row">
+              <div class="col-sm-6">
+                <label class="control-label" for="inputRisk">Risk Level</label>
+                <input class="form-control" type="text" id="inputRisk" placeholder="Risk" name="risk">
+              </div>
+              <div class="col-sm-6">
+                <label class="control-label" for="inputDividend">Dividend %</label>
+                <input class="form-control" type="text" id="inputDividend" placeholder="Dividend" name="dividend">
+              </div>
+            </div>
+
+            <div class="row">
+              <div class="col-sm-6">
+                <label class="control-label" for="inputReturn">Year Return %</label>
+                <input class="form-control" type="text" id="inputReturn" placeholder="Return" name="return">
+              </div>
+            </div>
+          </div>
+        </form>
+      </div>
+      <div class="modal-footer">
+        <button type="button" class="btn btn-default" data-dismiss="modal">Cancel</button>
+        <button type="button" class="btn btn-primary" ng-click="selectInvestments()" data-dismiss="modal">
+          Search
+        </button>
+      </div>
+    </div>
+    <!-- /.modal-content -->
+  </div>
+  <!-- /.modal-dialog -->
+</div></div>
+
+<div class="modal fade" id="investResearchModal"
+     tabindex="-1" role="dialog"
+     aria-labelledby="investResearchModal"
+     aria-hidden="true">
+  <div class="modal-dialog">
+    <div class="modal-content">
+      <div class="modal-header panel-green-bg">
+        <button type="button" class="close" data-dismiss="modal" aria-hidden="true">&times;</button>
+        <h4 class="modal-title">Research Page</h4>
+      </div>
+      <div class="modal-body">
+        <form class="form-horizontal" role="form">
+          <div class="form-group" style="padding:10px;">
+            <div class="row">
+              <div class="col-sm-9">
+                <!--<label class="control-label" for="inputIndustry">Symbol</label>-->
+                <!--<input type="text" ng-model="stock" id="symbolNameLookup"-->
+                       <!--placeholder="Enter the stock symbol..."-->
+                       <!--typeahead="stock.symbol + ' - (' + stock.name + ')' for stock in getSuggestedStocks($viewValue)"-->
+                       <!--typeahead-on-select="setSelectedStockFromSuggested($item.symbol)"-->
+                       <!--class="form-control">-->
+              </div>
+            </div>
+            <div class="row">
+              <div class="col-sm-9">
+                <label  class="control-label" for="inputSize">Name of Company or Fund</label>
+                <input class="form-control" type="text" id="inputSize" placeholder="Name of Company or Fund" name="companyName">
+              </div>
+            </div>
+
+          </div>
+        </form>
+      </div>
+      <div class="modal-footer">
+        <button type="button" class="btn btn-default" data-dismiss="modal">Cancel</button>
+        <button type="button" class="btn btn-primary" ng-click="researchFunds()">Identify</button>
+      </div>
+    </div>
+    <!-- /.modal-content -->
+  </div>
+  <!-- /.modal-dialog -->
+</div></div>
+
+<script type="text/ng-template" id="deleteStockModal.html">
+  <div class="modal-header panel-green-bg">
+    <h3 class="modal-title">Delete Stock</h3>
+  </div>
+  <div class="modal-body">
+    Do you wish to proceed with deleting this stock from your fund?
+  </div>
+  <div class="modal-footer">
+    <button class="btn btn-default" ng-click="ok()">OK</button>
+    <button class="btn btn-warning" ng-click="cancel()">Cancel</button>
+  </div>
+</script>
+
+<script type="text/ng-template" id="deleteFundModal.html">
+  <div class="modal-header panel-green-bg">
+    <h3 class="modal-title">Delete fund?</h3>
+  </div>
+  <div class="modal-body">
+    Do you wish to proceed with deleting this fund?
+  </div>
+  <div class="modal-footer">
+    <button class="btn btn-primary" ng-click="ok()">OK</button>
+    <button class="btn btn-warning" ng-click="cancel()">Cancel</button>
+  </div>
+</script>
+
+<script type="text/ng-template" id="modifyStockAlloctionModal.html">
+
+  <div class="modal-header panel-green-bg">
+    <h3 class="modal-title">Modify Investment Allocation</h3>
+  </div>
+  <div class="modal-body">
+    Do you wish to proceed with deleting this stock from your fund?
+  </div>
+  <div class="modal-footer">
+    <button class="btn btn-default" ng-click="ok()">OK</button>
+    <button class="btn btn-warning" ng-click="cancel()">Cancel</button>
+  </div>
+</script>
+
+
+<!-- End:  MODALS-->
+
+</div>
+<!-- /#page-wrapper -->
+
