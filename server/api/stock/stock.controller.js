@@ -159,37 +159,37 @@ exports.create = function (req, res) {
 exports.update = function (req, res) {
 
   var user = req.user;
+  var stockToUpdate = req.body.stockToUpdate;
 
-  if (!req.body) {
-    return res.send(400);
-  }
-
-  if (req.body._id) {
-    delete req.body._id;
-  }
+  if (!req.body) { return res.send(400);}
+  if (req.body._id) {delete req.body._id;}
+  if (!stockToUpdate) {return res.send(404,'Missing stock to update');}
 
   fund.findById(req.body.fundId, function (err, selectedFund) {
     if (err) {
       return handleError(res, err);
     }
+
     if (!selectedFund) {
-      return res.send(404);
+      return res.send(404, 'unable to locate fund');
     }
 
-    Stock.findById(req.params.id, function (err, stock) {
-      if (err) {
-        return handleError(res, err);
+      var cashForPurchase = 0;
+      var purchasePrice = 0;
+      var amountToReturnToFund = 0;
+
+      if(selectedFund.finalized){
+        cashForPurchase =(selectedFund.goal * (stockToUpdate.currentPercentOfFund / 100));
+       // stockToUpdate.numberOfShares = cashForPurchase / stockToUpdate.currentPrice;
+        purchasePrice = stockToUpdate.numberOfShares * stockToUpdate.currentPrice;
+        amountToReturnToFund = stockToUpdate.numberOfShares * stockToUpdate.currentPrice;
+
+      }else{
+        cashForPurchase =(selectedFund.goal * (stockToUpdate.originalPercentOfFund / 100));
+        stockToUpdate.numberOfShares = cashForPurchase / stockToUpdate.price;
+        purchasePrice = stockToUpdate.numberOfShares * stockToUpdate.price;
+        amountToReturnToFund = stockToUpdate.numberOfShares * stockToUpdate.price;
       }
-      if (!stock) {
-        return res.send(404);
-      }
-
-      var cashForPurchase = (selectedFund.goal * (req.body.stockToUpdate.originalPercentOfFund / 100));
-
-      req.body.numberOfShares = cashForPurchase / req.body.stockToUpdate.price;
-
-      var purchasePrice = req.body.numberOfShares * req.body.stockToUpdate.price;
-      var amountToReturnToFund = stock.numberOfShares * req.body.stockToUpdate.price;
 
       selectedFund.cash = selectedFund.cash + amountToReturnToFund;
       selectedFund.cash = selectedFund.cash - purchasePrice;
@@ -202,93 +202,107 @@ exports.update = function (req, res) {
 
       var stockStatus = true;
 
-      if(req.body.stockToUpdate.originalPercentOfFund == 0){
-        stockStatus = false;
+      if(selectedFund.finalized){
+        if(stockToUpdate.currentPercentOfFund == 0){
+          stockStatus = false;
+        }
+      }else{
+        if(stockToUpdate.originalPercentOfFund == 0){
+          stockStatus = false;
+        }
       }
 
-      req.body.stockToUpdate.active = stockStatus;
+     stockToUpdate.active = stockStatus;
 
-      var updatedStock = _.merge(stock, req.body.stockToUpdate);
+     console.log('Updating fund:' + selectedFund.name + ' stock: ' + stockToUpdate.symbol);
 
-      updatedStock.save(function (err) {
-        if (err) {
-          return handleError(res, err);
-        }
+      fund.update(
+        {'_id': req.body.fundId, 'stocks._id': mongoose.Types.ObjectId(stockToUpdate._id)},
+        {$set: {'stocks.$.originalPercentOfFund': stockToUpdate.originalPercentOfFund,
+                'stocks.$.currentPercentOfFund': stockToUpdate.currentPercentOfFund,
+                'stocks.$.numberOfShares': stockToUpdate.numberOfShares,
+                'stocks.$.active': stockToUpdate.active
+                }},
+          function (err, result) {
+            if (err) {
+              return handleError(result, err);
+            }
+            else {
+              var action = 'Buy';
 
-
-        console.log('Updating fund:' + selectedFund.name + ' stock: ' + updatedStock.symbol);
-
-        fund.update(
-          {'_id': req.body.fundId, 'stocks._id': mongoose.Types.ObjectId(updatedStock._id)},
-          {$set: {'stocks.$.originalPercentOfFund': updatedStock.originalPercentOfFund,
-                  'stocks.$.numberOfShares': updatedStock.numberOfShares,
-                  'stocks.$.active': updatedStock.active
-                  }},
-            function (err, result) {
-              if (err) {
-                return handleError(result, err);
+              if(stockToUpdate.action == 'buy'){
+                action = 'Sell';
               }
-              else {
-                var action = 'Buy';
 
-                if(updatedStock.action == 'buy'){
-                  action = 'Sell';
-                }
+              transaction.create(
+                {
+                  fundId: selectedFund._id,
+                  date: new Date(),
+                  symbol: 'YMMF',
+                  description: stockToUpdate.action + ' ' + stockToUpdate.description + ' ' + stockToUpdate.numberOfShares + ' at $' +  stockToUpdate.price,
+                  price: 1,
+                  action: action,
+                  numberOfShares: stockToUpdate.numberOfShares,
+                  total: stockToUpdate.price * stockToUpdate.numberOfShares,
+                  company: 'Your Money Market Fund',
+                  active: true
+                },
+                function (err, result) {
+                  if (err) {
+                    return handleError(result, err);
+                  }
+                  console.log('saving YMMF fund transaction for stock purchase');
+                });
 
-                transaction.create(
+              var datePlusOneSecond = new Date();
+              datePlusOneSecond.setSeconds(datePlusOneSecond.getSeconds() + 1);
+
+              transaction.create(
                   {
                     fundId: selectedFund._id,
-                    date: new Date(),
-                    symbol: 'YMMF',
-                    description: updatedStock.action + ' ' + updatedStock.description + ' ' + req.body.stockToUpdate.numberOfShares + ' at $' +  req.body.stockToUpdate.price,
-                    price: 1,
-                    action: action,
-                    numberOfShares: req.body.stockToUpdate.numberOfShares,
-                    total: req.body.stockToUpdate.price * req.body.stockToUpdate.numberOfShares,
-                    company: 'Your Money Market Fund',
+                    date: datePlusOneSecond,
+                    symbol: stockToUpdate.symbol,
+                    description: stockToUpdate.action + ' ' + stockToUpdate.description + ' ' + stockToUpdate.numberOfShares + ' at $' +  stockToUpdate.price,
+                    price: stockToUpdate.price,
+                    action: stockToUpdate.action,
+                    numberOfShares: stockToUpdate.numberOfShares,
+                    total: stockToUpdate.price * stockToUpdate.numberOfShares,
+                    company: stockToUpdate.description,
                     active: true
-                  },
-                  function (err, result) {
-                    if (err) {
-                      return handleError(result, err);
-                    }
-                    console.log('saving YMMF fund transaction for stock purchase');
-                  });
+                  },function (err, result) {
+                  if (err) {
+                    return handleError(result, err);
+                  }
+                  console.log('saving fund transaction for stock purchase');
+                });
 
-                var datePlusOneSecond = new Date();
-                datePlusOneSecond.setSeconds(datePlusOneSecond.getSeconds() + 1);
+            console.log('Updating fund:' + user.selectedFund + ' stock: ' + stockToUpdate.symbol);
 
+          }
+        });
 
+    var remainingInvestment = selectedFund.percentLeftToInvest;
 
-                transaction.create(
-                    {
-                      fundId: selectedFund._id,
-                      date: datePlusOneSecond,
-                      symbol: updatedStock.symbol,
-                      description: updatedStock.action + ' ' + updatedStock.description + ' ' + req.body.stockToUpdate.numberOfShares + ' at $' +  req.body.stockToUpdate.price,
-                      price: req.body.stockToUpdate.price,
-                      action: updatedStock.action,
-                      numberOfShares: req.body.stockToUpdate.numberOfShares,
-                      total: req.body.stockToUpdate.price * req.body.stockToUpdate.numberOfShares,
-                      company: updatedStock.description,
-                      active: true
-                    },function (err, result) {
-                    if (err) {
-                      return handleError(result, err);
-                    }
-                    console.log('saving fund transaction for stock purchase');
-                  });
-
-              console.log('Updating fund:' + user.selectedFund + ' stock: ' + updatedStock.symbol);
-              return res.send(204);
-            }
-          });
-
-      });
+    selectedFund.stocks.forEach(function(stock) {
+      if (selectedFund.stocks.length > 0 && selectedFund.finalized == true) {
+        remainingInvestment -= stock.currentPercentOfFund;
+      }
+      else{
+        remainingInvestment -= stock.originalPercentOfFund;
+      }
     });
 
-  });
+    selectedFund.set({ "percentLeftToInvest" : remainingInvestment});
+    selectedFund.save(function (errs) {
+      if (errs) {
+        console.log(errs);
+        return res.render('500');
+      }
+      return res.send(204);
+      console.log('saving user selectedFund');
+    });
 
+  })
 };
 
 
