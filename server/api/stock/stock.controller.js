@@ -32,7 +32,22 @@ exports.show = function (req, res) {
   });
 };
 
-// Creates a new stock in the DB.
+
+function setPercentLeftToInvest(selectedFund) {
+  var remainingInvestment = selectedFund.percentLeftToInvest;
+
+  selectedFund.stocks.forEach(function (stock) {
+    if (selectedFund.stocks.length > 0 && selectedFund.finalized == true) {
+      remainingInvestment -= stock.currentPercentOfFund;
+    }
+    else {
+      remainingInvestment -= stock.originalPercentOfFund;
+    }
+  });
+
+  selectedFund.set({"percentLeftToInvest": remainingInvestment});
+}
+
 exports.create = function (req, res) {
 
   var symbol = req.body.symbol;
@@ -86,6 +101,8 @@ exports.create = function (req, res) {
             selectedFund.cash = 0; //don't let this go in the negative
           }
 
+          setPercentLeftToInvest(selectedFund);
+
           selectedFund.save(function (e) {
             if (e) {
               return handleError(res, err);
@@ -97,7 +114,6 @@ exports.create = function (req, res) {
             if(!selectedFund.finalized){
               transaction.remove( { fundId:selectedFund._id, symbol: req.body.symbol } );
             }
-
 
             transaction.create(
               {
@@ -119,11 +135,8 @@ exports.create = function (req, res) {
                 console.log('saving YMMF transaction for stock purchase');
               });
 
-
             var datePlusOneSecond = new Date();
             datePlusOneSecond.setSeconds(datePlusOneSecond.getSeconds() + 1);
-
-
 
             transaction.create(
               {
@@ -144,8 +157,6 @@ exports.create = function (req, res) {
                 }
                 console.log('saving YMMF transaction for stock purchase');
               });
-
-
 
             return res.json(201, selectedFund);
           });
@@ -281,18 +292,8 @@ exports.update = function (req, res) {
           }
         });
 
-    var remainingInvestment = selectedFund.percentLeftToInvest;
+    setPercentLeftToInvest(selectedFund);
 
-    selectedFund.stocks.forEach(function(stock) {
-      if (selectedFund.stocks.length > 0 && selectedFund.finalized == true) {
-        remainingInvestment -= stock.currentPercentOfFund;
-      }
-      else{
-        remainingInvestment -= stock.originalPercentOfFund;
-      }
-    });
-
-    selectedFund.set({ "percentLeftToInvest" : remainingInvestment});
     selectedFund.save(function (errs) {
       if (errs) {
         console.log(errs);
