@@ -48,8 +48,36 @@ exports.index = function (req, res) {
   });
 };
 
+exports.getFund = function (req, res) {
 
-// Get a single fund
+  console.log('fund.controller: init');
+
+  var user = req.user;
+
+  fund.findById(req.params.id, function (err, selectedFund) {
+    if (err) {
+      return handleError(res, err);
+    }
+    if (!fund) {
+      return res.send(404);
+    }
+
+    user.selectedFund = fund._id;
+
+    user.save(function (errs) {
+      if (errs) {
+        console.log(errs);
+        return res.render('500');
+      }
+
+      return res.json(selectedFund);
+
+      console.log('saving user selectedFund');
+    });
+  });
+};
+
+// Get a single fund w/stock updates
 exports.show = function (req, res) {
 
   console.log('fund.controller: init');
@@ -64,7 +92,6 @@ exports.show = function (req, res) {
       return res.send(404);
     }
 
-    var remainingInvestment = selectedFund.percentLeftToInvest;
 
     if (selectedFund.stocks.length > 0) {
       selectedFund.stocks.forEach(function (stock) {
@@ -112,16 +139,14 @@ exports.show = function (req, res) {
 
         setPercentLeftToInvest(selectedFund);
 
+
         selectedFund.save(function (err) {
           if (err) {
             return handleError(res, err);
           }
         });
 
-
-
-
-        });
+      });
 
     }
 
@@ -197,7 +222,7 @@ exports.update = function (req, res) {
     delete req.body._id;
   }
 
-  function updateFundInvestementPercentages(updatedFund,selectedFund) {
+  function updateFundInvestementPercentages(updatedFund, selectedFund) {
     if (updatedFund.stocks.length > 0) {
       updatedFund.stocks.forEach(function (stock) {
         fund.update(
@@ -225,15 +250,14 @@ exports.update = function (req, res) {
     }
 
     var cashDifference = req.body.cash - selectedFund.cash;
+
     var action = 'Add';
 
-    if (req.body.cash < selectedFund.cash) {
+    if (req.body.cash <= selectedFund.cash) {
       action = 'Sell';
     }
 
     var updatedFund = _.merge(selectedFund, req.body);
-
-    updateFundInvestementPercentages(selectedFund,updatedFund);
 
     setPercentLeftToInvest(updatedFund);
 
