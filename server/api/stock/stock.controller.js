@@ -195,19 +195,27 @@ exports.update = function (req, res) {
         purchasePrice = stockToUpdate.numberOfShares * stockToUpdate.currentPrice;
         amountToReturnToFund = stockToUpdate.numberOfShares * stockToUpdate.currentPrice;
 
+        //Updated funds cash left
+        selectedFund.cash = selectedFund.cash - purchasePrice;
       }else{
+
+        // Add funds back to fund
+        if(req.body.originalAllocation){
+          cashForPurchase =(selectedFund.goal * (req.body.originalAllocation / 100));
+          stockToUpdate.numberOfShares = cashForPurchase / stockToUpdate.price;
+          purchasePrice = stockToUpdate.numberOfShares * stockToUpdate.price;
+
+          selectedFund.cash = selectedFund.cash + purchasePrice;
+        }
+
         cashForPurchase =(selectedFund.goal * (stockToUpdate.originalPercentOfFund / 100));
         stockToUpdate.numberOfShares = cashForPurchase / stockToUpdate.price;
         purchasePrice = stockToUpdate.numberOfShares * stockToUpdate.price;
+
+        //Updated funds cash left
+        selectedFund.cash = selectedFund.cash - purchasePrice;
       }
 
-      selectedFund.cash = selectedFund.cash - purchasePrice;
-
-      selectedFund.save(function (e) {
-        if (e) {
-          return handleError(res, err);
-        }
-      });
 
       var stockStatus = true;
 
