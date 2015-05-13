@@ -216,28 +216,53 @@ exports.create = function (req, res) {
 
 };
 
+
+
+
 // Updates an existing fund in the DB.
 exports.update = function (req, res) {
   if (req.body._id) {
     delete req.body._id;
   }
 
-  function updateFundInvestementPercentages(updatedFund, selectedFund) {
+
+  function updateFundInvestementPercentages(updatedFund) {
+
+
     if (updatedFund.stocks.length > 0) {
-      updatedFund.stocks.forEach(function (stock) {
-        fund.update(
-          {'_id': mongoose.Types.ObjectId(updatedFund._id), 'stocks._id': mongoose.Types.ObjectId(stock._id)},
-          {
-            $set: {
-              'stocks.$.originalPercentOfFund': ((stock.numberOfShares * stock.price) / selectedFund.goal) * 100
+      if(updatedFund.finalized == false){
+        updatedFund.stocks.forEach(function (stock) {
+          fund.update(
+            {'_id': mongoose.Types.ObjectId(updatedFund._id), 'stocks._id': mongoose.Types.ObjectId(stock._id)},
+            {
+              $set: {
+                'stocks.$.originalPercentOfFund': ((stock.numberOfShares * stock.price) / updatedFund.goal) * 100
+              }
+            }, function (err, result) {
+              if (err) {
+                return handleError(result, err);
+              }
             }
-          }, function (err, result) {
-            if (err) {
-              return handleError(result, err);
+          );
+        });
+      }
+      else{
+        updatedFund.stocks.forEach(function (stock) {
+          fund.update(
+            {'_id': mongoose.Types.ObjectId(updatedFund._id), 'stocks._id': mongoose.Types.ObjectId(stock._id)},
+            {
+              $set: {
+                'stocks.$.originalPercentOfFund': ((stock.numberOfShares * stock.currentPrice) / updatedFund.goal) * 100
+              }
+            }, function (err, result) {
+              if (err) {
+                return handleError(result, err);
+              }
             }
-          }
-        );
-      });
+          );
+        });
+      }
+
     }
   }
 
@@ -259,7 +284,7 @@ exports.update = function (req, res) {
 
     var updatedFund = _.merge(selectedFund, req.body);
 
-    setPercentLeftToInvest(updatedFund);
+    updateFundInvestementPercentages(updatedFund);
 
     updatedFund.save(function (err) {
       if (err) {
