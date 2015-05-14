@@ -32,9 +32,8 @@ exports.show = function (req, res) {
   });
 };
 
-
 function setPercentLeftToInvest(selectedFund) {
-  var remainingInvestment = selectedFund.percentLeftToInvest;
+  var remainingInvestment = 100;
 
   selectedFund.stocks.forEach(function (stock) {
     if (selectedFund.stocks.length > 0 && selectedFund.finalized == true) {
@@ -312,7 +311,6 @@ exports.update = function (req, res) {
   })
 };
 
-
 // Updates an existing stock in the DB.
 exports.trade = function (req, res) {
 
@@ -376,7 +374,7 @@ exports.destroy = function (req, res) {
 
     console.log(stock);
 
-    fund.update({'_id': user.selectedFund},
+    fund.update({'_id': req.body.fundId},
       {$pull: {"stocks": {_id: mongoose.Types.ObjectId(req.params.id)}}},
       function (err, result) {
         if (err) {
@@ -388,7 +386,7 @@ exports.destroy = function (req, res) {
         }
       });
 
-    fund.findById(user.selectedFund, function (err, fund) {
+    fund.findById(req.body.fundId, function (err, fund) {
       if (err) {
         return handleError(res, err);
       }
@@ -399,6 +397,9 @@ exports.destroy = function (req, res) {
       var updatedCash = fund.cash + (stock.price * stock.numberOfShares);
 
       fund.set({"cash": updatedCash});
+
+      setPercentLeftToInvest(fund);
+
       fund.save();
 
       return res.send(204);
