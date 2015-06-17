@@ -86,9 +86,9 @@ exports.create = function (req, res) {
           }
 
 
-          stock.currentPrice = '0';
-          stock.currentNumberOfShares = 0;
-          stock.currentPercentOfFund = '0';
+          stock.currentPrice = req.body.price;
+          stock.currentNumberOfShares = req.body.numberOfShares;
+          stock.currentPercentOfFund = req.body.originalPercentOfFund;
 
           console.log('stock:' + req.body.symbol + ' has been created');
 
@@ -195,7 +195,9 @@ exports.update = function (req, res) {
         amountToReturnToFund = stockToUpdate.numberOfShares * stockToUpdate.currentPrice;
 
         //Updated funds cash left
-        selectedFund.cash = selectedFund.cash - purchasePrice;
+        stockToUpdate.numberOfShares = cashForPurchase / stockToUpdate.price;
+        selectedFund.cash = selectedFund.cash + purchasePrice;
+        selectedFund.cash = selectedFund.cash - cashForPurchase;
       }else{
 
         // Add funds back to fund

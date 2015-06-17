@@ -5,6 +5,7 @@ var mongoose = require('mongoose'),
 
 var fundSchema = new Schema({
   name: "string",
+  originalGoal: Number,
   goal: Number,
   cash: Number,
   accountId: "string",
