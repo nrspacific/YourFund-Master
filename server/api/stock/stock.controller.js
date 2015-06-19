@@ -198,6 +198,7 @@ exports.update = function (req, res) {
         stockToUpdate.numberOfShares = cashForPurchase / stockToUpdate.price;
         selectedFund.cash = selectedFund.cash + purchasePrice;
         selectedFund.cash = selectedFund.cash - cashForPurchase;
+        stockToUpdate.originalPercentOfFund =  stockToUpdate.currentPercentOfFund;
       }else{
 
         // Add funds back to fund
