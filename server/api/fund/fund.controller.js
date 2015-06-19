@@ -252,7 +252,8 @@ exports.update = function (req, res) {
             {'_id': mongoose.Types.ObjectId(updatedFund._id), 'stocks._id': mongoose.Types.ObjectId(stock._id)},
             {
               $set: {
-                'stocks.$.originalPercentOfFund': ((stock.numberOfShares * stock.currentPrice) / updatedFund.goal) * 100
+                'stocks.$.originalPercentOfFund': ((stock.numberOfShares * stock.currentPrice) / updatedFund.goal) * 100,
+                'stocks.$.currentPercentOfFund': ((stock.numberOfShares * stock.currentPrice) / updatedFund.goal) * 100
               }
             }, function (err, result) {
               if (err) {
