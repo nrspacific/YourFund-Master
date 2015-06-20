@@ -77,7 +77,7 @@ exports.create = function (req, res) {
         req.body.exchange = result[0].e;
         req.body.price = result[0].l;
         var cashForPurchase = (selectedFund.goal * (req.body.originalPercentOfFund / 100));
-        req.body.numberOfShares = cashForPurchase / req.body.price;
+        req.body.numberOfShares = Math.floor( (cashForPurchase / req.body.price) * 100) / 100;
         req.body.change = result[0].c;
 
         Stock.create(req.body, function (err, stock) {
@@ -85,10 +85,11 @@ exports.create = function (req, res) {
             return handleError(res, err);
           }
 
-
           stock.currentPrice = req.body.price;
           stock.currentNumberOfShares = req.body.numberOfShares;
           stock.currentPercentOfFund = req.body.originalPercentOfFund;
+          stock.currentCashInvestment =  Math.floor((req.body.numberOfShares * req.body.price)* 100) / 100;
+          stock.originalCashInvestment =  Math.floor((req.body.numberOfShares * req.body.price)* 100) / 100;
 
           console.log('stock:' + req.body.symbol + ' has been created');
 

@@ -117,13 +117,17 @@ exports.show = function (req, res) {
               console.log('stock.currentNumberOfShares: ' + cashForPurchase / currentPrice);
               console.log('stock.currentPercentOfFund: ' + currentPercentOfFund);
 
+              var numberOfShares = Math.floor((cashForPurchase / currentPrice)* 100) / 100;
+              var currentCashInvestment =  Math.floor((numberOfShares * currentPrice)* 100) / 100;
+
               fund.update(
                 {'_id': mongoose.Types.ObjectId(selectedFund._id), 'stocks._id': mongoose.Types.ObjectId(stock._id)},
                 {
                   $set: {
                     'stocks.$.currentPrice': currentPrice,
-                    'stocks.$.currentNumberOfShares': cashForPurchase / currentPrice,
-                    'stocks.$.currentPercentOfFund': currentPercentOfFund.toString()
+                    'stocks.$.currentNumberOfShares': numberOfShares,
+                    'stocks.$.currentPercentOfFund': currentPercentOfFund.toString(),
+                    'stocks.$.currentCashInvestment': currentCashInvestment
                   }
                 },
                 function (err, result) {
