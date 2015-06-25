@@ -215,8 +215,8 @@ exports.update = function (req, res) {
         stockToUpdate.numberOfShares = cashForPurchase / stockToUpdate.price;
         purchasePrice = stockToUpdate.numberOfShares * stockToUpdate.price;
 
-        //Updated funds cash left ;
-        selectedFund.cash = Math.floor((selectedFund.cash - purchasePrice)* 100) / 100;
+        //Updated funds cash left
+        selectedFund.cash = selectedFund.cash - purchasePrice;
       }
 
 
