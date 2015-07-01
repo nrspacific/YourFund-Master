@@ -112,13 +112,12 @@ exports.show = function (req, res) {
 
               var currentPercentOfFund = ((stock.numberOfShares * currentPrice) / selectedFund.goal) * 100;
               var cashForPurchase = (selectedFund.goal * (currentPercentOfFund / 100));
-
-              console.log('stock.currentPrice: ' + currentPrice);
-              console.log('stock.currentNumberOfShares: ' + cashForPurchase / currentPrice);
-              console.log('stock.currentPercentOfFund: ' + currentPercentOfFund);
-
               var numberOfShares = Math.floor((cashForPurchase / currentPrice)* 100) / 100;
               var currentCashInvestment =  Math.floor((numberOfShares * currentPrice)* 100) / 100;
+
+              console.log('stock.currentPrice: ' + currentPrice);
+              console.log('stock.currentNumberOfShares: ' + numberOfShares);
+              console.log('stock.currentPercentOfFund: ' + currentPercentOfFund);
 
               fund.update(
                 {'_id': mongoose.Types.ObjectId(selectedFund._id), 'stocks._id': mongoose.Types.ObjectId(stock._id)},
@@ -126,7 +125,7 @@ exports.show = function (req, res) {
                   $set: {
                     'stocks.$.currentPrice': currentPrice,
                     'stocks.$.currentNumberOfShares': numberOfShares,
-                    'stocks.$.currentPercentOfFund': currentPercentOfFund.toString(),
+                    'stocks.$.currentPercentOfFund': currentPercentOfFund,
                     'stocks.$.currentCashInvestment': currentCashInvestment
                   }
                 },
@@ -256,7 +255,7 @@ exports.update = function (req, res) {
             {'_id': mongoose.Types.ObjectId(updatedFund._id), 'stocks._id': mongoose.Types.ObjectId(stock._id)},
             {
               $set: {
-                'stocks.$.originalPercentOfFund': ((stock.numberOfShares * stock.currentPrice) / updatedFund.goal) * 100,
+               // 'stocks.$.originalPercentOfFund': ((stock.numberOfShares * stock.currentPrice) / updatedFund.goal) * 100,
                 'stocks.$.currentPercentOfFund': ((stock.numberOfShares * stock.currentPrice) / updatedFund.goal) * 100
               }
             }, function (err, result) {
