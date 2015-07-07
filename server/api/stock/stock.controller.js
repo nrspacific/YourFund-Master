@@ -77,8 +77,17 @@ exports.create = function (req, res) {
         req.body.exchange = result[0].e;
         req.body.price = result[0].l;
         var cashForPurchase = (selectedFund.goal * (req.body.originalPercentOfFund / 100));
-        req.body.numberOfShares = Math.floor( (cashForPurchase / req.body.price) * 100) / 100;
+        var sharesToPurchase = (cashForPurchase / req.body.price) * 100 / 100;
+        req.body.numberOfShares = sharesToPurchase;
         req.body.change = result[0].c;
+
+
+        function getNumberDecimalPlace(input,places){
+
+          var factor = "1" + Array(+(places > 0 && places + 1)).join("0");
+          return parseInt(input * factor) / factor;
+        }
+
 
         Stock.create(req.body, function (err, stock) {
           if (err) {
