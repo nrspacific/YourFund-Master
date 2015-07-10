@@ -175,6 +175,13 @@ function UpdatePreInitializedFunds(selectedFund, req) {
                 'stocks.$.currentCashInvestment': (req.body.numberOfShares * req.body.price) * 100 / 100,
                 'stocks.$.originalCashInvestment': (req.body.numberOfShares * req.body.price) * 100 / 100
               }
+            },
+            function (err, result) {
+              if (err) {
+                return handleError(result, err);
+              }
+
+              console.log('GetStockCurrentPrice: updating DB with current price for: ' + stock.symbol);
             });
         }
     })
