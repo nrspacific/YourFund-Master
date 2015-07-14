@@ -128,73 +128,81 @@ function UpdateInitializedFunds(selectedFund, res) {
       }
     );
 
-    setPercentLeftToInvest(selectedFund);
 
-    selectedFund.save(function (err) {
-      if (err) {
-        return handleError(res, err);
-      }
-    });
 
   });
 }
 
-function UpdatePreInitializedFunds(selectedFund, req) {
 
-    selectedFund.stocks.forEach(function (stock)
-    {
-      var stockRequestOptions = {
-        url: 'http://finance.google.com/finance/info?q=' + stock.symbol,
-        json: true
-      };
 
-      Request(stockRequestOptions, function (error, response, body) {
-        if (!error && response.statusCode === 200) {
-          var result = JSON.parse(body.replace("//", ""));
+function UpdatePreInitializedFunds(selectedFund, req, updatedFund) {
 
-          req.body.exchange = result[0].e;
-          req.body.price = result[0].l;
-          var cashForPurchase = (selectedFund.goal * (stock.originalPercentOfFund / 100));
-          var sharesToPurchase = (cashForPurchase / req.body.price) * 100 / 100;
-          req.body.numberOfShares = sharesToPurchase;
-          req.body.change = result[0].c;
-          var investmentAmount = req.body.numberOfShares * req.body.price;
-          var percentOfFund = investmentAmount / selectedFund.goal * 100;
+  var selectedFundCash = selectedFund.goal;
+  var investmentUpdateCount = 0;
 
-          fund.update(
-            {
-              '_id': mongoose.Types.ObjectId(selectedFund._id),
-              'stocks._id': mongoose.Types.ObjectId(stock._id)
-            },
-            {
-              $set: {
-                'stocks.$.currentPrice': req.body.price,
-                'stocks.$.currentNumberOfShares': req.body.numberOfShares,
-                'stocks.$.currentPercentOfFund': percentOfFund,
-                'stocks.$.originalPercentOfFund': percentOfFund,
-                'stocks.$.currentCashInvestment': (req.body.numberOfShares * req.body.price) * 100 / 100,
-                'stocks.$.originalCashInvestment': (req.body.numberOfShares * req.body.price) * 100 / 100
+  selectedFund.stocks.forEach(function (stock)  {
+
+    console.log('GetStockCurrentPrice: updating DB with current price for: ' + stock.symbol);
+
+    var stockRequestOptions = {
+      url: 'http://finance.google.com/finance/info?q=' + stock.symbol,
+      json: true
+    };
+
+    Request(stockRequestOptions, function (error, response, body) {
+      if (!error && response.statusCode === 200) {
+        var result = JSON.parse(body.replace("//", ""));
+
+        req.body.exchange = result[0].e;
+        req.body.price = result[0].l;
+        var cashForPurchase = (selectedFund.goal * (stock.originalPercentOfFund / 100));
+        var sharesToPurchase = (cashForPurchase / req.body.price) * 100 / 100;
+        req.body.numberOfShares = sharesToPurchase;
+        req.body.change = result[0].c;
+        var investmentAmount = req.body.numberOfShares * req.body.price;
+        var percentOfFund = investmentAmount / selectedFund.goal * 100;
+
+        selectedFundCash -= investmentAmount;
+
+        fund.update(
+          {
+            '_id': mongoose.Types.ObjectId(selectedFund._id),
+            'stocks._id': mongoose.Types.ObjectId(stock._id)
+          },
+          {
+            $set: {
+              'cash' : selectedFundCash,
+              'stocks.$.price': req.body.price,
+              'stocks.$.created': Date(),
+              'stocks.$.currentPrice': req.body.price,
+              'stocks.$.currentNumberOfShares': req.body.numberOfShares,
+              'stocks.$.currentPercentOfFund': percentOfFund,
+              'stocks.$.originalPercentOfFund': percentOfFund,
+              'stocks.$.currentCashInvestment': (req.body.numberOfShares * req.body.price) * 100 / 100,
+              'stocks.$.originalCashInvestment': (req.body.numberOfShares * req.body.price) * 100 / 100
+            }
+          },
+          function (err, result) {
+            if (err) {
+              return handleError(result, err);
+            }
+
+            investmentUpdateCount++;
+
+            if(selectedFund.stocks.length == investmentUpdateCount) {
+              if(typeof updatedFund == "function") {
+                updatedFund(selectedFund);
               }
-            },
-            function (err, result) {
-              if (err) {
-                return handleError(result, err);
-              }
+            }
 
-              console.log('GetStockCurrentPrice: updating DB with current price for: ' + stock.symbol);
-            });
-        }
+
+          });
+      }
     })
 
-      setPercentLeftToInvest(selectedFund);
 
-      selectedFund.save(function (err) {
-        if (err) {
-          return handleError(res, err);
-        }
-      });
+  })
 
-    })
 }
 
   exports.show = function (req, res) {
@@ -216,11 +224,16 @@ function UpdatePreInitializedFunds(selectedFund, req) {
           UpdateInitializedFunds(selectedFund, res);
         }
         else {
-          UpdatePreInitializedFunds(selectedFund, req, res);
+
+          UpdatePreInitializedFunds(selectedFund, req, function(selectedFund) {
+            return res.send(selectedFund);
+          });
         }
       }
 
       user.selectedFund = fund._id;
+
+      setPercentLeftToInvest(selectedFund);
 
       user.save(function (errs) {
         if (errs) {
@@ -228,10 +241,12 @@ function UpdatePreInitializedFunds(selectedFund, req) {
           return res.render('500');
         }
 
-        return res.json(selectedFund);
-
         console.log('saving user selectedFund');
       });
+
+
+
+
     });
   };
 
