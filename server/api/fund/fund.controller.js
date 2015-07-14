@@ -230,6 +230,10 @@ function UpdatePreInitializedFunds(selectedFund, req, updatedFund) {
           });
         }
       }
+      else
+      {
+        return res.send(selectedFund);
+      }
 
       user.selectedFund = fund._id;
 
