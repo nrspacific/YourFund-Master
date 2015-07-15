@@ -99,8 +99,8 @@ exports.create = function (req, res) {
 
           stock.currentPrice = req.body.price;
           stock.currentNumberOfShares = req.body.numberOfShares;
-          stock.currentPercentOfFund = percentOfFund;
-          stock.originalPercentOfFund = percentOfFund;
+          stock.currentPercentOfFund = req.body.originalPercentOfFund;
+          stock.originalPercentOfFund = req.body.originalPercentOfFund;
           stock.currentCashInvestment =  (req.body.numberOfShares * req.body.price)* 100 / 100;
           stock.originalCashInvestment =  (req.body.numberOfShares * req.body.price)* 100 / 100;
 
