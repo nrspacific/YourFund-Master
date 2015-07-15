@@ -45,7 +45,7 @@ angular.module('yourfundFullstackApp')
       $scope.amountLeftToInvest = fund.cash;
       $scope.percentLeftToInvest = fund.percentLeftToInvest;
       $scope.currentCashInvestment = fund.currentCashInvestment;
-      $scope.totalStockAllocated = 0;
+      $scope.totalInvestmentPercentage = 0;
       $scope.totalCashInvestedInFund = 0;
       $scope.originalMoneyInvested = 0;
       $scope.originalCMMFInvested = 0;
@@ -55,28 +55,28 @@ angular.module('yourfundFullstackApp')
       var originalInvestmentTotal = 0;
       var currentInvestmentTotal = 0;
       $scope.currentInvestmentTotal = 0;
+      $scope.gainLossCash = 0;
 
       fund.stocks.forEach(function (s) {
-        if (fund.finalized === 'false') {
-          $scope.totalStockAllocated = $scope.totalStockAllocated + Number(s.originalPercentOfFund);
-          $scope.totalCashInvestedInFund = $scope.totalCashInvestedInFund + Number(s.price * s.numberOfShares);
+        if (fund.finalized === false) {
+          $scope.totalInvestmentPercentage =  $scope.totalInvestmentPercentage + Number(s.originalPercentOfFund);
+          $scope.totalCashInvestedInFund = $scope.totalCashInvestedInFund +  parseFloat(s.price * s.numberOfShares);
         }
         else {
-          $scope.totalStockAllocated = $scope.totalStockAllocated + Number(s.currentPercentOfFund);
+          $scope.totalInvestmentPercentage = $scope.totalInvestmentPercentage + Number(s.currentPercentOfFund);
           $scope.totalCashInvestedInFund = $scope.totalCashInvestedInFund + Number(s.currentPrice * s.numberOfShares);
           originalInvestmentTotal += Number(s.price * s.numberOfShares);
           $scope.currentInvestmentTotal += s.currentCashInvestment;
+          $scope.gainLossCash += (s.numberOfShares * s.currentPrice) - (s.numberOfShares * s.price);
+          gainLossPercent += ((s.numberOfShares * s.currentPrice) - (s.numberOfShares * s.price)) / (s.numberOfShares * s.price);
         }
-
-        gainLossPercent += parseInt(s.change);
       });
 
       $scope.currentCMMFInvested = $scope.totalInvested  - $scope.currentInvestmentTotal;
       $scope.originalCMMFInvested = $scope.totalInvested  - originalInvestmentTotal;
       $scope.originalMoneyInvested = $scope.originalCMMFInvested   + originalInvestmentTotal;
-      $scope.gainLossCash = 0;
       $scope.gainLossPercent = gainLossPercent / fund.stocks.length;
-      $scope.currentTotalInvestmentAmount  = $scope.currentInvestmentTotal + ($scope.totalInvested - $scope.currentInvestmentTotal);
+      $scope.currentTotalInvestmentAmount  = $scope.currentInvestmentTotal + fund.cash;
 
       getSelectedFundTransactionHistory(fundID);
 

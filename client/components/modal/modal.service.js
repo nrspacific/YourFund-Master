@@ -83,8 +83,9 @@ angular.module('yourfundFullstackApp')
       // are triggered.
       $timeout(function() {
         var element = $window.document.getElementById(id);
+
         if(element)
           element.focus();
-      },500);
+      },1500);
     };
   });

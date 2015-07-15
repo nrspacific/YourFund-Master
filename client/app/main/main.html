@@ -66,10 +66,10 @@
               Total Invested: {{totalInvested | currency}}
             </div>
             <div class="col-md-3">
-              Amount Left To Invest: {{currentCMMFInvested | currency}}
+              Amount Left To Invest: {{selectedFund.cash | currency}}
             </div>
             <div class="col-md-3">
-              Percent Left To Invest: {{percentLeftToInvest | number:1 }}%
+              Percent Left To Invest: {{percentLeftToInvest | number:2 }}%
             </div>
             <div class="col-md-3">
               Create Date: {{selectedFund.created | date : format : timezone}}
@@ -152,10 +152,10 @@
                                            style="width:55px;text-align:center">
                                     <input type="button" ng-click="updateAllocationAmount(stock)" value="Update">
                                 </span>
-                                <span ng-hide="editMode">{{ stock.originalPercentOfFund | number:1 }}%</span>
+                                <span ng-hide="editMode">{{stock.originalPercentOfFund  | number:4 }}%</span>
                               </td>
                               <td data-title="'Money Invested'">{{ stock.numberOfShares * stock.price | currency }}</td>
-                              <td data-title="'Current Bought'">{{ stock.price | currency }}</td>
+                              <td data-title="'Current Price'">{{ stock.price | currency }}</td>
                               <td data-title="'# Of Shares'">{{ stock.numberOfShares | number:4}}</td>
                               <td>
                                 <div class="btn-group">
@@ -172,10 +172,10 @@
                             </tr>
                             <tr style="background:#fffee;font-weight: 700">
                               <td style="text-align: right;padding-right:5px">Totals:</td>
-                              <td ng-show="!selectedFund.finalized">{{totalStockAllocated | number:1 }}%</td>
-                              <td ng-show="!selectedFund.finalized">{{totalCashInvestedInFund | currency}}</td>
-                              <td colspan="6" ng-show="!selectedFund.finalized"></td>
-                              <td colspan="12" ng-show="selectedFund.finalized"></td>
+                              <td >{{totalInvestmentPercentage | setDecimal:4}}%</td>
+                              <td >{{totalCashInvestedInFund | currency}}</td>
+                              <td colspan="6"></td>
+                              <td colspan="12"></td>
                             </tr>
                           </table>
 
@@ -188,7 +188,7 @@
                               </td>
                               <td data-title="'Current Price'">{{ stock.currentPrice | currency }}</td>
                               <td data-title="'# Of Shares'">{{ stock.currentNumberOfShares }}</td>
-                              <td data-title="'Original % Allocated'">{{ stock.originalPercentOfFund | number:1 }}%</td>
+                              <td data-title="'Original % Allocated'">{{ ((stock.originalCashInvestment) / selectedFund.goal) * 100 | number:1 }}%</td>
                               <td data-title="'Original Money Invested'">{{ stock.originalCashInvestment | currency }}
                               </td>
                               <td data-title="'Original Price'">{{ stock.price | currency }}</td>
@@ -196,7 +196,7 @@
                                 stock.numberOfShares * stock.price | currency }}
                               </td>
                               <td data-title="'Gain/Loss %'">{{ ((stock.numberOfShares * stock.currentPrice) -
-                                (stock.numberOfShares * stock.price)) / (stock.numberOfShares * stock.price) | number:2
+                                (stock.numberOfShares * stock.price)) / (stock.numberOfShares * stock.price) | number:4
                                 }}%
                               </td>
 
@@ -218,7 +218,7 @@
                             <tr ng-show="amountLeftToInvest > 0" style="background:#ffffcc">
                               <td>Cash Money Market Fund</td>
                               <td>{{selectedFund.percentLeftToInvest | number:1 }}%</td>
-                              <td>{{currentCMMFInvested | currency}}</td>
+                              <td>{{selectedFund.cash | currency}}</td>
                               <td>$1.00</td>
                               <td>{{currentCMMFInvested| number:2}}</td>
                               <td>{{ (originalCMMFInvested/totalInvested) * 100 | number:1 }}%</td>
@@ -237,8 +237,8 @@
                               <td >100%</td>
                               <td>{{originalMoneyInvested | currency}}</td>
                               <td></td>
-                              <td>TODO{{gainLossCash | currency}}</td>
-                              <td>TODO{{gainLossPercent}} %</td>
+                              <td>{{gainLossCash | currency}}</td>
+                              <td>{{gainLossPercent | number:4}} %</td>
                               <td></td>
                             </tr>
                           </table>
@@ -247,7 +247,7 @@
                           <div class="row" style="color:#2f4f4f; font-size:11pt;margin:5px"
                                ng-show="!selectedFund.finalized">
                             <div class="col-md-6">
-                              *The remaining Cash ({{amountLeftToInvest | currency}}) will be in a cash fund once
+                              *The remaining Cash ({{ selectedFund.goal - totalCashInvestedInFund | currency}}) will be in a cash fund once
                               invested.
                             </div>
                           </div>
@@ -539,7 +539,7 @@
         <h4 class="modal-title">Do you wish to initialize this fund?</h4>
       </div>
       <div class="modal-body">
-        You are about to purchase {{ (selectedFund.goal - amountLeftToInvest) | currency}} in investments and the
+        You are about to purchase ${{ (selectedFund.goal - selectedFund.cash)}} in investments and the
         remaining {{amountLeftToInvest | currency}} will be placed in a Money Market Fund.
       </div>
       <div class="modal-footer">
