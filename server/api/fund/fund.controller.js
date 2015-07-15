@@ -154,15 +154,15 @@ function UpdatePreInitializedFunds(selectedFund, req, updatedFund) {
         var result = JSON.parse(body.replace("//", ""));
 
         req.body.exchange = result[0].e;
-        req.body.price = result[0].l;
-        var cashForPurchase = (selectedFund.goal * (stock.originalPercentOfFund / 100));
+        req.body.price = result[0].l; //Stock price
+        var cashForPurchase = (selectedFund.goal * (stock.originalPercentOfFund / 100)); //goal is total amount invested
         var sharesToPurchase = (cashForPurchase / req.body.price) * 100 / 100;
         req.body.numberOfShares = sharesToPurchase;
-        req.body.change = result[0].c;
-        var investmentAmount = req.body.numberOfShares * req.body.price;
-        var percentOfFund = investmentAmount / selectedFund.goal * 100;
+        req.body.change = result[0].c; //Stock change
+        var investmentAmount = req.body.numberOfShares * req.body.price; //Money invested
+        //var percentOfFund = investmentAmount / selectedFund.goal * 100; //percent of fund allocated
 
-        selectedFundCash -= investmentAmount;
+        selectedFundCash -= cashForPurchase;
 
         fund.update(
           {
@@ -175,11 +175,13 @@ function UpdatePreInitializedFunds(selectedFund, req, updatedFund) {
               'stocks.$.price': req.body.price,
               'stocks.$.created': Date(),
               'stocks.$.currentPrice': req.body.price,
+              'stocks.$.numberOfShares': req.body.numberOfShares,
               'stocks.$.currentNumberOfShares': req.body.numberOfShares,
-              'stocks.$.currentPercentOfFund': percentOfFund,
-              'stocks.$.originalPercentOfFund': percentOfFund,
-              'stocks.$.currentCashInvestment': (req.body.numberOfShares * req.body.price) * 100 / 100,
-              'stocks.$.originalCashInvestment': (req.body.numberOfShares * req.body.price) * 100 / 100
+
+              //'stocks.$.currentPercentOfFund': percentOfFund,
+              //'stocks.$.originalPercentOfFund': percentOfFund,
+              //'stocks.$.currentCashInvestment': (req.body.numberOfShares * req.body.price) * 100 / 100,
+              //'stocks.$.originalCashInvestment': (req.body.numberOfShares * req.body.price) * 100 / 100
             }
           },
           function (err, result) {
