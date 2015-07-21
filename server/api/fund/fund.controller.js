@@ -78,7 +78,10 @@ exports.getFund = function (req, res) {
 };
 
 // Get a single fund w/stock updates
-function UpdateInitializedFunds(selectedFund, res) {
+function UpdateInitializedFunds(selectedFund, res,  updatedFund) {
+  var investmentUpdateCount = 0;
+
+
   selectedFund.stocks.forEach(function (stock) {
 
     var stockRequestOptions = {
@@ -122,14 +125,19 @@ function UpdateInitializedFunds(selectedFund, res) {
                 return handleError(result, err);
               }
 
+              investmentUpdateCount++;
+
+              if(selectedFund.stocks.length == investmentUpdateCount) {
+                if(typeof updatedFund == "function") {
+                  updatedFund(selectedFund);
+                }
+              }
+
               console.log('GetStockCurrentPrice: updating DB with current price for: ' + stock.symbol);
             });
         }
       }
     );
-
-
-
   });
 }
 
@@ -196,15 +204,10 @@ function UpdatePreInitializedFunds(selectedFund, req, updatedFund) {
                 updatedFund(selectedFund);
               }
             }
-
-
           });
       }
     })
-
-
   })
-
 }
 
   exports.show = function (req, res) {
@@ -223,7 +226,9 @@ function UpdatePreInitializedFunds(selectedFund, req, updatedFund) {
 
       if (selectedFund.stocks.length > 0) {
         if (selectedFund.finalized == true) {
-          UpdateInitializedFunds(selectedFund, res);
+          UpdateInitializedFunds(selectedFund, res, function(selectedFund) {
+            return res.send(selectedFund);
+          });
         }
         else {
 
