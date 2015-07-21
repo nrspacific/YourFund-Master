@@ -115,6 +115,7 @@ function UpdateInitializedFunds(selectedFund, res,  updatedFund) {
             {
               $set: {
                 'stocks.$.currentPrice': currentPrice,
+                'stocks.$.created': Date(),
                 'stocks.$.currentNumberOfShares': numberOfShares,
                 'stocks.$.currentPercentOfFund': currentPercentOfFund,
                 'stocks.$.currentCashInvestment': currentCashInvestment
@@ -140,8 +141,6 @@ function UpdateInitializedFunds(selectedFund, res,  updatedFund) {
     );
   });
 }
-
-
 
 function UpdatePreInitializedFunds(selectedFund, req, updatedFund) {
 
