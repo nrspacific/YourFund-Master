@@ -98,6 +98,7 @@ function UpdateInitializedFunds(selectedFund, res,  updatedFund) {
           var currentPrice = result[0].l;
           console.log('GetStockCurrentPrice: current price for: ' + stock.symbol + ' - ' + currentPrice);
 
+
           var currentPercentOfFund = ((stock.numberOfShares * currentPrice) / selectedFund.goal) * 100;
           var cashForPurchase = (selectedFund.goal * (currentPercentOfFund / 100));
           var numberOfShares = cashForPurchase / currentPrice * 100 / 100;
