@@ -99,7 +99,7 @@ function UpdateInitializedFunds(selectedFund, res,  updatedFund) {
           console.log('GetStockCurrentPrice: current price for: ' + stock.symbol + ' - ' + currentPrice);
 
 
-          var currentPercentOfFund = ((stock.numberOfShares * currentPrice) / selectedFund.goal) * 100;
+          var currentPercentOfFund = ((stock.currentNumberOfShares * currentPrice) / selectedFund.goal) * 100;
           var cashForPurchase = (selectedFund.goal * (currentPercentOfFund / 100));
           var numberOfShares = cashForPurchase / currentPrice * 100 / 100;
           var currentCashInvestment = Math.floor((numberOfShares * currentPrice) * 100) / 100;
@@ -119,7 +119,7 @@ function UpdateInitializedFunds(selectedFund, res,  updatedFund) {
                 'stocks.$.created': Date(),
                 'stocks.$.currentNumberOfShares': numberOfShares,
                 'stocks.$.currentPercentOfFund': currentPercentOfFund,
-               // 'stocks.$.currentCashInvestment': currentCashInvestment
+                'stocks.$.currentCashInvestment': currentCashInvestment
               }
             },
             function (err, result) {
