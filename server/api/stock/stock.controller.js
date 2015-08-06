@@ -253,7 +253,10 @@ exports.update = function (req, res) {
       fund.update(
         {'_id': req.body.fundId, 'stocks._id': mongoose.Types.ObjectId(stockToUpdate._id)},
         {$set: {'stocks.$.currentPercentOfFund': stockToUpdate.currentPercentOfFund,
+                'stocks.$.originalPercentOfFund': stockToUpdate.originalPercentOfFund,
                 'stocks.$.currentNumberOfShares': stockToUpdate.numberOfShares,
+                'stocks.$.currentCashInvestment': stockToUpdate.currentCashInvestment,
+                'stocks.$.originalCashInvestment': stockToUpdate.originalCashInvestment,
                 'stocks.$.active': stockToUpdate.active
         }},function (err, result) {
           if (err) {
