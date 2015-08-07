@@ -214,16 +214,13 @@ exports.update = function (req, res) {
         selectedFund.cash = selectedFund.cash ;
         //stockToUpdate.originalPercentOfFund =  stockToUpdate.currentPercentOfFund;
       }else{
-
         // Add funds back to fund
         if(req.body.originalAllocation){
           cashForPurchase =(selectedFund.goal * (req.body.originalAllocation / 100));
           stockToUpdate.numberOfShares = cashForPurchase / stockToUpdate.price;
           purchasePrice = stockToUpdate.numberOfShares * stockToUpdate.price;
-
           selectedFund.cash = selectedFund.cash + purchasePrice;
         }
-
         cashForPurchase =(selectedFund.goal * (stockToUpdate.originalPercentOfFund / 100));
         stockToUpdate.numberOfShares = cashForPurchase / stockToUpdate.price;
         purchasePrice = stockToUpdate.numberOfShares * stockToUpdate.price;
@@ -231,7 +228,6 @@ exports.update = function (req, res) {
         //Updated funds cash left
         selectedFund.cash = selectedFund.cash - purchasePrice;
       }
-
 
       if(selectedFund.finalized == true){
         if(stockToUpdate.currentPercentOfFund == 0){
@@ -380,13 +376,6 @@ exports.update = function (req, res) {
         });
     }
 
-
-
-
-
-
-
-
     setPercentLeftToInvest(selectedFund);
 
     selectedFund.save(function (errs) {
@@ -394,9 +383,7 @@ exports.update = function (req, res) {
         console.log(errs);
         return res.render('500');
       }
-      return res.send(204);
-
-
+      return res.send(204,selectedFund);
     });
 
   })

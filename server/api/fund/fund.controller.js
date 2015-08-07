@@ -80,7 +80,7 @@ exports.getFund = function (req, res) {
 // Get a single fund w/stock updates
 function UpdateInitializedFunds(selectedFund, res,  updatedFund) {
   var investmentUpdateCount = 0;
-
+  var selectedFundCash = selectedFund.goal;
 
   selectedFund.stocks.forEach(function (stock) {
 
@@ -108,6 +108,8 @@ function UpdateInitializedFunds(selectedFund, res,  updatedFund) {
           console.log('stock.currentNumberOfShares: ' + numberOfShares);
           console.log('stock.currentPercentOfFund: ' + currentPercentOfFund);
 
+          selectedFundCash -= cashForPurchase;
+
           fund.update(
             {
               '_id': mongoose.Types.ObjectId(selectedFund._id),
@@ -115,6 +117,7 @@ function UpdateInitializedFunds(selectedFund, res,  updatedFund) {
             },
             {
               $set: {
+                'cash' : selectedFundCash,
                 'stocks.$.currentPrice': currentPrice,
                 'stocks.$.created': Date(),
                 'stocks.$.currentNumberOfShares': numberOfShares,
