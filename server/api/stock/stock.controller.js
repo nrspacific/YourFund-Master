@@ -206,13 +206,12 @@ exports.update = function (req, res) {
       if(selectedFund.finalized == true){
         cashForPurchase =(selectedFund.goal * (stockToUpdate.currentPercentOfFund / 100));
        // stockToUpdate.numberOfShares = cashForPurchase / stockToUpdate.currentPrice;
-        purchasePrice = stockToUpdate.numberOfShares * stockToUpdate.currentPrice;
-        amountToReturnToFund = stockToUpdate.numberOfShares * stockToUpdate.currentPrice;
+        purchasePrice = stockToUpdate.currentNumberOfShares * stockToUpdate.currentPrice;
+        amountToReturnToFund = stockToUpdate.currentNumberOfShares * stockToUpdate.currentPrice;
 
         //Updated funds cash left
-        stockToUpdate.numberOfShares = cashForPurchase / stockToUpdate.price;
-        selectedFund.cash = selectedFund.cash + purchasePrice;
-        selectedFund.cash = selectedFund.cash - cashForPurchase;
+        stockToUpdate.currentNumberOfShares = cashForPurchase / stockToUpdate.currentPrice;
+        selectedFund.cash = selectedFund.cash ;
         //stockToUpdate.originalPercentOfFund =  stockToUpdate.currentPercentOfFund;
       }else{
 
@@ -254,7 +253,7 @@ exports.update = function (req, res) {
         {'_id': req.body.fundId, 'stocks._id': mongoose.Types.ObjectId(stockToUpdate._id)},
         {$set: {'stocks.$.currentPercentOfFund': stockToUpdate.currentPercentOfFund,
                 'stocks.$.originalPercentOfFund': stockToUpdate.originalPercentOfFund,
-                'stocks.$.currentNumberOfShares': stockToUpdate.numberOfShares,
+                'stocks.$.currentNumberOfShares': stockToUpdate.currentNumberOfShares,
                 'stocks.$.currentCashInvestment': stockToUpdate.currentCashInvestment,
                 'stocks.$.originalCashInvestment': stockToUpdate.originalCashInvestment,
                 'stocks.$.active': stockToUpdate.active
