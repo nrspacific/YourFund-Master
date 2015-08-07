@@ -383,7 +383,7 @@ exports.update = function (req, res) {
         console.log(errs);
         return res.render('500');
       }
-      return res.send(204,selectedFund);
+      return res.send(204);
     });
 
   })
