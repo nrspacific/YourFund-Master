@@ -78,7 +78,10 @@ exports.getFund = function (req, res) {
 };
 
 // Get a single fund w/stock updates
-function UpdateInitializedFunds(selectedFund, res) {
+function UpdateInitializedFunds(selectedFund, res,  updatedFund) {
+  var investmentUpdateCount = 0;
+  var selectedFundCash = selectedFund.goal;
+
   selectedFund.stocks.forEach(function (stock) {
 
     var stockRequestOptions = {
@@ -95,14 +98,17 @@ function UpdateInitializedFunds(selectedFund, res) {
           var currentPrice = result[0].l;
           console.log('GetStockCurrentPrice: current price for: ' + stock.symbol + ' - ' + currentPrice);
 
-          var currentPercentOfFund = ((stock.numberOfShares * currentPrice) / selectedFund.goal) * 100;
+
+          var currentPercentOfFund = ((stock.currentNumberOfShares * currentPrice) / selectedFund.goal) * 100;
           var cashForPurchase = (selectedFund.goal * (currentPercentOfFund / 100));
-          var numberOfShares = cashForPurchase / currentPrice * 100 / 100;
+          var numberOfShares = cashForPurchase / currentPrice;
           var currentCashInvestment = Math.floor((numberOfShares * currentPrice) * 100) / 100;
 
           console.log('stock.currentPrice: ' + currentPrice);
           console.log('stock.currentNumberOfShares: ' + numberOfShares);
           console.log('stock.currentPercentOfFund: ' + currentPercentOfFund);
+
+          selectedFundCash -= cashForPurchase;
 
           fund.update(
             {
@@ -111,10 +117,13 @@ function UpdateInitializedFunds(selectedFund, res) {
             },
             {
               $set: {
+               // 'cash' : selectedFundCash,
                 'stocks.$.currentPrice': currentPrice,
+                'stocks.$.created': Date(),
                 'stocks.$.currentNumberOfShares': numberOfShares,
                 'stocks.$.currentPercentOfFund': currentPercentOfFund,
-                'stocks.$.currentCashInvestment': currentCashInvestment
+                'stocks.$.currentCashInvestment': currentCashInvestment,
+                'stocks.$.originalCashInvestment': currentCashInvestment
               }
             },
             function (err, result) {
@@ -122,18 +131,21 @@ function UpdateInitializedFunds(selectedFund, res) {
                 return handleError(result, err);
               }
 
+              investmentUpdateCount++;
+
+              if(selectedFund.stocks.length == investmentUpdateCount) {
+                if(typeof updatedFund == "function") {
+                  updatedFund(selectedFund);
+                }
+              }
+
               console.log('GetStockCurrentPrice: updating DB with current price for: ' + stock.symbol);
             });
         }
       }
     );
-
-
-
   });
 }
-
-
 
 function UpdatePreInitializedFunds(selectedFund, req, updatedFund) {
 
@@ -196,18 +208,13 @@ function UpdatePreInitializedFunds(selectedFund, req, updatedFund) {
                 updatedFund(selectedFund);
               }
             }
-
-
           });
       }
     })
-
-
   })
-
 }
 
-  exports.show = function (req, res) {
+exports.show = function (req, res) {
 
     console.log('fund.controller: init');
 
@@ -223,7 +230,10 @@ function UpdatePreInitializedFunds(selectedFund, req, updatedFund) {
 
       if (selectedFund.stocks.length > 0) {
         if (selectedFund.finalized == true) {
-          UpdateInitializedFunds(selectedFund, res);
+          UpdateInitializedFunds(selectedFund, res, function(selectedFund) {
+            setPercentLeftToInvest(selectedFund);
+            return res.send(selectedFund);
+          });
         }
         else {
 
@@ -239,7 +249,7 @@ function UpdatePreInitializedFunds(selectedFund, req, updatedFund) {
 
       user.selectedFund = fund._id;
 
-      setPercentLeftToInvest(selectedFund);
+
 
       user.save(function (errs) {
         if (errs) {
@@ -306,7 +316,6 @@ function UpdatePreInitializedFunds(selectedFund, req, updatedFund) {
     });
 
   };
-
 
 // Updates an existing fund in the DB.
   exports.update = function (req, res) {

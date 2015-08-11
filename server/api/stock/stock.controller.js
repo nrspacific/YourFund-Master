@@ -99,8 +99,8 @@ exports.create = function (req, res) {
 
           stock.currentPrice = req.body.price;
           stock.currentNumberOfShares = req.body.numberOfShares;
-          stock.currentPercentOfFund = percentOfFund;
-          stock.originalPercentOfFund = percentOfFund;
+          stock.currentPercentOfFund = req.body.originalPercentOfFund;
+          stock.originalPercentOfFund = req.body.originalPercentOfFund;
           stock.currentCashInvestment =  (req.body.numberOfShares * req.body.price)* 100 / 100;
           stock.originalCashInvestment =  (req.body.numberOfShares * req.body.price)* 100 / 100;
 
@@ -184,6 +184,7 @@ exports.update = function (req, res) {
 
   var user = req.user;
   var stockToUpdate = req.body.stockToUpdate;
+  var fundToUpdate = req.body.fundToUpdate;
 
   if (!req.body) { return res.send(400);}
   if (req.body._id) {delete req.body._id;}
@@ -206,25 +207,21 @@ exports.update = function (req, res) {
       if(selectedFund.finalized == true){
         cashForPurchase =(selectedFund.goal * (stockToUpdate.currentPercentOfFund / 100));
        // stockToUpdate.numberOfShares = cashForPurchase / stockToUpdate.currentPrice;
-        purchasePrice = stockToUpdate.numberOfShares * stockToUpdate.currentPrice;
-        amountToReturnToFund = stockToUpdate.numberOfShares * stockToUpdate.currentPrice;
+        purchasePrice = stockToUpdate.currentNumberOfShares * stockToUpdate.currentPrice;
+        amountToReturnToFund = stockToUpdate.currentNumberOfShares * stockToUpdate.currentPrice;
 
         //Updated funds cash left
-        stockToUpdate.numberOfShares = cashForPurchase / stockToUpdate.price;
-        selectedFund.cash = selectedFund.cash + purchasePrice;
-        selectedFund.cash = selectedFund.cash - cashForPurchase;
+        stockToUpdate.currentNumberOfShares = cashForPurchase / stockToUpdate.currentPrice;
+        selectedFund.cash = fundToUpdate.cash ;
         //stockToUpdate.originalPercentOfFund =  stockToUpdate.currentPercentOfFund;
       }else{
-
         // Add funds back to fund
         if(req.body.originalAllocation){
           cashForPurchase =(selectedFund.goal * (req.body.originalAllocation / 100));
           stockToUpdate.numberOfShares = cashForPurchase / stockToUpdate.price;
           purchasePrice = stockToUpdate.numberOfShares * stockToUpdate.price;
-
-          selectedFund.cash = selectedFund.cash + purchasePrice;
+          selectedFund.cash = fundToUpdate.cash + purchasePrice;
         }
-
         cashForPurchase =(selectedFund.goal * (stockToUpdate.originalPercentOfFund / 100));
         stockToUpdate.numberOfShares = cashForPurchase / stockToUpdate.price;
         purchasePrice = stockToUpdate.numberOfShares * stockToUpdate.price;
@@ -232,7 +229,6 @@ exports.update = function (req, res) {
         //Updated funds cash left
         selectedFund.cash = selectedFund.cash - purchasePrice;
       }
-
 
       if(selectedFund.finalized == true){
         if(stockToUpdate.currentPercentOfFund == 0){
@@ -252,8 +248,12 @@ exports.update = function (req, res) {
     if(selectedFund.finalized == true){
       fund.update(
         {'_id': req.body.fundId, 'stocks._id': mongoose.Types.ObjectId(stockToUpdate._id)},
-        {$set: {'stocks.$.currentPercentOfFund': stockToUpdate.currentPercentOfFund,
-                'stocks.$.currentNumberOfShares': stockToUpdate.numberOfShares,
+        {$set: {'cash': selectedFund.cash,
+                'stocks.$.currentPercentOfFund': stockToUpdate.currentPercentOfFund,
+                'stocks.$.originalPercentOfFund': stockToUpdate.originalPercentOfFund,
+                'stocks.$.currentNumberOfShares': stockToUpdate.currentNumberOfShares,
+                'stocks.$.currentCashInvestment': stockToUpdate.currentCashInvestment,
+                'stocks.$.originalCashInvestment': stockToUpdate.originalCashInvestment,
                 'stocks.$.active': stockToUpdate.active
         }},function (err, result) {
           if (err) {
@@ -316,8 +316,13 @@ exports.update = function (req, res) {
     else{
       fund.update(
         {'_id': req.body.fundId, 'stocks._id': mongoose.Types.ObjectId(stockToUpdate._id)},
-        {$set: {'stocks.$.originalPercentOfFund': stockToUpdate.originalPercentOfFund,
+        {$set: { 'cash': selectedFund.cash,
+                'stocks.$.originalPercentOfFund': stockToUpdate.originalPercentOfFund,
+                'stocks.$.currentPercentOfFund': stockToUpdate.originalPercentOfFund,
+                'stocks.$.currentNumberOfShares': stockToUpdate.numberOfShares,
                 'stocks.$.numberOfShares': stockToUpdate.numberOfShares,
+                'stocks.$.originalCashInvestment': purchasePrice,
+                'stocks.$.currentCashInvestment': purchasePrice,
                 'stocks.$.active': stockToUpdate.active
         }},function (err, result) {
           if (err) {
@@ -378,13 +383,6 @@ exports.update = function (req, res) {
         });
     }
 
-
-
-
-
-
-
-
     setPercentLeftToInvest(selectedFund);
 
     selectedFund.save(function (errs) {
@@ -393,8 +391,6 @@ exports.update = function (req, res) {
         return res.render('500');
       }
       return res.send(204);
-
-
     });
 
   })

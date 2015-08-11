@@ -2,7 +2,7 @@
 
 angular.module('yourfundFullstackApp')
   .controller('MainCtrl',
-  function ($scope, $modal, $http, $filter, socket, Auth, User, transactionService, stocklookupservice, focus) {
+  function ($scope, $modal, $http, $filter,$interval, socket, Auth, User, transactionService, stocklookupservice, focus) {
 
     $scope.getCurrentUser = Auth.getCurrentUser;
     $scope.selectedFund = null;
@@ -14,6 +14,7 @@ angular.module('yourfundFullstackApp')
       if ($scope.getCurrentUser().funds) {
         $scope.getCurrentUser.Funds = $scope.getCurrentUser().funds;
         setSelectedFund($scope.getCurrentUser().funds[0]);
+        $scope.selectedFund = $scope.getCurrentUser().funds[0];
       }
     }
 
@@ -61,6 +62,7 @@ angular.module('yourfundFullstackApp')
         if (fund.finalized === false) {
           $scope.totalInvestmentPercentage =  $scope.totalInvestmentPercentage + Number(s.originalPercentOfFund);
           $scope.totalCashInvestedInFund = $scope.totalCashInvestedInFund +  parseFloat(s.price * s.numberOfShares);
+          originalInvestmentTotal += Number(s.price * s.numberOfShares);
         }
         else {
           $scope.totalInvestmentPercentage = $scope.totalInvestmentPercentage + Number(s.currentPercentOfFund);
@@ -68,21 +70,24 @@ angular.module('yourfundFullstackApp')
           originalInvestmentTotal += Number(s.price * s.numberOfShares);
           $scope.currentInvestmentTotal += s.currentCashInvestment;
           $scope.gainLossCash += (s.numberOfShares * s.currentPrice) - (s.numberOfShares * s.price);
-          gainLossPercent += ((s.numberOfShares * s.currentPrice) - (s.numberOfShares * s.price)) / (s.numberOfShares * s.price);
         }
       });
+
 
       $scope.currentCMMFInvested = $scope.totalInvested  - $scope.currentInvestmentTotal;
       $scope.originalCMMFInvested = $scope.totalInvested  - originalInvestmentTotal;
       $scope.originalMoneyInvested = $scope.originalCMMFInvested   + originalInvestmentTotal;
-      $scope.gainLossPercent = gainLossPercent / fund.stocks.length;
+      $scope.gainLossPercent = ($scope.gainLossCash/$scope.totalInvested) * 100;
       $scope.currentTotalInvestmentAmount  = $scope.currentInvestmentTotal + fund.cash;
 
       getSelectedFundTransactionHistory(fundID);
 
       $scope.selectedFund = fund;
+
+
       console.log("selected fund = " + JSON.stringify(fund));
     }
+
 
     function getFund(fundID) {
       $http.get('/api/funds/' + fundID)
@@ -98,13 +103,35 @@ angular.module('yourfundFullstackApp')
         });
     };
 
+
+    // Cancel interval on page changes
+    $scope.$on('$destroy', function(){
+      stopPriceCheck();
+    });
+
+    function stopPriceCheck(){
+      console.log('stopping price check for investments');
+      if (angular.isDefined(promise)) {
+        $interval.cancel(promise);
+        promise = undefined;
+      }
+    }
+
+
+    var promise = $interval(function() {
+      setSelectedFund($scope.selectedFund);
+    }, 300000);
+
+
     function setSelectedFund(fund) {
-      try {
-        setSelectedFundByID(fund._id);
-      }
-      catch (err) {
-        document.getElementById("demo").innerHTML = err.message;
-      }
+     if(fund){
+       try {
+         setSelectedFundByID(fund._id);
+       }
+       catch (err) {
+         document.getElementById("demo").innerHTML = err.message;
+       }
+     }
     }
 
     function getSelectedFundTransactionHistory(fundID) {
@@ -404,6 +431,19 @@ angular.module('yourfundFullstackApp')
       return item.active === 'true' || item.active === 'True';
     };
 
+    $scope.tradeAmountCash = 0;
+
+    $scope.updateTradeAmountPercentage = function(selectedStock){
+      $scope.tradeAmount = '';
+      $scope.numberOfShares = '';
+
+
+      var numberOfShares =  $scope.tradeAmountCash / selectedStock.currentPrice;
+
+      $scope.tradeAmount =  (selectedStock.currentPrice * numberOfShares) / $scope.currentTotalInvestmentAmount * 100 ;
+      $scope.numberOfShares = numberOfShares;
+    };
+
     $scope.performTradeOnInvestment = function () {
 
       $scope.selectedStock.action = $scope.investmentAction;
@@ -411,20 +451,36 @@ angular.module('yourfundFullstackApp')
       if ($scope.selectedStock.action === 'sell') {
         if($scope.selectedFund.finalized){
           $scope.selectedStock.currentPercentOfFund = parseInt($scope.selectedStock.currentPercentOfFund) - parseInt($scope.tradeAmount);
+          $scope.selectedStock.originalPercentOfFund = parseInt($scope.selectedStock.originalPercentOfFund) - parseInt($scope.tradeAmount);
+          $scope.selectedStock.currentCashInvestment = parseInt($scope.selectedStock.currentCashInvestment) -  parseInt($scope.tradeAmountCash);
+          $scope.selectedStock.currentNumberOfShares = $scope.selectedStock.currentNumberOfShares - $scope.numberOfShares;
+          $scope.selectedStock.originalCashInvestment =  parseInt($scope.selectedStock.originalCashInvestment) -  parseInt($scope.tradeAmountCash);
+          $scope.selectedFund.cash = $scope.selectedFund.cash  + parseInt($scope.tradeAmountCash);
         }else{
           $scope.selectedStock.originalPercentOfFund = parseInt($scope.selectedStock.originalPercentOfFund) - parseInt($scope.tradeAmount);
         }
       }
       else if ($scope.selectedStock.action === 'sellall') {
         if($scope.selectedFund.finalized){
+          $scope.selectedFund.cash = $scope.selectedFund.cash  + $scope.selectedStock.currentCashInvestment;
           $scope.selectedStock.currentPercentOfFund = 0;
+          $scope.selectedStock.currentCashInvestment = 0;
+          $scope.selectedStock.currentNumberOfShares = 0;
+          $scope.selectedStock.originalCashInvestment =  0;
+
         }else{
           $scope.selectedStock.originalPercentOfFund = 0;
+          $scope.selectedStock.originalCashInvestment =  0;
         }
       }
       else {
         if($scope.selectedFund.finalized){
           $scope.selectedStock.currentPercentOfFund = parseInt($scope.selectedStock.currentPercentOfFund) + parseInt($scope.tradeAmount);
+          $scope.selectedStock.originalPercentOfFund = parseInt($scope.selectedStock.originalPercentOfFund) + parseInt($scope.tradeAmount);
+          $scope.selectedStock.currentCashInvestment =  parseInt($scope.selectedStock.currentCashInvestment) +  parseInt($scope.tradeAmountCash);
+          $scope.selectedStock.originalCashInvestment =  parseInt($scope.selectedStock.originalCashInvestment) +  parseInt($scope.tradeAmountCash);
+          $scope.selectedStock.currentNumberOfShares = $scope.selectedStock.currentNumberOfShares + $scope.numberOfShares;
+          $scope.selectedFund.cash = $scope.selectedFund.cash - $scope.tradeAmountCash;
         }else{
           $scope.selectedStock.originalPercentOfFund = parseInt($scope.selectedStock.originalPercentOfFund) + parseInt($scope.tradeAmount);
         }
@@ -432,17 +488,19 @@ angular.module('yourfundFullstackApp')
 
       $http.put('/api/stocks/' + $scope.selectedStock._id, {
         stockToUpdate: $scope.selectedStock,
+        fundToUpdate: $scope.selectedFund,
         fundId: $scope.selectedFund._id
       }).then(function (response) {
           $scope.editMode = false;
-          $scope.getCurrentUser().funds = Auth.updateCurrentUser();
-          setSelectedFundByID($scope.selectedFund._id);
+         // $scope.getCurrentUser().funds = Auth.updateCurrentUser();
+          setSelectedFund($scope.selectedFund);
         })
         .catch(function (response) {
           console.error('Stocks update error', response);
         });
 
       $scope.tradeAmount = '';
+      $scope.tradeAmountCash = '';
       $scope.selectedStock = null;
     };
 
