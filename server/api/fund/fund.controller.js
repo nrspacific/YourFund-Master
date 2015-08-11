@@ -122,8 +122,8 @@ function UpdateInitializedFunds(selectedFund, res,  updatedFund) {
                 'stocks.$.created': Date(),
                 'stocks.$.currentNumberOfShares': numberOfShares,
                 'stocks.$.currentPercentOfFund': currentPercentOfFund,
-                'stocks.$.currentCashInvestment': currentCashInvestment,
-                'stocks.$.originalCashInvestment': currentCashInvestment
+                'stocks.$.currentCashInvestment': currentCashInvestment
+              //  'stocks.$.originalCashInvestment': currentCashInvestment
               }
             },
             function (err, result) {
