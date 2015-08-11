@@ -184,6 +184,7 @@ exports.update = function (req, res) {
 
   var user = req.user;
   var stockToUpdate = req.body.stockToUpdate;
+  var fundToUpdate = req.body.fundToUpdate;
 
   if (!req.body) { return res.send(400);}
   if (req.body._id) {delete req.body._id;}
@@ -211,7 +212,7 @@ exports.update = function (req, res) {
 
         //Updated funds cash left
         stockToUpdate.currentNumberOfShares = cashForPurchase / stockToUpdate.currentPrice;
-        selectedFund.cash = selectedFund.cash ;
+        selectedFund.cash = fundToUpdate.cash ;
         //stockToUpdate.originalPercentOfFund =  stockToUpdate.currentPercentOfFund;
       }else{
         // Add funds back to fund
@@ -219,7 +220,7 @@ exports.update = function (req, res) {
           cashForPurchase =(selectedFund.goal * (req.body.originalAllocation / 100));
           stockToUpdate.numberOfShares = cashForPurchase / stockToUpdate.price;
           purchasePrice = stockToUpdate.numberOfShares * stockToUpdate.price;
-          selectedFund.cash = selectedFund.cash + purchasePrice;
+          selectedFund.cash = fundToUpdate.cash + purchasePrice;
         }
         cashForPurchase =(selectedFund.goal * (stockToUpdate.originalPercentOfFund / 100));
         stockToUpdate.numberOfShares = cashForPurchase / stockToUpdate.price;
@@ -247,7 +248,8 @@ exports.update = function (req, res) {
     if(selectedFund.finalized == true){
       fund.update(
         {'_id': req.body.fundId, 'stocks._id': mongoose.Types.ObjectId(stockToUpdate._id)},
-        {$set: {'stocks.$.currentPercentOfFund': stockToUpdate.currentPercentOfFund,
+        {$set: {'cash': selectedFund.cash,
+                'stocks.$.currentPercentOfFund': stockToUpdate.currentPercentOfFund,
                 'stocks.$.originalPercentOfFund': stockToUpdate.originalPercentOfFund,
                 'stocks.$.currentNumberOfShares': stockToUpdate.currentNumberOfShares,
                 'stocks.$.currentCashInvestment': stockToUpdate.currentCashInvestment,
@@ -314,7 +316,8 @@ exports.update = function (req, res) {
     else{
       fund.update(
         {'_id': req.body.fundId, 'stocks._id': mongoose.Types.ObjectId(stockToUpdate._id)},
-        {$set: {'stocks.$.originalPercentOfFund': stockToUpdate.originalPercentOfFund,
+        {$set: { 'cash': selectedFund.cash,
+                'stocks.$.originalPercentOfFund': stockToUpdate.originalPercentOfFund,
                 'stocks.$.currentPercentOfFund': stockToUpdate.originalPercentOfFund,
                 'stocks.$.currentNumberOfShares': stockToUpdate.numberOfShares,
                 'stocks.$.numberOfShares': stockToUpdate.numberOfShares,

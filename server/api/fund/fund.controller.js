@@ -101,7 +101,7 @@ function UpdateInitializedFunds(selectedFund, res,  updatedFund) {
 
           var currentPercentOfFund = ((stock.currentNumberOfShares * currentPrice) / selectedFund.goal) * 100;
           var cashForPurchase = (selectedFund.goal * (currentPercentOfFund / 100));
-          var numberOfShares = cashForPurchase / currentPrice * 100 / 100;
+          var numberOfShares = cashForPurchase / currentPrice;
           var currentCashInvestment = Math.floor((numberOfShares * currentPrice) * 100) / 100;
 
           console.log('stock.currentPrice: ' + currentPrice);
@@ -122,7 +122,8 @@ function UpdateInitializedFunds(selectedFund, res,  updatedFund) {
                 'stocks.$.created': Date(),
                 'stocks.$.currentNumberOfShares': numberOfShares,
                 'stocks.$.currentPercentOfFund': currentPercentOfFund,
-                'stocks.$.currentCashInvestment': currentCashInvestment
+                'stocks.$.currentCashInvestment': currentCashInvestment,
+                'stocks.$.originalCashInvestment': currentCashInvestment
               }
             },
             function (err, result) {
@@ -213,7 +214,7 @@ function UpdatePreInitializedFunds(selectedFund, req, updatedFund) {
   })
 }
 
-  exports.show = function (req, res) {
+exports.show = function (req, res) {
 
     console.log('fund.controller: init');
 
@@ -230,6 +231,7 @@ function UpdatePreInitializedFunds(selectedFund, req, updatedFund) {
       if (selectedFund.stocks.length > 0) {
         if (selectedFund.finalized == true) {
           UpdateInitializedFunds(selectedFund, res, function(selectedFund) {
+            setPercentLeftToInvest(selectedFund);
             return res.send(selectedFund);
           });
         }
@@ -247,7 +249,7 @@ function UpdatePreInitializedFunds(selectedFund, req, updatedFund) {
 
       user.selectedFund = fund._id;
 
-      setPercentLeftToInvest(selectedFund);
+
 
       user.save(function (errs) {
         if (errs) {
@@ -314,7 +316,6 @@ function UpdatePreInitializedFunds(selectedFund, req, updatedFund) {
     });
 
   };
-
 
 // Updates an existing fund in the DB.
   exports.update = function (req, res) {
