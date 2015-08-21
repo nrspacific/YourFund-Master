@@ -21,14 +21,27 @@ exports.index = function (req, res) {
 
 // Get a single stock
 exports.show = function (req, res) {
-  Stock.findById(req.params.id, function (err, stock) {
-    if (err) {
-      return handleError(res, err);
+
+  var symbol = req.params.id;
+
+  var options = {
+    url: 'http://finance.google.com/finance/info?q=' + symbol,
+    json: true
+  };
+
+  console.log('Getting stock:' + symbol );
+
+  Request(options, function (error, response, body) {
+    if (!error && response.statusCode === 200) {
+      var result = JSON.parse(body.replace("//", ""));
+
+      console.log('Returned stock:' + symbol );
+
+      var stock = {};
+      stock.currentPrice = result[0].l;
+
+      return res.json(200, stock);
     }
-    if (!stock) {
-      return res.send(404);
-    }
-    return res.json(stock);
   });
 };
 
