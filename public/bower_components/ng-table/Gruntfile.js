@@ -1,7 +1,7 @@
-var mountFolder = function(connect, dir) {
+var mountFolder = function (connect, dir) {
     return connect.static(require('path').resolve(dir));
 };
-module.exports = function(grunt) {
+module.exports = function (grunt) {
 
     require('load-grunt-tasks')(grunt);
 
@@ -17,7 +17,7 @@ module.exports = function(grunt) {
 
     grunt.registerTask('default', [
         'dev',
-    'uglify',
+        'uglify',
         'cssmin'
     ]);
 
@@ -33,19 +33,23 @@ module.exports = function(grunt) {
         },
         copy: {
             styles: {
-                files: [{
-                    src: './src/styles/ng-table.less',
-                    dest: './dist/ng-table.less'
-                }]
+                files: [
+                    {
+                        src: './src/styles/ng-table.less',
+                        dest: './ng-table.less'
+                    }
+                ]
             }
         },
         uglify: {
             js: {
-                src: ['./dist/ng-table.js'],
-                dest: './dist/ng-table.min.js',
+                src: ['ng-table.js'],
+                dest: 'ng-table.min.js',
                 options: {
                     banner: '<%= banner %>',
-                    sourceMap: true
+                    sourceMap: function (fileName) {
+                        return fileName.replace(/\.min\.js$/, '.map');
+                    }
                 }
             }
         },
@@ -61,20 +65,20 @@ module.exports = function(grunt) {
                     './.temp/scripts/views.js',
                     'src/scripts/07-*.js'
                 ],
-                dest: './dist/ng-table.js'
+                dest: 'ng-table.js'
             }
         },
         less: {
             css: {
                 files: {
-                    './dist/ng-table.css': 'src/styles/ng-table.less'
+                    'ng-table.css': 'src/styles/ng-table.less'
                 }
             }
         },
         cssmin: {
             css: {
                 files: {
-                    './dist/ng-table.min.css': './dist/ng-table.css'
+                    'ng-table.min.css': 'ng-table.css'
                 },
                 options: {
                     banner: '<%= banner %>'
@@ -111,7 +115,7 @@ module.exports = function(grunt) {
             },
             serve: {
                 options: {
-                    middleware: function(connect) {
+                    middleware: function (connect) {
                         return [
                             mountFolder(connect, '.')
                         ];

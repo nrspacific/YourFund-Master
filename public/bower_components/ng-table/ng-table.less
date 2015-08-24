@@ -14,7 +14,7 @@
         &.sortable {
             cursor: pointer;
 
-            .sort-indicator {
+            div {
                 padding-right: 18px;
                 position: relative;
 
@@ -24,7 +24,7 @@
                     border-style: solid;
                     border-color: #000 transparent;
                     visibility: visible;
-                    right: 5px;
+                    right: 8px;
                     top: 50%;
                     position: absolute;
                     opacity: .3;
@@ -39,7 +39,7 @@
                 }
             }
 
-            .sort-indicator:hover:after, .sort-indicator:hover:before {
+            div:hover:after, div:hover:before {
                 opacity: 1;
                 visibility: visible;
             }
@@ -47,21 +47,21 @@
                 background-color: rgba(141, 192, 219, 0.25);
                 text-shadow: 0 1px 1px rgba(255, 255, 255, 0.75);
 
-                .sort-indicator:after {
+                div:after {
                     margin-top: -2px;
                 }
-                .sort-indicator:before {
+                div:before {
                     visibility: hidden;
                 }
             }
-            &.sort-asc .sort-indicator:after, &.sort-asc .sort-indicator:hover:after {
+            &.sort-asc div:after, &.sort-asc div:hover:after {
                 visibility: visible;
                 filter: alpha(opacity=60);
                 -khtml-opacity: 0.6;
                 -moz-opacity: 0.6;
                 opacity: 0.6;
             }
-            &.sort-desc .sort-indicator:after {
+            &.sort-desc div:after {
                 border-bottom: none;
                 border-left: 4px solid transparent;
                 border-right: 4px solid transparent;
