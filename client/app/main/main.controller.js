@@ -2,7 +2,7 @@
 
 angular.module('yourfundFullstackApp')
   .controller('MainCtrl',
-  function ($scope, $modal, $http, $filter,$interval, socket, Auth, User, transactionService, stocklookupservice, focus) {
+  function ($scope, $modal, $http, $filter, $interval, socket, Auth, User, transactionService, stocklookupservice, focus) {
 
     $scope.getCurrentUser = Auth.getCurrentUser;
     $scope.selectedFund = null;
@@ -10,7 +10,7 @@ angular.module('yourfundFullstackApp')
     $scope.addFundOption = "CMMF";
     $scope.getCurrentUser.Funds = [];
 
-    function setToFirstFund(){
+    function setToFirstFund() {
       if ($scope.getCurrentUser().funds) {
         $scope.getCurrentUser.Funds = $scope.getCurrentUser().funds;
         setSelectedFund($scope.getCurrentUser().funds[0]);
@@ -18,11 +18,11 @@ angular.module('yourfundFullstackApp')
       }
     }
 
-    $scope.setFocusOnFundName = function() {
+    $scope.setFocusOnFundName = function () {
       focus('fundName');
     };
 
-    $scope.setFocusOnSymbolName = function() {
+    $scope.setFocusOnSymbolName = function () {
       focus('symbolName');
     };
 
@@ -57,12 +57,13 @@ angular.module('yourfundFullstackApp')
       var currentInvestmentTotal = 0;
       $scope.currentInvestmentTotal = 0;
       $scope.gainLossCash = 0;
+      $scope.originalInvestmentTotal = 0;
 
       fund.stocks.forEach(function (s) {
         if (fund.finalized === false) {
-          $scope.totalInvestmentPercentage =  $scope.totalInvestmentPercentage + Number(s.originalPercentOfFund);
-          $scope.totalCashInvestedInFund = $scope.totalCashInvestedInFund +  parseFloat(s.price * s.numberOfShares);
-          originalInvestmentTotal += Number(s.price * s.numberOfShares);
+          $scope.totalInvestmentPercentage = $scope.totalInvestmentPercentage + Number(s.originalPercentOfFund);
+          $scope.totalCashInvestedInFund = $scope.totalCashInvestedInFund + parseFloat(s.price * s.numberOfShares);
+          $scope.originalInvestmentTotal += s.originalCashInvestment;
         }
         else {
           $scope.totalInvestmentPercentage = $scope.totalInvestmentPercentage + Number(s.currentPercentOfFund);
@@ -73,21 +74,18 @@ angular.module('yourfundFullstackApp')
         }
       });
 
-
-      $scope.currentCMMFInvested = $scope.totalInvested  - $scope.currentInvestmentTotal;
-      $scope.originalCMMFInvested = $scope.totalInvested  - originalInvestmentTotal;
-      $scope.originalMoneyInvested = $scope.originalCMMFInvested   + originalInvestmentTotal;
-      $scope.gainLossPercent = ($scope.gainLossCash/$scope.totalInvested) * 100;
-      $scope.currentTotalInvestmentAmount  = $scope.currentInvestmentTotal + fund.cash;
+      $scope.currentCMMFInvested = $scope.totalInvested - $scope.currentInvestmentTotal;
+      $scope.originalCMMFInvested = $scope.totalInvested - originalInvestmentTotal;
+      $scope.originalMoneyInvested = $scope.originalCMMFInvested + originalInvestmentTotal;
+      $scope.gainLossPercent = ($scope.gainLossCash / $scope.totalInvested) * 100;
+      $scope.currentTotalInvestmentAmount = $scope.currentInvestmentTotal + fund.cash;
 
       getSelectedFundTransactionHistory(fundID);
 
       $scope.selectedFund = fund;
 
-
       console.log("selected fund = " + JSON.stringify(fund));
     }
-
 
     function getFund(fundID) {
       $http.get('/api/funds/' + fundID)
@@ -103,13 +101,12 @@ angular.module('yourfundFullstackApp')
         });
     };
 
-
     // Cancel interval on page changes
-    $scope.$on('$destroy', function(){
+    $scope.$on('$destroy', function () {
       stopPriceCheck();
     });
 
-    function stopPriceCheck(){
+    function stopPriceCheck() {
       console.log('stopping price check for investments');
       if (angular.isDefined(promise)) {
         $interval.cancel(promise);
@@ -117,21 +114,19 @@ angular.module('yourfundFullstackApp')
       }
     }
 
-
-    var promise = $interval(function() {
+    var promise = $interval(function () {
       setSelectedFund($scope.selectedFund);
     }, 300000);
 
-
     function setSelectedFund(fund) {
-     if(fund){
-       try {
-         setSelectedFundByID(fund._id);
-       }
-       catch (err) {
-         document.getElementById("demo").innerHTML = err.message;
-       }
-     }
+      if (fund) {
+        try {
+          setSelectedFundByID(fund._id);
+        }
+        catch (err) {
+          document.getElementById("demo").innerHTML = err.message;
+        }
+      }
     }
 
     function getSelectedFundTransactionHistory(fundID) {
@@ -178,8 +173,7 @@ angular.module('yourfundFullstackApp')
       setSelectedFund(fund);
     };
 
-    $scope.deleteFund = function (fund)
-    {
+    $scope.deleteFund = function (fund) {
 
       $scope.fundToDelete = $scope.selectedFund;
 
@@ -193,7 +187,8 @@ angular.module('yourfundFullstackApp')
         }
       });
 
-      modalInstance.result.then(function (selectedItem) {}, function(){
+      modalInstance.result.then(function (selectedItem) {
+      }, function () {
         setSelectedFund($scope.getCurrentUser.Funds[0]);
       });
     };
@@ -207,12 +202,12 @@ angular.module('yourfundFullstackApp')
         templateUrl: 'deleteStockModal.html',
         controller: 'DeleteStockModalInstanceCtrl',
         resolve: {
-                    stockToDelete: function () {
-                      return $scope.stockToDelete;
-                    },
-                    selectedFund: function(){
-                      return $scope.selectedFund;
-                    }
+          stockToDelete: function () {
+            return $scope.stockToDelete;
+          },
+          selectedFund: function () {
+            return $scope.selectedFund;
+          }
         }
       });
 
@@ -287,7 +282,7 @@ angular.module('yourfundFullstackApp')
           name: $scope.fundName,
           cash: $scope.initialInvestment,
           goal: $scope.initialInvestment,
-          percentLeftToInvest:  100,
+          percentLeftToInvest: 100,
           finalized: false,
           created: Date()
         })
@@ -318,7 +313,7 @@ angular.module('yourfundFullstackApp')
       if ($scope.addFundOption == "CMMF") { //Add additional funds only to CMMF
         $scope.selectedFund.goal = parseInt($scope.selectedFund.goal) + parseInt($scope.additionalInvestment);
         $scope.selectedFund.cash = parseInt($scope.selectedFund.cash) + parseInt($scope.additionalInvestment);
-        $scope.selectedFund.percentLeftToInvest = (parseInt($scope.selectedFund.cash)/parseInt($scope.selectedFund.goal)) * 100;
+        $scope.selectedFund.percentLeftToInvest = (parseInt($scope.selectedFund.cash) / parseInt($scope.selectedFund.goal)) * 100;
 
         $http.patch('/api/funds/' + $scope.selectedFund._id + '/action/CMMF', $scope.selectedFund)
           .success(function (fund) {
@@ -358,11 +353,11 @@ angular.module('yourfundFullstackApp')
       $scope.additionalInvestment = '';
     };
 
-    $scope.withDrawAllowed = function(){
-      if($scope.investmentWithdraw && $scope.selectedFund.cash){
-        return  parseInt($scope.investmentWithdraw) <= parseInt($scope.selectedFund.cash);
+    $scope.withDrawAllowed = function () {
+      if ($scope.investmentWithdraw && $scope.selectedFund.cash) {
+        return parseInt($scope.investmentWithdraw) <= parseInt($scope.selectedFund.cash);
       }
-      else{
+      else {
         return true;
       }
     };
@@ -372,13 +367,13 @@ angular.module('yourfundFullstackApp')
         return;
       }
 
-        $scope.isBusy = true;
+      $scope.isBusy = true;
 
       if ($scope.addFundOption == "CMMF") { //Withdraw funds only from CMMF
 
         $scope.selectedFund.goal = parseInt($scope.selectedFund.goal) - parseInt($scope.investmentWithdraw);
         $scope.selectedFund.cash = parseInt($scope.selectedFund.cash) - parseInt($scope.investmentWithdraw);
-        $scope.selectedFund.percentLeftToInvest = (parseInt($scope.selectedFund.cash)/parseInt($scope.selectedFund.goal)) * 100;
+        $scope.selectedFund.percentLeftToInvest = (parseInt($scope.selectedFund.cash) / parseInt($scope.selectedFund.goal)) * 100;
 
         $http.patch('/api/funds/' + $scope.selectedFund._id + '/action/CMMF', $scope.selectedFund)
           .then(function (fund) {
@@ -433,14 +428,36 @@ angular.module('yourfundFullstackApp')
 
     $scope.tradeAmountCash = 0;
 
-    $scope.updateTradeAmountPercentage = function(selectedStock){
+    $scope.updateInvestmentAmountPercentage = function () {
+      $scope.tradeAmount = '';
+      $scope.numberOfShares = '';
+      $scope.stockToAdd = {};
+
+      $http.get('/api/stocks/' + $scope.stockSymbol,
+        {
+          symbol: $scope.stockSymbol
+        })
+        .then(function (stock) {
+          $scope.isBusy = false;
+          var numberOfShares = $scope.tradeAmountCash / stock.data.currentPrice;
+          $scope.stockToAdd.currentPrice = stock.data.currentPrice;
+          $scope.tradeAmount = (stock.data.currentPrice * numberOfShares) / $scope.currentTotalInvestmentAmount * 100;
+          $scope.numberOfShares = numberOfShares;
+          $scope.stockToAdd.currentPercentOfFund = ($scope.stockToAdd.currentPrice * numberOfShares) / $scope.selectedFund.goal * 100;
+        },
+        function (response) { // optional
+          $scope.isBusy = false;
+        });
+    };
+
+    $scope.updateTradeAmountPercentage = function (selectedStock) {
       $scope.tradeAmount = '';
       $scope.numberOfShares = '';
 
 
-      var numberOfShares =  $scope.tradeAmountCash / selectedStock.currentPrice;
+      var numberOfShares = $scope.tradeAmountCash / selectedStock.currentPrice;
 
-      $scope.tradeAmount =  (selectedStock.currentPrice * numberOfShares) / $scope.currentTotalInvestmentAmount * 100 ;
+      $scope.tradeAmount = (selectedStock.currentPrice * numberOfShares) / $scope.currentTotalInvestmentAmount * 100;
       $scope.numberOfShares = numberOfShares;
     };
 
@@ -449,39 +466,39 @@ angular.module('yourfundFullstackApp')
       $scope.selectedStock.action = $scope.investmentAction;
 
       if ($scope.selectedStock.action === 'sell') {
-        if($scope.selectedFund.finalized){
+        if ($scope.selectedFund.finalized) {
           $scope.selectedStock.currentPercentOfFund = parseInt($scope.selectedStock.currentPercentOfFund) - parseInt($scope.tradeAmount);
           $scope.selectedStock.originalPercentOfFund = parseInt($scope.selectedStock.originalPercentOfFund) - parseInt($scope.tradeAmount);
-          $scope.selectedStock.currentCashInvestment = parseInt($scope.selectedStock.currentCashInvestment) -  parseInt($scope.tradeAmountCash);
+          $scope.selectedStock.currentCashInvestment = parseInt($scope.selectedStock.currentCashInvestment) - parseInt($scope.tradeAmountCash);
           $scope.selectedStock.currentNumberOfShares = $scope.selectedStock.currentNumberOfShares - $scope.numberOfShares;
-          $scope.selectedStock.originalCashInvestment =  parseInt($scope.selectedStock.originalCashInvestment) -  parseInt($scope.tradeAmountCash);
-          $scope.selectedFund.cash = $scope.selectedFund.cash  + parseInt($scope.tradeAmountCash);
-        }else{
+          $scope.selectedStock.originalCashInvestment = parseInt($scope.selectedStock.originalCashInvestment) - parseInt($scope.tradeAmountCash);
+          $scope.selectedFund.cash = $scope.selectedFund.cash + parseInt($scope.tradeAmountCash);
+        } else {
           $scope.selectedStock.originalPercentOfFund = parseInt($scope.selectedStock.originalPercentOfFund) - parseInt($scope.tradeAmount);
         }
       }
       else if ($scope.selectedStock.action === 'sellall') {
-        if($scope.selectedFund.finalized){
-          $scope.selectedFund.cash = $scope.selectedFund.cash  + $scope.selectedStock.currentCashInvestment;
+        if ($scope.selectedFund.finalized) {
+          $scope.selectedFund.cash = $scope.selectedFund.cash + $scope.selectedStock.currentCashInvestment;
           $scope.selectedStock.currentPercentOfFund = 0;
           $scope.selectedStock.currentCashInvestment = 0;
           $scope.selectedStock.currentNumberOfShares = 0;
-          $scope.selectedStock.originalCashInvestment =  0;
+          $scope.selectedStock.originalCashInvestment = 0;
 
-        }else{
+        } else {
           $scope.selectedStock.originalPercentOfFund = 0;
-          $scope.selectedStock.originalCashInvestment =  0;
+          $scope.selectedStock.originalCashInvestment = 0;
         }
       }
       else {
-        if($scope.selectedFund.finalized){
+        if ($scope.selectedFund.finalized) {
           $scope.selectedStock.currentPercentOfFund = parseInt($scope.selectedStock.currentPercentOfFund) + parseInt($scope.tradeAmount);
           $scope.selectedStock.originalPercentOfFund = parseInt($scope.selectedStock.originalPercentOfFund) + parseInt($scope.tradeAmount);
-          $scope.selectedStock.currentCashInvestment =  parseInt($scope.selectedStock.currentCashInvestment) +  parseInt($scope.tradeAmountCash);
-          $scope.selectedStock.originalCashInvestment =  parseInt($scope.selectedStock.originalCashInvestment) +  parseInt($scope.tradeAmountCash);
+          $scope.selectedStock.currentCashInvestment = parseInt($scope.selectedStock.currentCashInvestment) + parseInt($scope.tradeAmountCash);
+          $scope.selectedStock.originalCashInvestment = parseInt($scope.selectedStock.originalCashInvestment) + parseInt($scope.tradeAmountCash);
           $scope.selectedStock.currentNumberOfShares = $scope.selectedStock.currentNumberOfShares + $scope.numberOfShares;
           $scope.selectedFund.cash = $scope.selectedFund.cash - $scope.tradeAmountCash;
-        }else{
+        } else {
           $scope.selectedStock.originalPercentOfFund = parseInt($scope.selectedStock.originalPercentOfFund) + parseInt($scope.tradeAmount);
         }
       }
@@ -491,13 +508,15 @@ angular.module('yourfundFullstackApp')
         fundToUpdate: $scope.selectedFund,
         fundId: $scope.selectedFund._id
       }).then(function (response) {
-          $scope.editMode = false;
-         // $scope.getCurrentUser().funds = Auth.updateCurrentUser();
-          setSelectedFund($scope.selectedFund);
-        })
-        .catch(function (response) {
-          console.error('Stocks update error', response);
+        $scope.editMode = false;
+
+        bootbox.alert("Transaction completed successfully.", function() {
+          setSelectedFundByID($scope.selectedFund._id);
         });
+      })
+      .catch(function (response) {
+        console.error('Stocks update error', response);
+      });
 
       $scope.tradeAmount = '';
       $scope.tradeAmountCash = '';
@@ -512,7 +531,7 @@ angular.module('yourfundFullstackApp')
     };
 
     $scope.addStockToFund = function () {
-      if (!$scope.stockSymbol || !$scope.stockPercentage) {
+      if (!$scope.stockSymbol || !$scope.tradeAmount) {
         return;
       }
       $scope.isBusy = true;
@@ -521,8 +540,8 @@ angular.module('yourfundFullstackApp')
         {
           symbol: $scope.stockSymbol,
           action: "Buy", //Buy or Sell
-          originalPercentOfFund: $scope.stockPercentage,
-          currentPercentOfFund: $scope.stockPercentage,
+          originalPercentOfFund: $scope.tradeAmount,
+          currentPercentOfFund: $scope.tradeAmount,
           explanation: "",
           description: $scope.stock,
           active: true,
@@ -532,20 +551,21 @@ angular.module('yourfundFullstackApp')
         })
         .then(function (fund) {
           $scope.isBusy = false;
-          setSelectedFund(fund.data);
+
+          $scope.tradeAmount = '';
+          $scope.numberOfShares = '';
+          $scope.tradeAmountCash = '';
+          $scope.stockToAdd = {};
+
+          bootbox.alert( "Investment: [" + $scope.stock + " ] successfully added.", function() {
+            setSelectedFundByID($scope.selectedFund._id);
+          });
+
         },
         function (response) { // optional
           $scope.isBusy = false;
         });
-
-
     };
-
-
-
-
-
-
   });
 
 angular.module('yourfundFullstackApp')
@@ -556,8 +576,8 @@ angular.module('yourfundFullstackApp')
     $scope.ok = function () {
       $http.put('/api/stocks/delete/' + stockToDelete._id,
         {
-        fundId : selectedFund._id
-       })
+          fundId: selectedFund._id
+        })
         .then(function (response) {
           $scope.isBusy = false;
           $scope.stockToDelete = null;
