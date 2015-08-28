@@ -83,6 +83,7 @@ function UpdateInitializedFunds(selectedFund, res,  updatedFund) {
   var selectedFundCash = selectedFund.goal;
 
   selectedFund.stocks.forEach(function (stock) {
+    console.log('executing: fund.UpdateInitializedFunds');
 
     var stockRequestOptions = {
       url: 'http://finance.google.com/finance/info?q=' + stock.symbol,
@@ -102,11 +103,12 @@ function UpdateInitializedFunds(selectedFund, res,  updatedFund) {
           var currentPercentOfFund = ((stock.currentNumberOfShares * currentPrice) / selectedFund.goal) * 100;
           var cashForPurchase = (selectedFund.goal * (currentPercentOfFund / 100));
           var numberOfShares = cashForPurchase / currentPrice;
-          var currentCashInvestment = Math.floor((numberOfShares * currentPrice) * 100) / 100;
+          var currentCashInvestment = (numberOfShares * currentPrice) * 100 / 100;
 
           console.log('stock.currentPrice: ' + currentPrice);
           console.log('stock.currentNumberOfShares: ' + numberOfShares);
           console.log('stock.currentPercentOfFund: ' + currentPercentOfFund);
+          console.log('stock.currentCashInvestment: ' + currentCashInvestment);
 
           selectedFundCash -= cashForPurchase;
 

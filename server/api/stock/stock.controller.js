@@ -62,6 +62,8 @@ function setPercentLeftToInvest(selectedFund) {
 
 exports.create = function (req, res) {
 
+  console.log('executing: stock.Create');
+
   var symbol = req.body.symbol;
   var selectedFund;
   var user = req.user;
@@ -95,13 +97,6 @@ exports.create = function (req, res) {
         req.body.change = result[0].c;
 
 
-        function getNumberDecimalPlace(input,places){
-
-          var factor = "1" + Array(+(places > 0 && places + 1)).join("0");
-          return parseInt(input * factor) / factor;
-        }
-
-
         Stock.create(req.body, function (err, stock) {
           if (err) {
             return handleError(res, err);
@@ -114,8 +109,8 @@ exports.create = function (req, res) {
           stock.currentNumberOfShares = req.body.numberOfShares;
           stock.currentPercentOfFund = req.body.originalPercentOfFund;
           stock.originalPercentOfFund = req.body.originalPercentOfFund;
-          stock.currentCashInvestment =  (req.body.numberOfShares * req.body.price)* 100 / 100;
-          stock.originalCashInvestment =  (req.body.numberOfShares * req.body.price)* 100 / 100;
+          stock.currentCashInvestment =  req.body.numberOfShares * req.body.price * 100 / 100;
+          stock.originalCashInvestment =  req.body.numberOfShares * req.body.price * 100 / 100;
 
           console.log('stock:' + req.body.symbol + ' has been created');
 
