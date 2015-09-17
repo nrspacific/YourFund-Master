@@ -136,6 +136,7 @@ exports.create = function (req, res) {
               transaction.remove( { fundId:selectedFund._id, symbol: req.body.symbol } );
             }
 
+
             transaction.create(
               {
                 fundId: selectedFund._id,
@@ -145,7 +146,7 @@ exports.create = function (req, res) {
                 price: 1,
                 action: stock.action,
                 numberOfShares: stock.numberOfShares,
-                total: stock.price * stock.numberOfShares,
+                total:  stock.price * stock.numberOfShares,
                 company: 'Your Money Market Fund',
                 active: true
               },
