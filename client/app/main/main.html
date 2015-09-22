@@ -157,7 +157,7 @@
                                            style="width:55px;text-align:center">
                                     <input type="button" ng-click="updateAllocationAmount(stock)" value="Update">
                                 </span>
-                                <span ng-hide="editMode">{{stock.originalPercentOfFund  | number:4 }}%</span>
+                                <span ng-hide="editMode">{{stock.originalPercentOfFund  | number:2 }}%</span>
                               </td>
                               <td data-title="'Money Invested'">{{ stock.numberOfShares * stock.price | currency }}</td>
                               <td data-title="'Current Price'">{{ stock.price | currency }}</td>
@@ -185,7 +185,7 @@
                           </table>
 
                           <!-- Finalized Table -->
-                          <table class="row-border hover" ng-table="tableParams" ng-show="selectedFund.finalized">
+                          <table class="row-border hover" ng-table="tableParams" ng-show="selectedFund.finalized" >
                             <tr ng-repeat="stock in selectedFund.stocks | filter: { active: true}">
                               <td data-title="'Symbol'" style="width:20%">{{ stock.description }}</td>
                               <td data-title="'Current % Allocated'">{{ stock.currentCashInvestment / currentTotalInvestmentAmount * 100  | number:2 }}%</td>
@@ -193,7 +193,7 @@
                               </td>
                               <td data-title="'Current Price'">{{ stock.currentPrice | currency }}</td>
                               <td data-title="'# Of Shares'">{{ stock.currentNumberOfShares | number:4 }}</td>
-                              <td data-title="'Original % Allocated'">{{ stock.originalPercentOfFund | number:2 }}%</td>
+                              <td data-title="'Original % Allocated'">{{stock.originalCashInvestment / originalMoneyInvested * 100  | number:2}}%</td>
                               <td data-title="'Original Money Invested'">{{ stock.originalCashInvestment | currency }}
                               </td>
                               <td data-title="'Original Price'">{{ stock.price | currency }}</td>
@@ -222,7 +222,7 @@
 
                             <tr ng-show="amountLeftToInvest > 0" style="background:#ffffcc">
                               <td>Cash Money Market Fund</td>
-                              <td>{{selectedFund.percentLeftToInvest | number:2 }}%</td>
+                              <td>{{(selectedFund.cash/currentTotalInvestmentAmount) * 100 | number:2 }}%</td>
                               <td>{{selectedFund.cash | currency}}</td>
                               <td>$1.00</td>
                               <td>{{selectedFund.cash| number:2}}</td>
@@ -240,7 +240,7 @@
                               <td >{{ currentTotalInvestmentAmount| currency}}</td>
                               <td colspan="2"></td>
                               <td >100%</td>
-                              <td>{{originalMoneyInvested | currency}}</td>
+                              <td>{{originalTotalInvestmentAmount  | currency}}</td>
                               <td></td>
                               <td>{{gainLossCash | currency}}</td>
                               <td>{{gainLossPercent | number:4}} %</td>
@@ -349,26 +349,24 @@
           <form role="form" class="form-horizontal" >
                 <div class="form-group">
                   <div class="col-sm-offset-2 col-sm-10">
-                    <div class="checkbox">
-                      <label>
-                        <input type="radio" ng-model="investmentAction" value="buy">Buy<br/>
-                        <input type="radio" ng-model="investmentAction" value="sell">Sell&nbsp;
-                        <input type="radio" ng-model="investmentAction" value="sellall">Sell All&nbsp;
-                      </label>
-                    </div>
+                    <label class="checkbox-inline">
+                        <input type="radio" ng-model="investmentAction" value="buy" style="padding:5px;" ng-change="enableTradeInvestmentFields()"> Buy&nbsp;
+                        <input type="radio" ng-model="investmentAction" value="sell" style="padding:5px;" ng-change="enableTradeInvestmentFields()"> Sell&nbsp;
+                        <input type="radio" ng-model="investmentAction" value="sellall" style="padding:5px;" ng-change="disableTradeInvestmentFields()"> Sell All&nbsp;
+                    </label>
                   </div>
                 </div>
 
                 <div class="form-group">
                   <label for="tradeAmountCash" class="control-label col-sm-3" >Dollar Amount</label>
                   <div class="col-sm-5">
-                  <input class="form-control" ng-model="tradeAmountCash" name="tradeAmountCash" ng-change="updateTradeAmountPercentage(selectedStock)">
+                  <input class="form-control" ng-model="tradeAmountCash" name="tradeAmountCash" ng-change="updateTradeAmountPercentage(selectedStock)" ng-readonly="isTradeAmountEditable">
                   </div>
                 </div>
                 <div class="form-group ">
                   <label for="tradeAmount" class="control-label col-sm-3" >Percent</label>
                   <div class="col-sm-5">
-                  <input class="form-control" name="tradeAmount" value="{{tradeAmount | number:4}}">
+                  <input class="form-control" name="tradeAmount" value="{{tradeAmount | number:4}}" ng-readonly="isTradeAmountEditable">
                   </div>
                 </div>
               <div class="form-group ">
@@ -552,26 +550,26 @@
                        typeahead-on-select="setSelectedStockFromSuggested($item.symbol)" >
               </div>
             </div>
-            <div class="form-group">
+            <div class="form-group" ng-show="selectedFund.finalized">
               <label for="tradeAmountCash" class="control-label col-sm-3" >Dollar Amount</label>
               <div class="col-sm-5">
                 <input class="form-control" ng-model="tradeAmountCash" name="tradeAmountCash"
                        ng-change="updateInvestmentAmountPercentage()">
               </div>
             </div>
-            <div class="form-group ">
+            <div class="form-group " >
               <label for="tradeAmount" class="control-label col-sm-3">Percent</label>
               <div class="col-sm-5">
-                <input class="form-control" name="tradeAmount" value="{{tradeAmount | number:4}}">
+                <input class="form-control" name="tradeAmount" value="{{tradeAmount | number:4}}" ng-model="tradeAmount">
               </div>
             </div>
-            <div class="form-group ">
+            <div class="form-group " ng-show="selectedFund.finalized">
               <label for="currentPrice" class="control-label col-sm-3">Current Price</label>
               <div class="col-sm-5">
                 <input class="form-control" ng-model="stockToAdd.currentPrice" name="currentPrice" readonly>
               </div>
             </div>
-            <div class="form-group ">
+            <div class="form-group " ng-show="selectedFund.finalized">
               <label for="numberOfShares" class="control-label col-sm-3"># of Share</label>
               <div class="col-sm-5">
                 <input class="form-control" ng-model="numberOfShares" name="numberOfShares" readonly>
@@ -679,8 +677,8 @@
         <h4 class="modal-title">Do you wish to initialize this fund?</h4>
       </div>
       <div class="modal-body">
-        You are about to purchase ${{ (selectedFund.goal - selectedFund.cash)}} in investments and the
-        remaining {{amountLeftToInvest | currency}} will be placed in a Money Market Fund.
+        You are about to purchase {{ (selectedFund.goal - selectedFund.cash) | currency}} in investments and the
+        remaining {{ amountLeftToInvest | currency }} will be placed in a Money Market Fund.
       </div>
       <div class="modal-footer">
         <button type="button" class="btn btn-default" data-dismiss="modal">Cancel</button>
