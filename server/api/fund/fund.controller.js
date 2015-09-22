@@ -216,6 +216,80 @@ function UpdatePreInitializedFunds(selectedFund, req, updatedFund) {
   })
 }
 
+function logFundCashUpdate(updatedFund, action, cashDifference, res) {
+
+  updatedFund.save(function (err) {
+    if (err) {
+      return handleError(res, err);
+    }
+    else{
+      transaction.create(
+        {
+          fundId: updatedFund._id,
+          date: new Date(),
+          symbol: 'YMMF',
+          description: action + ' funds to/from YMMF',
+          price: 1,
+          action: action,
+          numberOfShares: cashDifference,
+          total: cashDifference,
+          company: 'Your Money Market Fund',
+          active: true,
+          renderOnPreInit: true
+        }, function (err, result) {
+          if (err) {
+            return handleError(result, err);
+          }
+          return res.json(200, updatedFund);
+        });
+    }
+  });
+}
+
+function updateFundInvestementPercentages(updatedFund,cashDifference,action, res) {
+  if (updatedFund.stocks.length > 0) {
+    if (updatedFund.finalized == false) {
+      updatedFund.stocks.forEach(function (stock) {
+        fund.update(
+          {'_id': mongoose.Types.ObjectId(updatedFund._id), 'stocks._id': mongoose.Types.ObjectId(stock._id)},
+          {
+            $set: {
+              'stocks.$.originalPercentOfFund': ((stock.numberOfShares * stock.price) / updatedFund.goal) * 100
+            }
+          }, function (err, result) {
+            if (err) {
+              return handleError(result, err);
+            }
+            else{
+              logFundCashUpdate(updatedFund, action, cashDifference, res);
+            }
+          }
+        );
+      });
+    }
+    else {
+      updatedFund.stocks.forEach(function (stock) {
+        fund.update(
+          {'_id': mongoose.Types.ObjectId(updatedFund._id), 'stocks._id': mongoose.Types.ObjectId(stock._id)},
+          {
+            $set: {
+              // 'stocks.$.originalPercentOfFund': ((stock.numberOfShares * stock.currentPrice) / updatedFund.goal) * 100,
+              'stocks.$.currentPercentOfFund': ((stock.numberOfShares * stock.currentPrice) / updatedFund.goal) * 100
+            }
+          }, function (err, result) {
+            if (err) {
+              return handleError(result, err);
+            }
+            else{
+              logFundCashUpdate(updatedFund, action, cashDifference, res);
+            }
+          }
+        );
+      });
+    }
+  }
+}
+
 exports.show = function (req, res) {
 
     console.log('fund.controller: init');
@@ -269,7 +343,7 @@ exports.show = function (req, res) {
   };
 
 // Creates a new fund in the DB.
-  exports.create = function (req, res) {
+exports.create = function (req, res) {
 
     var user = req.user;
 
@@ -320,52 +394,13 @@ exports.show = function (req, res) {
   };
 
 // Updates an existing fund in the DB.
-  exports.update = function (req, res) {
+exports.update = function (req, res) {
     if (req.body._id) {
       delete req.body._id;
     }
 
 
-    function updateFundInvestementPercentages(updatedFund) {
-
-
-      if (updatedFund.stocks.length > 0) {
-        if (updatedFund.finalized == false) {
-          updatedFund.stocks.forEach(function (stock) {
-            fund.update(
-              {'_id': mongoose.Types.ObjectId(updatedFund._id), 'stocks._id': mongoose.Types.ObjectId(stock._id)},
-              {
-                $set: {
-                  'stocks.$.originalPercentOfFund': ((stock.numberOfShares * stock.price) / updatedFund.goal) * 100
-                }
-              }, function (err, result) {
-                if (err) {
-                  return handleError(result, err);
-                }
-              }
-            );
-          });
-        }
-        else {
-          updatedFund.stocks.forEach(function (stock) {
-            fund.update(
-              {'_id': mongoose.Types.ObjectId(updatedFund._id), 'stocks._id': mongoose.Types.ObjectId(stock._id)},
-              {
-                $set: {
-                  // 'stocks.$.originalPercentOfFund': ((stock.numberOfShares * stock.currentPrice) / updatedFund.goal) * 100,
-                  'stocks.$.currentPercentOfFund': ((stock.numberOfShares * stock.currentPrice) / updatedFund.goal) * 100
-                }
-              }, function (err, result) {
-                if (err) {
-                  return handleError(result, err);
-                }
-              }
-            );
-          });
-        }
-
-      }
-    }
+    console.log('executing: fund.update');
 
     fund.findById(req.params.id, function (err, selectedFund) {
       if (err) {
@@ -376,45 +411,14 @@ exports.show = function (req, res) {
       }
 
       var cashDifference = req.body.cash - selectedFund.cash;
-
       var action = 'Add';
-
       if (req.body.cash <= selectedFund.cash) {
         action = 'Sell';
       }
 
       var updatedFund = _.merge(selectedFund, req.body);
 
-      updateFundInvestementPercentages(updatedFund);
-
-      updatedFund.save(function (err) {
-        if (err) {
-          return handleError(res, err);
-        }
-
-        transaction.create(
-          {
-            fundId: fund._id,
-            date: new Date(),
-            symbol: 'YMMF',
-            description: action + ' funds to/from YMMF',
-            price: 1,
-            action: action,
-            numberOfShares: cashDifference,
-            total: fund.cash,
-            company: 'Your Money Market Fund',
-            active: true,
-            renderOnPreInit: true
-          }, function (err, result) {
-            if (err) {
-              return handleError(result, err);
-            }
-
-            return res.json(200, updatedFund);
-
-            console.log('fund.controller: Updating YMMF transaction');
-          });
-      });
+      updateFundInvestementPercentages(updatedFund, cashDifference, action, res );
     });
   };
 

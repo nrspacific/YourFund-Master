@@ -132,53 +132,51 @@ exports.create = function (req, res) {
             console.log('stock:' + req.body.symbol + ' has been added to fund: ' + req.body.fundId);
             var description = stock.action + ' ' + stock.description + ' ' + stock.numberOfShares + ' at $' +  stock.price;
 
-            if(!selectedFund.finalized){
-              transaction.remove( { fundId:selectedFund._id, symbol: req.body.symbol } );
+            if(selectedFund.finalized){
+              transaction.create(
+                {
+                  fundId: selectedFund._id,
+                  date: new Date(),
+                  symbol: 'YMMF',
+                  description: description,
+                  price: 1,
+                  action: stock.action,
+                  numberOfShares: stock.numberOfShares,
+                  total:  stock.price * stock.numberOfShares,
+                  company: 'Your Money Market Fund',
+                  active: true
+                },
+                function (err, result) {
+                  if (err) {
+                    return handleError(result, err);
+                  }
+                  console.log('saving YMMF transaction for stock purchase');
+                });
+
+
+              var datePlusOneSecond = new Date();
+              datePlusOneSecond.setSeconds(datePlusOneSecond.getSeconds() + 1);
+
+              transaction.create(
+                {
+                  fundId: selectedFund._id,
+                  date: datePlusOneSecond ,
+                  symbol: req.body.symbol,
+                  description: description,
+                  price: req.body.price,
+                  action: stock.action,
+                  numberOfShares: req.body.numberOfShares,
+                  total: req.body.price * req.body.numberOfShares,
+                  company: stock.description,
+                  active: true
+                },
+                function (err, result) {
+                  if (err) {
+                    return handleError(result, err);
+                  }
+                  console.log('saving YMMF transaction for stock purchase');
+                });
             }
-
-
-            transaction.create(
-              {
-                fundId: selectedFund._id,
-                date: new Date(),
-                symbol: 'YMMF',
-                description: description,
-                price: 1,
-                action: stock.action,
-                numberOfShares: stock.numberOfShares,
-                total:  stock.price * stock.numberOfShares,
-                company: 'Your Money Market Fund',
-                active: true
-              },
-              function (err, result) {
-                if (err) {
-                  return handleError(result, err);
-                }
-                console.log('saving YMMF transaction for stock purchase');
-              });
-
-            var datePlusOneSecond = new Date();
-            datePlusOneSecond.setSeconds(datePlusOneSecond.getSeconds() + 1);
-
-            transaction.create(
-              {
-                fundId: selectedFund._id,
-                date: datePlusOneSecond ,
-                symbol: req.body.symbol,
-                description: description,
-                price: req.body.price,
-                action: stock.action,
-                numberOfShares: req.body.numberOfShares,
-                total: req.body.price * req.body.numberOfShares,
-                company: stock.description,
-                active: true
-              },
-              function (err, result) {
-                if (err) {
-                  return handleError(result, err);
-                }
-                console.log('saving YMMF transaction for stock purchase');
-              });
 
             return res.json(201, selectedFund);
           });
@@ -345,49 +343,49 @@ exports.update = function (req, res) {
               action = 'Sell';
             }
 
-            transaction.create(
-              {
-                fundId: selectedFund._id,
-                date: new Date(),
-                symbol: 'YMMF',
-                description: stockToUpdate.action + ' ' + stockToUpdate.description + ' ' + stockToUpdate.numberOfShares + ' at $' +  stockToUpdate.price,
-                price: 1,
-                action: action,
-                numberOfShares: stockToUpdate.numberOfShares,
-                total: stockToUpdate.price * stockToUpdate.numberOfShares,
-                company: 'Your Money Market Fund',
-                active: true
-              },
-              function (err, result) {
-                if (err) {
-                  return handleError(result, err);
-                }
-                console.log('saving YMMF fund transaction for stock purchase');
-              });
-
-            var datePlusOneSecond = new Date();
-            datePlusOneSecond.setSeconds(datePlusOneSecond.getSeconds() + 1);
-
-            transaction.create(
-              {
-                fundId: selectedFund._id,
-                date: datePlusOneSecond,
-                symbol: stockToUpdate.symbol,
-                description: stockToUpdate.action + ' ' + stockToUpdate.description + ' ' + stockToUpdate.numberOfShares + ' at $' +  stockToUpdate.price,
-                price: stockToUpdate.price,
-                action: stockToUpdate.action,
-                numberOfShares: stockToUpdate.numberOfShares,
-                total: stockToUpdate.price * stockToUpdate.numberOfShares,
-                company: stockToUpdate.description,
-                active: true
-              },function (err, result) {
-                if (err) {
-                  return handleError(result, err);
-                }
-                console.log('saving fund transaction for stock purchase');
-              });
-
-            console.log('Updating fund:' + user.selectedFund + ' stock: ' + stockToUpdate.symbol);
+            //transaction.create(
+            //  {
+            //    fundId: selectedFund._id,
+            //    date: new Date(),
+            //    symbol: 'YMMF',
+            //    description: stockToUpdate.action + ' ' + stockToUpdate.description + ' ' + stockToUpdate.numberOfShares + ' at $' +  stockToUpdate.price,
+            //    price: 1,
+            //    action: action,
+            //    numberOfShares: stockToUpdate.numberOfShares,
+            //    total: stockToUpdate.price * stockToUpdate.numberOfShares,
+            //    company: 'Your Money Market Fund',
+            //    active: true
+            //  },
+            //  function (err, result) {
+            //    if (err) {
+            //      return handleError(result, err);
+            //    }
+            //    console.log('saving YMMF fund transaction for stock purchase');
+            ////  });
+            //
+            //var datePlusOneSecond = new Date();
+            //datePlusOneSecond.setSeconds(datePlusOneSecond.getSeconds() + 1);
+            //
+            //transaction.create(
+            //  {
+            //    fundId: selectedFund._id,
+            //    date: datePlusOneSecond,
+            //    symbol: stockToUpdate.symbol,
+            //    description: stockToUpdate.action + ' ' + stockToUpdate.description + ' ' + stockToUpdate.numberOfShares + ' at $' +  stockToUpdate.price,
+            //    price: stockToUpdate.price,
+            //    action: stockToUpdate.action,
+            //    numberOfShares: stockToUpdate.numberOfShares,
+            //    total: stockToUpdate.price * stockToUpdate.numberOfShares,
+            //    company: stockToUpdate.description,
+            //    active: true
+            //  },function (err, result) {
+            //    if (err) {
+            //      return handleError(result, err);
+            //    }
+            //    console.log('saving fund transaction for stock purchase');
+            //  });
+            //
+            //console.log('Updating fund:' + user.selectedFund + ' stock: ' + stockToUpdate.symbol);
 
           }
         });
