@@ -443,7 +443,6 @@ exports.update = function (req, res) {
   exports.finalize = function (req, res) {
 
     var user = req.user;
-    var selectedStock;
 
     fund.findById(req.params.id, function (err, fund) {
       if (err) {
@@ -459,33 +458,52 @@ exports.update = function (req, res) {
       userModel.update(
         {'_id': user._id, 'funds._id': mongoose.Types.ObjectId(req.params.id)},
         {$set: {'funds.$.finalized': true}},
-        function (err, result) {
-          if (err) {
-            return handleError(result, err);
-          }
-          else {
+          function (err, result) {
+            if (err) {
+              return handleError(result, err);
+            }
+            else {
+              createFinalizedTransactions(res,fund);
+              console.log(result);
+            }
+          });
+      });
 
-            createFinalizedTransactions(res,fund);
-            console.log(result);
-
-          }
-        });
-    });
-
-    function createFinalizedTransactions(res,updatedFund){
-
-
+     function createFinalizedTransactions(res,updatedFund){
 
       updatedFund.stocks.forEach(function (stock) {
 
-        console.log(stock._id);
+        var description = stock.action + ' ' + stock.description + ' ' + stock.numberOfShares + ' at $' +  stock.price;
+
+        var datePlusOneSecond = new Date();
+        datePlusOneSecond.setSeconds(datePlusOneSecond.getSeconds() + 1);
+
+        transaction.create(
+          {
+            fundId: updatedFund._id,
+            date: datePlusOneSecond ,
+            symbol: stock.symbol,
+            description: description,
+            price: stock.price,
+            action: stock.action,
+            numberOfShares: stock.numberOfShares,
+            total: stock.price * stock.numberOfShares,
+            company: stock.description,
+            active: true
+          },
+          function (err, result) {
+            if (err) {
+              return handleError(result, err);
+            }
+            return res.send(204);
+          });
 
       });
 
-      return res.send(204);
+    };
+
 
   };
-
 
   function handleError(res, err) {
     return res.send(500, err);
