@@ -464,11 +464,25 @@ exports.update = function (req, res) {
             return handleError(result, err);
           }
           else {
+
+            createFinalizedTransactions(res,fund);
             console.log(result);
-            return res.send(204);
+
           }
         });
     });
+
+    function createFinalizedTransactions(res,updatedFund){
+
+
+
+      updatedFund.stocks.forEach(function (stock) {
+
+        console.log(stock._id);
+
+      });
+
+      return res.send(204);
 
   };
 
