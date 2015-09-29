@@ -471,23 +471,28 @@ exports.update = function (req, res) {
 
      function createFinalizedTransactions(res,updatedFund){
 
-       updatedFund.stocks.forEach(function (stock) {
+        var i = 0;
 
-        var description = stock.action + ' ' + stock.description + ' ' + Math.floor(stock.numberOfShares * 100) / 100 + ' at $' +  stock.price;
+        updatedFund.stocks.forEach(function (stock) {
+
+          i++;
+
+         var description = stock.action + ' ' + stock.description + ' ' + Math.floor(stock.numberOfShares * 100) / 100 + ' at $' +  stock.price;
+
          var datePlusOneSecond = new Date();
-         datePlusOneSecond.setSeconds(datePlusOneSecond.getSeconds() + 1);
+         datePlusOneSecond.setSeconds(datePlusOneSecond.getSeconds() + i);
 
          transaction.create(
            {
              fundId: updatedFund._id,
-             date: new Date(),
-             symbol: stock.symbol,
+             date: datePlusOneSecond,
+             symbol: 'YMMF',
              description: description,
-             price: stock.price,
+             price: 1,
              action: stock.action,
              numberOfShares: stock.numberOfShares,
-             total: stock.price * stock.numberOfShares,
-             company: stock.description,
+             total:  stock.price * stock.numberOfShares,
+             company: 'Your Money Market Fund',
              active: true
            },
            function (err, result) {
@@ -498,25 +503,26 @@ exports.update = function (req, res) {
                {
                  fundId: updatedFund._id,
                  date: datePlusOneSecond,
-                 symbol: 'YMMF',
+                 symbol: stock.symbol,
                  description: description,
-                 price: 1,
+                 price: stock.price,
                  action: stock.action,
                  numberOfShares: stock.numberOfShares,
-                 total:  stock.price * stock.numberOfShares,
-                 company: 'Your Money Market Fund',
+                 total: stock.price * stock.numberOfShares,
+                 company: stock.description,
                  active: true
                },
                function (err, result) {
                  if (err) {
                    return handleError(result, err);
                  }
-                 return res.send(204);
                });
 
              console.log('saving YMMF transaction for stock purchase');
            });
       });
+
+        return res.send(204);
     };
 
 
