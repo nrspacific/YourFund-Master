@@ -45,6 +45,27 @@ exports.show = function (req, res) {
   });
 };
 
+// Get a single stock
+exports.getCompany = function (req, res) {
+
+  var symbol = req.params.symbol;
+
+  var options = {
+    url: 'http://dev.markitondemand.com/MODApis/Api/v2/Lookup/JSON/?input=' + symbol
+  };
+
+  console.log('Getting stock:' + symbol );
+
+  Request(options, function (error, response) {
+    if (!error && response.statusCode === 200) {
+
+      console.log('Returned stock:' + symbol );
+
+      return res.json(response);
+    }
+  });
+};
+
 function setPercentLeftToInvest(selectedFund) {
   var remainingInvestment = 100;
 
