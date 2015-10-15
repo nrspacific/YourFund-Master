@@ -280,12 +280,14 @@ function updateFundInvestementPercentages(updatedFund,cashDifference,action, res
             if (err) {
               return handleError(result, err);
             }
-            else{
-              logFundCashUpdate(updatedFund, action, cashDifference, res);
-            }
+
           }
         );
       });
+
+
+        logFundCashUpdate(updatedFund, action, cashDifference, res);
+
     }
   }
 }
