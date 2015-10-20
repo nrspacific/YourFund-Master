@@ -153,6 +153,18 @@ exports.create = function (req, res) {
             console.log('stock:' + req.body.symbol + ' has been added to fund: ' + req.body.fundId);
             var description = stock.action + ' ' + stock.description + ' ' + stock.numberOfShares + ' at $' +  stock.price;
 
+            var action = 'Buy';
+
+            if(stock.action == 'buy' || stock.action == 'Buy'){
+              action = 'Sell';
+              stock.action = 'Buy'
+            }
+            else
+            {
+              action = 'Buy';
+              stock.action = 'Sell'
+            }
+
             if(selectedFund.finalized){
               transaction.create(
                 {
@@ -161,7 +173,7 @@ exports.create = function (req, res) {
                   symbol: 'YMMF',
                   description: description,
                   price: 1,
-                  action: stock.action,
+                  action: action,
                   numberOfShares: stock.numberOfShares,
                   total:  stock.price * stock.numberOfShares,
                   company: 'Your Money Market Fund',
@@ -213,6 +225,7 @@ exports.update = function (req, res) {
   var user = req.user;
   var stockToUpdate = req.body.stockToUpdate;
   var fundToUpdate = req.body.fundToUpdate;
+  var tradeAmount = req.body.tradeAmount;
 
   if (!req.body) { return res.send(400);}
   if (req.body._id) {delete req.body._id;}
@@ -293,6 +306,12 @@ exports.update = function (req, res) {
 
             if(stockToUpdate.action == 'buy'){
               action = 'Sell';
+              stockToUpdate.action = 'Buy'
+            }
+            else
+            {
+              action = 'Buy';
+              stockToUpdate.action = 'Sell'
             }
 
             transaction.create(
@@ -304,7 +323,7 @@ exports.update = function (req, res) {
                 price: 1,
                 action: action,
                 numberOfShares: stockToUpdate.numberOfShares,
-                total: stockToUpdate.price * stockToUpdate.numberOfShares,
+                total: tradeAmount,
                 company: 'Your Money Market Fund',
                 active: true
               },
@@ -327,7 +346,7 @@ exports.update = function (req, res) {
                 price: stockToUpdate.price,
                 action: stockToUpdate.action,
                 numberOfShares: stockToUpdate.numberOfShares,
-                total: stockToUpdate.price * stockToUpdate.numberOfShares,
+                total: tradeAmount,
                 company: stockToUpdate.description,
                 active: true
               },function (err, result) {
