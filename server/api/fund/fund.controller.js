@@ -280,12 +280,14 @@ function updateFundInvestementPercentages(updatedFund,cashDifference,action, res
             if (err) {
               return handleError(result, err);
             }
-            else{
-              logFundCashUpdate(updatedFund, action, cashDifference, res);
-            }
+
           }
         );
       });
+
+
+        logFundCashUpdate(updatedFund, action, cashDifference, res);
+
     }
   }
 }
@@ -443,7 +445,6 @@ exports.update = function (req, res) {
   exports.finalize = function (req, res) {
 
     var user = req.user;
-    var selectedStock;
 
     fund.findById(req.params.id, function (err, fund) {
       if (err) {
@@ -459,19 +460,75 @@ exports.update = function (req, res) {
       userModel.update(
         {'_id': user._id, 'funds._id': mongoose.Types.ObjectId(req.params.id)},
         {$set: {'funds.$.finalized': true}},
-        function (err, result) {
-          if (err) {
-            return handleError(result, err);
-          }
-          else {
-            console.log(result);
-            return res.send(204);
-          }
-        });
-    });
+          function (err, result) {
+            if (err) {
+              return handleError(result, err);
+            }
+            else {
+              createFinalizedTransactions(res,fund);
+              console.log(result);
+            }
+          });
+      });
+
+     function createFinalizedTransactions(res,updatedFund){
+
+        var i = 0;
+
+        updatedFund.stocks.forEach(function (stock) {
+
+          i++;
+
+         var description = stock.action + ' ' + stock.description + ' ' + Math.floor(stock.numberOfShares * 100) / 100 + ' at $' +  stock.price;
+
+         var datePlusOneSecond = new Date();
+         datePlusOneSecond.setSeconds(datePlusOneSecond.getSeconds() + i);
+
+         transaction.create(
+           {
+             fundId: updatedFund._id,
+             date: datePlusOneSecond,
+             symbol: 'YMMF',
+             description: description,
+             price: 1,
+             action: stock.action,
+             numberOfShares: stock.numberOfShares,
+             total:  stock.price * stock.numberOfShares,
+             company: 'Your Money Market Fund',
+             active: true
+           },
+           function (err, result) {
+             if (err) {
+               return handleError(result, err);
+             }
+             transaction.create(
+               {
+                 fundId: updatedFund._id,
+                 date: datePlusOneSecond,
+                 symbol: stock.symbol,
+                 description: description,
+                 price: stock.price,
+                 action: stock.action,
+                 numberOfShares: stock.numberOfShares,
+                 total: stock.price * stock.numberOfShares,
+                 company: stock.description,
+                 active: true
+               },
+               function (err, result) {
+                 if (err) {
+                   return handleError(result, err);
+                 }
+               });
+
+             console.log('saving YMMF transaction for stock purchase');
+           });
+      });
+
+        return res.send(204);
+    };
+
 
   };
-
 
   function handleError(res, err) {
     return res.send(500, err);

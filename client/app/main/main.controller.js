@@ -67,7 +67,7 @@ angular.module('yourfundFullstackApp')
           $scope.originalInvestmentTotal += s.originalCashInvestment;
         }
         else {
-          if(s.active == true){
+          if (s.active == true) {
             $scope.totalInvestmentPercentage = $scope.totalInvestmentPercentage + Number(s.currentPercentOfFund);
             $scope.totalCashInvestedInFund = $scope.totalCashInvestedInFund + Number(s.currentPrice * s.numberOfShares);
             originalInvestmentTotal += Number(s.price * s.numberOfShares);
@@ -167,7 +167,7 @@ angular.module('yourfundFullstackApp')
         .then(function ($response) {
           var output = [];
 
-          $response.ResultSet.Result.forEach(function (stock) {
+          $response.forEach(function (stock) {
             output.push(stock);
           });
 
@@ -512,17 +512,18 @@ angular.module('yourfundFullstackApp')
       $http.put('/api/stocks/' + $scope.selectedStock._id, {
         stockToUpdate: $scope.selectedStock,
         fundToUpdate: $scope.selectedFund,
-        fundId: $scope.selectedFund._id
+        fundId: $scope.selectedFund._id,
+        tradeAmount: $scope.tradeAmountCash
       }).then(function (response) {
         $scope.editMode = false;
 
-        bootbox.alert("Transaction completed successfully.", function() {
+        bootbox.alert("Transaction completed successfully.", function () {
           setSelectedFundByID($scope.selectedFund._id);
         });
       })
-      .catch(function (response) {
-        console.error('Stocks update error', response);
-      });
+        .catch(function (response) {
+          console.error('Stocks update error', response);
+        });
 
       $scope.tradeAmount = '';
       $scope.tradeAmountCash = '';
@@ -531,17 +532,16 @@ angular.module('yourfundFullstackApp')
 
     $scope.isTradeAmountEditable = false;
 
-    $scope.disableTradeInvestmentFields = function(){
+    $scope.disableTradeInvestmentFields = function () {
       $scope.isTradeAmountEditable = true;
-      $scope.tradeAmountCash =  $scope.selectedStock.currentCashInvestment;
-      $scope.updateTradeAmountPercentage( $scope.selectedStock);
+      $scope.tradeAmountCash = $scope.selectedStock.currentCashInvestment;
+      $scope.updateTradeAmountPercentage($scope.selectedStock);
     };
 
-    $scope.enableTradeInvestmentFields = function(){
+    $scope.enableTradeInvestmentFields = function () {
       $scope.isTradeAmountEditable = false;
       $scope.tradeAmountCash = '';
     };
-
 
     $scope.clearInvestmentVals = function () {
       $scope.stockSymbol = ''; //value actually submitted
@@ -577,12 +577,12 @@ angular.module('yourfundFullstackApp')
           $scope.tradeAmountCash = '';
           $scope.stockToAdd = {};
 
-          if($scope.selectedFund.finalized === true){
-            bootbox.alert( "Investment: " + $scope.stock + " successfully added.", function() {
+          if ($scope.selectedFund.finalized === true) {
+            bootbox.alert("Investment: " + $scope.stock + " successfully added.", function () {
               setSelectedFundByID($scope.selectedFund._id);
             });
           }
-          else{
+          else {
             setSelectedFundByID($scope.selectedFund._id);
           }
 

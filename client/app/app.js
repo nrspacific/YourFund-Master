@@ -8,10 +8,13 @@ angular.module('yourfundFullstackApp', [
   'ui.router',
   'ui.bootstrap',
   'ngTable'
+
 ])
   .config(function ($stateProvider, $urlRouterProvider, $locationProvider, $httpProvider) {
     $urlRouterProvider
       .otherwise('/');
+
+
 
     $locationProvider.html5Mode(true);
     $httpProvider.interceptors.push('authInterceptor');
@@ -31,7 +34,7 @@ angular.module('yourfundFullstackApp', [
       // Intercept 401s and redirect you to login
       responseError: function(response) {
         if(response.status === 401) {
-          $location.path('/login');
+         // $location.path('/login');
           // remove any stale tokens
           $cookieStore.remove('token');
           return $q.reject(response);
@@ -43,12 +46,16 @@ angular.module('yourfundFullstackApp', [
     };
   })
 
-  .run(function ($rootScope, $location, Auth) {
+  .run(function ($rootScope, $location, Auth, loginModal, $state) {
+
+
     // Redirect to login if route requires auth and you're not logged in
     $rootScope.$on('$stateChangeStart', function (event, next) {
       Auth.isLoggedInAsync(function(loggedIn) {
         if (next.authenticate && !loggedIn) {
-          $location.path('/login');
+          //$location.path('/login');
+          event.preventDefault();
+          loginModal();
         }
       });
     });

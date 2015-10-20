@@ -45,6 +45,27 @@ exports.show = function (req, res) {
   });
 };
 
+// Get a single stock
+exports.getCompany = function (req, res) {
+
+  var symbol = req.params.symbol;
+
+  var options = {
+    url: 'http://dev.markitondemand.com/MODApis/Api/v2/Lookup/JSON/?input=' + symbol
+  };
+
+  console.log('Getting stock:' + symbol );
+
+  Request(options, function (error, response) {
+    if (!error && response.statusCode === 200) {
+
+      console.log('Returned stock:' + symbol );
+
+      return res.json(response);
+    }
+  });
+};
+
 function setPercentLeftToInvest(selectedFund) {
   var remainingInvestment = 100;
 
@@ -132,15 +153,27 @@ exports.create = function (req, res) {
             console.log('stock:' + req.body.symbol + ' has been added to fund: ' + req.body.fundId);
             var description = stock.action + ' ' + stock.description + ' ' + stock.numberOfShares + ' at $' +  stock.price;
 
+            var action = 'Buy';
+
+            if(stock.action == 'buy' || stock.action == 'Buy'){
+              action = 'Sell';
+              stock.action = 'Buy'
+            }
+            else
+            {
+              action = 'Buy';
+              stock.action = 'Sell'
+            }
+
             if(selectedFund.finalized){
               transaction.create(
                 {
                   fundId: selectedFund._id,
                   date: new Date(),
                   symbol: 'YMMF',
-                  description: description,
+                  description: action + ' ' + stock.description + ' ' + stock.numberOfShares + ' at $' +  stock.price,
                   price: 1,
-                  action: stock.action,
+                  action: action,
                   numberOfShares: stock.numberOfShares,
                   total:  stock.price * stock.numberOfShares,
                   company: 'Your Money Market Fund',
@@ -192,6 +225,7 @@ exports.update = function (req, res) {
   var user = req.user;
   var stockToUpdate = req.body.stockToUpdate;
   var fundToUpdate = req.body.fundToUpdate;
+  var tradeAmount = req.body.tradeAmount;
 
   if (!req.body) { return res.send(400);}
   if (req.body._id) {delete req.body._id;}
@@ -272,6 +306,12 @@ exports.update = function (req, res) {
 
             if(stockToUpdate.action == 'buy'){
               action = 'Sell';
+              stockToUpdate.action = 'Buy'
+            }
+            else
+            {
+              action = 'Buy';
+              stockToUpdate.action = 'Sell'
             }
 
             transaction.create(
@@ -279,11 +319,11 @@ exports.update = function (req, res) {
                 fundId: selectedFund._id,
                 date: new Date(),
                 symbol: 'YMMF',
-                description: stockToUpdate.action + ' ' + stockToUpdate.description + ' ' + stockToUpdate.numberOfShares + ' at $' +  stockToUpdate.price,
+                description: action + ' ' + stockToUpdate.description + ' ' + stockToUpdate.numberOfShares + ' at $' +  stockToUpdate.price,
                 price: 1,
                 action: action,
                 numberOfShares: stockToUpdate.numberOfShares,
-                total: stockToUpdate.price * stockToUpdate.numberOfShares,
+                total: tradeAmount,
                 company: 'Your Money Market Fund',
                 active: true
               },
@@ -306,7 +346,7 @@ exports.update = function (req, res) {
                 price: stockToUpdate.price,
                 action: stockToUpdate.action,
                 numberOfShares: stockToUpdate.numberOfShares,
-                total: stockToUpdate.price * stockToUpdate.numberOfShares,
+                total: tradeAmount,
                 company: stockToUpdate.description,
                 active: true
               },function (err, result) {
