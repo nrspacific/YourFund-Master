@@ -226,6 +226,7 @@ exports.update = function (req, res) {
   var stockToUpdate = req.body.stockToUpdate;
   var fundToUpdate = req.body.fundToUpdate;
   var tradeAmount = req.body.tradeAmount;
+  var tradeShares = req.body.tradeShares;
 
   if (!req.body) { return res.send(400);}
   if (req.body._id) {delete req.body._id;}
@@ -319,10 +320,10 @@ exports.update = function (req, res) {
                 fundId: selectedFund._id,
                 date: new Date(),
                 symbol: 'YMMF',
-                description: action + ' ' + stockToUpdate.description + ' ' + stockToUpdate.numberOfShares + ' at $' +  stockToUpdate.price,
+                description: stockToUpdate.action + ' ' + stockToUpdate.description + ' ' + tradeShares + ' at $' +  stockToUpdate.currentPrice,
                 price: 1,
-                action: action,
-                numberOfShares: stockToUpdate.numberOfShares,
+                action: stockToUpdate.action,
+                numberOfShares: tradeShares,
                 total: tradeAmount,
                 company: 'Your Money Market Fund',
                 active: true
@@ -342,10 +343,10 @@ exports.update = function (req, res) {
                 fundId: selectedFund._id,
                 date: datePlusOneSecond,
                 symbol: stockToUpdate.symbol,
-                description: stockToUpdate.action + ' ' + stockToUpdate.description + ' ' + stockToUpdate.numberOfShares + ' at $' +  stockToUpdate.price,
+                description: stockToUpdate.action + ' ' + stockToUpdate.description + ' ' + tradeShares + ' at $' +  stockToUpdate.currentPrice,
                 price: stockToUpdate.price,
                 action: stockToUpdate.action,
-                numberOfShares: stockToUpdate.numberOfShares,
+                numberOfShares: tradeShares,
                 total: tradeAmount,
                 company: stockToUpdate.description,
                 active: true
