@@ -451,6 +451,7 @@ exports.finalize = function (req, res) {
     }
 
     fund.set({"finalized": true});
+    fund.set({"originalCash": fund.cash});
     fund.save();
 
     userModel.update(
@@ -487,9 +488,9 @@ exports.finalize = function (req, res) {
           fundId: updatedFund._id,
           date: datePlusOneSecond,
           symbol: 'YMMF',
-          description: ymmfAction + ' ' + stock.description + ' ' + Math.floor(stock.numberOfShares * 100) / 100 + ' at $' + stock.price,
+          description: stock.action + ' ' + stock.description + ' ' + Math.floor(stock.numberOfShares * 100) / 100 + ' at $' + stock.price,
           price: 1,
-          action: ymmfAction,
+          action: stock.action,
           numberOfShares: stock.numberOfShares,
           total: stock.price * stock.numberOfShares,
           company: 'Your Money Market Fund',
