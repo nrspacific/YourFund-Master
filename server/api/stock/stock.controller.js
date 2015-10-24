@@ -151,7 +151,7 @@ exports.create = function (req, res) {
             }
 
             console.log('stock:' + req.body.symbol + ' has been added to fund: ' + req.body.fundId);
-            var description = stock.action + ' ' + stock.description + ' ' + stock.numberOfShares + ' at $' +  stock.price;
+            var description = stock.action + ' ' + stock.description + ' ' + stock.numberOfShares.toFixedDown(2) + ' at $' +  stock.price;
 
             var action = 'Buy';
 
@@ -171,9 +171,9 @@ exports.create = function (req, res) {
                   fundId: selectedFund._id,
                   date: new Date(),
                   symbol: 'YMMF',
-                  description: action + ' ' + stock.description + ' ' + stock.numberOfShares + ' at $' +  stock.price,
+                  description: stock.action + ' ' + stock.description + ' ' + stock.numberOfShares.toFixedDown(2) + ' at $' +  stock.price,
                   price: 1,
-                  action: action,
+                  action: stock.action,
                   numberOfShares: stock.numberOfShares,
                   total:  stock.price * stock.numberOfShares,
                   company: 'Your Money Market Fund',
@@ -218,6 +218,13 @@ exports.create = function (req, res) {
     }
   });
 };
+
+Number.prototype.toFixedDown = function(digits) {
+  var re = new RegExp("(\\d+\\.\\d{" + digits + "})(\\d)"),
+    m = this.toString().match(re);
+  return m ? parseFloat(m[1]) : this.valueOf();
+};
+
 
 // Updates an existing stock in the DB.
 exports.update = function (req, res) {
@@ -289,6 +296,7 @@ exports.update = function (req, res) {
 
 
     if(selectedFund.finalized == true){
+
       fund.update(
         {'_id': req.body.fundId, 'stocks._id': mongoose.Types.ObjectId(stockToUpdate._id)},
         {$set: {'cash': selectedFund.cash,
@@ -303,15 +311,12 @@ exports.update = function (req, res) {
             return handleError(result, err);
           }
           else {
-            var action = 'Buy';
 
             if(stockToUpdate.action == 'buy'){
-              action = 'Sell';
               stockToUpdate.action = 'Buy'
             }
             else
             {
-              action = 'Buy';
               stockToUpdate.action = 'Sell'
             }
 
@@ -320,12 +325,12 @@ exports.update = function (req, res) {
                 fundId: selectedFund._id,
                 date: new Date(),
                 symbol: 'YMMF',
-                description: stockToUpdate.action + ' ' + stockToUpdate.description + ' ' + tradeShares + ' at $' +  stockToUpdate.currentPrice,
+                description: stockToUpdate.action + ' ' + stockToUpdate.description + ' ' + tradeAmount + ' at $' +  stockToUpdate.currentPrice,
                 price: 1,
                 action: stockToUpdate.action,
                 numberOfShares: tradeShares,
                 total: tradeAmount,
-                company: 'Your Money Market Fund',
+                company: 'Your Money Market Fundz',
                 active: true
               },
               function (err, result) {
@@ -343,7 +348,7 @@ exports.update = function (req, res) {
                 fundId: selectedFund._id,
                 date: datePlusOneSecond,
                 symbol: stockToUpdate.symbol,
-                description: stockToUpdate.action + ' ' + stockToUpdate.description + ' ' + tradeShares + ' at $' +  stockToUpdate.currentPrice,
+                description: stockToUpdate.action + ' ' + stockToUpdate.description + ' ' + tradeShares.toFixedDown(2) + ' at $' +  stockToUpdate.currentPrice,
                 price: stockToUpdate.price,
                 action: stockToUpdate.action,
                 numberOfShares: tradeShares,
@@ -383,50 +388,6 @@ exports.update = function (req, res) {
             if(stockToUpdate.action == 'buy'){
               action = 'Sell';
             }
-
-            //transaction.create(
-            //  {
-            //    fundId: selectedFund._id,
-            //    date: new Date(),
-            //    symbol: 'YMMF',
-            //    description: stockToUpdate.action + ' ' + stockToUpdate.description + ' ' + stockToUpdate.numberOfShares + ' at $' +  stockToUpdate.price,
-            //    price: 1,
-            //    action: action,
-            //    numberOfShares: stockToUpdate.numberOfShares,
-            //    total: stockToUpdate.price * stockToUpdate.numberOfShares,
-            //    company: 'Your Money Market Fund',
-            //    active: true
-            //  },
-            //  function (err, result) {
-            //    if (err) {
-            //      return handleError(result, err);
-            //    }
-            //    console.log('saving YMMF fund transaction for stock purchase');
-            ////  });
-            //
-            //var datePlusOneSecond = new Date();
-            //datePlusOneSecond.setSeconds(datePlusOneSecond.getSeconds() + 1);
-            //
-            //transaction.create(
-            //  {
-            //    fundId: selectedFund._id,
-            //    date: datePlusOneSecond,
-            //    symbol: stockToUpdate.symbol,
-            //    description: stockToUpdate.action + ' ' + stockToUpdate.description + ' ' + stockToUpdate.numberOfShares + ' at $' +  stockToUpdate.price,
-            //    price: stockToUpdate.price,
-            //    action: stockToUpdate.action,
-            //    numberOfShares: stockToUpdate.numberOfShares,
-            //    total: stockToUpdate.price * stockToUpdate.numberOfShares,
-            //    company: stockToUpdate.description,
-            //    active: true
-            //  },function (err, result) {
-            //    if (err) {
-            //      return handleError(result, err);
-            //    }
-            //    console.log('saving fund transaction for stock purchase');
-            //  });
-            //
-            //console.log('Updating fund:' + user.selectedFund + ' stock: ' + stockToUpdate.symbol);
 
           }
         });
