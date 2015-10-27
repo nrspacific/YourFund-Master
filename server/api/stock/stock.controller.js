@@ -265,7 +265,7 @@ exports.update = function (req, res) {
 
         //Updated funds cash left
         stockToUpdate.currentNumberOfShares = cashForPurchase / stockToUpdate.currentPrice;
-        selectedFund.cash = fundToUpdate.cash ;
+        selectedFund.cash = selectedFund.cash ;
         //stockToUpdate.originalPercentOfFund =  stockToUpdate.currentPercentOfFund;
       }else{
         // Add funds back to fund
@@ -324,12 +324,17 @@ exports.update = function (req, res) {
               stockToUpdate.action = 'Sell'
             }
 
+            if(!tradeAmount){
+              tradeAmount = stockToUpdate.currentNumberOfShares;
+            }
+
+
             transaction.create(
               {
                 fundId: selectedFund._id,
                 date: new Date(),
                 symbol: 'YMMF',
-                description: stockToUpdate.action + ' ' + stockToUpdate.description + ' ' + tradeAmount + ' at $' +  stockToUpdate.currentPrice,
+                description: stockToUpdate.action + ' ' + stockToUpdate.description + ' ' + tradeAmount.toFixedDown(2) + ' at $' +  stockToUpdate.currentPrice,
                 price: 1,
                 action: stockToUpdate.action,
                 numberOfShares: tradeAmount,
@@ -352,7 +357,7 @@ exports.update = function (req, res) {
                 fundId: selectedFund._id,
                 date: datePlusOneSecond,
                 symbol: stockToUpdate.symbol,
-                description: stockToUpdate.action + ' ' + stockToUpdate.description + ' ' + tradeShares.toFixedDown(2) + ' at $' +  stockToUpdate.currentPrice,
+                description: stockToUpdate.action + ' ' + stockToUpdate.description + ' ' + tradeAmount.toFixedDown(2) + ' at $' +  stockToUpdate.currentPrice,
                 price: stockToUpdate.price,
                 action: stockToUpdate.action,
                 numberOfShares: tradeShares,
