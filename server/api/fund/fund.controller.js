@@ -284,12 +284,13 @@ function updateFundInvestementPercentages(updatedFund, cashDifference, action, r
           }
         );
       });
-
-
-      logFundCashUpdate(updatedFund, action, cashDifference, res);
-
     }
   }
+  else{
+    updatedFund.save();
+  }
+
+  logFundCashUpdate(updatedFund, action, cashDifference, res);
 }
 
 exports.show = function (req, res) {
