@@ -166,10 +166,35 @@ exports.create = function (req, res) {
             }
 
             if(selectedFund.finalized){
+
               transaction.create(
                 {
                   fundId: selectedFund._id,
-                  date: new Date(),
+                  date: new Date() ,
+                  symbol: req.body.symbol,
+                  description: description,
+                  price: req.body.price,
+                  action: stock.action,
+                  numberOfShares: req.body.numberOfShares,
+                  total: req.body.price * req.body.numberOfShares,
+                  company: stock.description,
+                  active: true
+                },
+                function (err, result) {
+                  if (err) {
+                    return handleError(result, err);
+                  }
+                  console.log('saving YMMF transaction for stock purchase');
+                });
+
+              var datePlusOneSecond = new Date();
+              datePlusOneSecond.setSeconds(datePlusOneSecond.getSeconds() + 1);
+
+
+              transaction.create(
+                {
+                  fundId: selectedFund._id,
+                  date: datePlusOneSecond,
                   symbol: 'YMMF',
                   description: stock.action + ' ' + stock.description + ' ' + stock.numberOfShares.toFixedDown(2) + ' at $' +  stock.price,
                   price: 1,
@@ -187,28 +212,7 @@ exports.create = function (req, res) {
                 });
 
 
-              var datePlusOneSecond = new Date();
-              datePlusOneSecond.setSeconds(datePlusOneSecond.getSeconds() + 1);
 
-              transaction.create(
-                {
-                  fundId: selectedFund._id,
-                  date: datePlusOneSecond ,
-                  symbol: req.body.symbol,
-                  description: description,
-                  price: req.body.price,
-                  action: stock.action,
-                  numberOfShares: req.body.numberOfShares,
-                  total: req.body.price * req.body.numberOfShares,
-                  company: stock.description,
-                  active: true
-                },
-                function (err, result) {
-                  if (err) {
-                    return handleError(result, err);
-                  }
-                  console.log('saving YMMF transaction for stock purchase');
-                });
             }
 
             return res.json(201, selectedFund);
@@ -328,9 +332,9 @@ exports.update = function (req, res) {
                 description: stockToUpdate.action + ' ' + stockToUpdate.description + ' ' + tradeAmount + ' at $' +  stockToUpdate.currentPrice,
                 price: 1,
                 action: stockToUpdate.action,
-                numberOfShares: tradeShares,
+                numberOfShares: tradeAmount,
                 total: tradeAmount,
-                company: 'Your Money Market Fundz',
+                company: 'Your Money Market Fund',
                 active: true
               },
               function (err, result) {
