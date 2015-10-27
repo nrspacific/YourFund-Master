@@ -13,12 +13,12 @@
           <span ng-show="stock.action == 'Sell' || stock.action == 'sell' ">({{stock.total | currency}})</span>
         </td>
         <td data-title="'Total'" ng-show="(stock.symbol == 'YMMF') && (stock.total != stock.numberOfShares)">
-          <span ng-show="stock.action == 'Buy' || stock.action == 'Add' ">{{stock.total | currency}}</span>
-          <span ng-show="stock.action == 'Sell' || stock.action == 'sell' ">({{stock.total | currency}})</span>
+          <span ng-show="stock.action == 'Buy' || stock.action == 'Add' ">({{stock.total | currency}})</span>
+          <span ng-show="stock.action == 'Sell' || stock.action == 'sell' ">{{stock.total | currency}}</span>
         </td>
         <td data-title="'Total'" ng-show="(stock.symbol == 'YMMF') && (stock.total == stock.numberOfShares) ">
           <span ng-show="stock.action == 'Buy' || stock.action == 'Add' ">{{stock.total | currency}}</span>
-          <span ng-show="stock.action == 'Sell' || stock.action == 'sell' ">({{stock.total | currency}})</span>
+          <span ng-show="stock.action == 'Sell' || stock.action == 'sell' ">{{stock.total | currency}}</span>
         </td>
         <td data-title="'Action'">{{stock.action}}</td>
         <td data-title="'Explanation'">{{stock.description}}</td>

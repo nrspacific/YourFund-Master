@@ -241,6 +241,10 @@
 
     <div style="padding:15pt;font-family: Arial, Helvetica, sans-serif;font-size: 18px;color: #37864A;">
       <div id="hed_ban_rgt_top">
+         <span ng-hide="isLoggedIn()" >
+          <a ng-href="/whatis" class="headLink">What Is It?&nbsp;</i></a>
+          &nbsp;I&nbsp;
+        </span>
         <span ng-hide="isLoggedIn()" >
           <a ng-href="#"
              ng-click="login()"

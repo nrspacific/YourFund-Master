@@ -84,8 +84,10 @@ angular.module('yourfundFullstackApp')
       $scope.originalInvestmentTotal = originalInvestmentTotal;
       $scope.gainLossPercent = ($scope.gainLossCash / $scope.totalInvested) * 100;
       $scope.currentTotalInvestmentAmount = $scope.currentInvestmentTotal + fund.cash;
+      $scope.currentInvestmentAmount = $scope.currentInvestmentTotal ;
       $scope.originalTotalInvestmentAmount = $scope.originalTotalInvestmentAmount + fund.cash;
-
+      $scope.cMMFGainLoss = $scope.originalTotalInvestmentAmount  - $scope.currentTotalInvestmentAmount;
+      $scope.cMMFGainLossPerecent = $scope.cMMFGainLoss / fund.originalCash;
 
       getSelectedFundTransactionHistory(fundID);
 
@@ -513,7 +515,8 @@ angular.module('yourfundFullstackApp')
         stockToUpdate: $scope.selectedStock,
         fundToUpdate: $scope.selectedFund,
         fundId: $scope.selectedFund._id,
-        tradeAmount: $scope.tradeAmountCash
+        tradeAmount: $scope.tradeAmountCash,
+        tradeShares: $scope.numberOfShares
       }).then(function (response) {
         $scope.editMode = false;
 
