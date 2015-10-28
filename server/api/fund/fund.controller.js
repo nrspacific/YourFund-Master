@@ -119,13 +119,11 @@ function UpdateInitializedFunds(selectedFund, res, updatedFund) {
             },
             {
               $set: {
-                // 'cash' : selectedFundCash,
                 'stocks.$.currentPrice': currentPrice,
                 'stocks.$.created': Date(),
                 'stocks.$.currentNumberOfShares': numberOfShares,
                 'stocks.$.currentPercentOfFund': currentPercentOfFund,
                 'stocks.$.currentCashInvestment': currentCashInvestment
-                //  'stocks.$.originalCashInvestment': currentCashInvestment
               }
             },
             function (err, result) {
@@ -186,6 +184,7 @@ function UpdatePreInitializedFunds(selectedFund, req, updatedFund) {
           {
             $set: {
               'cash': selectedFundCash,
+              'originalCash': selectedFundCash,
               'stocks.$.price': req.body.price,
               'stocks.$.created': Date(),
               'stocks.$.currentPrice': req.body.price,
@@ -307,25 +306,28 @@ exports.show = function (req, res) {
       return res.send(404);
     }
 
-    if (selectedFund.stocks.length > 0) {
-      if (selectedFund.finalized == true) {
-        UpdateInitializedFunds(selectedFund, res, function (selectedFund) {
-          setPercentLeftToInvest(selectedFund);
-          return res.send(selectedFund);
-        });
+    if (selectedFund && selectedFund.stocks){
+      if (selectedFund.stocks.length > 0) {
+        if (selectedFund.finalized == true) {
+          UpdateInitializedFunds(selectedFund, res, function (selectedFund) {
+            setPercentLeftToInvest(selectedFund);
+            return res.send(selectedFund);
+          });
+        }
+        else {
+
+          UpdatePreInitializedFunds(selectedFund, req, function (selectedFund) {
+            return res.send(selectedFund);
+          });
+        }
       }
       else {
-
-        UpdatePreInitializedFunds(selectedFund, req, function (selectedFund) {
-          return res.send(selectedFund);
-        });
+        return res.send(selectedFund);
       }
-    }
-    else {
-      return res.send(selectedFund);
+
+      user.selectedFund = fund._id;
     }
 
-    user.selectedFund = fund._id;
 
 
     user.save(function (errs) {
@@ -415,6 +417,7 @@ exports.update = function (req, res) {
       action = 'Sell';
     }
 
+    req.body.originalCash = req.body.cash;
     var updatedFund = _.merge(selectedFund, req.body);
 
     updateFundInvestementPercentages(updatedFund, cashDifference, action, res);
