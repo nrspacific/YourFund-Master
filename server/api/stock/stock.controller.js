@@ -186,7 +186,7 @@ exports.create = function (req, res) {
                 });
 
               var datePlusOneSecond = new Date();
-              datePlusOneSecond.setSeconds(datePlusOneSecond.getSeconds() + 1);
+              datePlusOneSecond.setSeconds(datePlusOneSecond.getSeconds() + 5);
 
               transaction.create(
                 {
