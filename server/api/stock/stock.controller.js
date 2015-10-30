@@ -112,7 +112,7 @@ exports.create = function (req, res) {
 
         req.body.exchange = result[0].e;
         req.body.price = result[0].l;
-        var cashForPurchase = (selectedFund.goal * (req.body.originalPercentOfFund / 100));
+        var cashForPurchase = req.body.tradeAmountCash;
         var sharesToPurchase = (cashForPurchase / req.body.price) * 100 / 100;
         req.body.numberOfShares = sharesToPurchase;
         req.body.change = result[0].c;
@@ -196,7 +196,7 @@ exports.create = function (req, res) {
                   description: stock.action + ' ' + stock.description + ' ' + stock.numberOfShares.toFixedDown(2) + ' at $' +  stock.price,
                   price: 1,
                   action: stock.action,
-                  numberOfShares: stock.numberOfShares,
+                  numberOfShares: stock.price * stock.numberOfShares,
                   total:  stock.price * stock.numberOfShares,
                   company: 'Your Money Market Fund',
                   active: true
@@ -340,7 +340,7 @@ exports.update = function (req, res) {
                 price: 1,
                 action: stockToUpdate.action,
                 numberOfShares: tradeAmount,
-                total: tradeAmount,
+                total: stock.price * tradeAmount,
                 company: 'Your Money Market Fund',
                 active: true
               },
