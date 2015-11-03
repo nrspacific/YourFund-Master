@@ -259,7 +259,7 @@ exports.update = function (req, res) {
 
         //Updated funds cash left
         stockToUpdate.currentNumberOfShares = cashForPurchase / stockToUpdate.currentPrice;
-       //selectedFund.cash = selectedFund.cash ;
+       // selectedFund.cash = selectedFund.cash;
        // selectedFund.originalCash = selectedFund.cash;
         //stockToUpdate.originalPercentOfFund =  stockToUpdate.currentPercentOfFund;
       }else{
@@ -340,7 +340,7 @@ exports.update = function (req, res) {
                 price: 1,
                 action: stockToUpdate.action,
                 numberOfShares: tradeAmount,
-                total: stock.price * tradeAmount,
+                total: stockToUpdate.price * tradeAmount,
                 company: 'Your Money Market Fund',
                 active: true
               },
