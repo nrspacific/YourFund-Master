@@ -254,16 +254,6 @@ exports.update = function (req, res) {
 
       if(selectedFund.finalized == true){
         stockToUpdate.numberOfShares = stockToUpdate.currentNumberOfShares;
-      }else{
-        // Add funds back to fund
-        if(req.body.originalAllocation){
-          cashForPurchase =(selectedFund.goal * (req.body.originalAllocation / 100));
-          stockToUpdate.numberOfShares = cashForPurchase / stockToUpdate.price;
-          purchasePrice = stockToUpdate.numberOfShares * stockToUpdate.price;
-          selectedFund.cash = selectedFund.cash + purchasePrice;
-          selectedFund.originalCash = selectedFund.cash ;
-        }
-      }
 
         purchasePrice = tradeAmount;
 
@@ -285,10 +275,25 @@ exports.update = function (req, res) {
           selectedFund.cash = parseFloat(fundToUpdate.cash) + parseFloat(stockToUpdate.currentCashInvestment);
           stockToUpdate.currentCashInvestment = 0;
         }
+      }
+      else
+      {
+        if(req.body.originalAllocation){
+          cashForPurchase =(selectedFund.goal * (stockToUpdate.originalPercentOfFund / 100));
+          stockToUpdate.numberOfShares = cashForPurchase / stockToUpdate.price;
+          purchasePrice = stockToUpdate.numberOfShares * stockToUpdate.price;
+
+          var cashToReturn =(selectedFund.goal * (req.body.originalAllocation / 100));
+
+          selectedFund.cash = selectedFund.cash + cashToReturn;
+          selectedFund.cash =  parseFloat(selectedFund.cash) -  parseFloat(purchasePrice);
+          selectedFund.originalCash =  selectedFund.cash ;
+        }
+      }
 
      console.log('Updating fund:' + selectedFund.name + ' stock: ' + stockToUpdate.symbol);
 
-    if(selectedFund.finalized == true){
+     if(selectedFund.finalized == true){
 
       fund.update(
         {'_id': req.body.fundId, 'stocks._id': mongoose.Types.ObjectId(stockToUpdate._id)},
@@ -361,7 +366,6 @@ exports.update = function (req, res) {
                 console.log('saving YMMF fund transaction for stock purchase');
               });
 
-
             console.log('Updating fund:' + user.selectedFund + ' stock: ' + stockToUpdate.symbol);
           }
 
@@ -376,25 +380,27 @@ exports.update = function (req, res) {
                 'stocks.$.currentPercentOfFund': stockToUpdate.originalPercentOfFund,
                 'stocks.$.currentNumberOfShares': stockToUpdate.numberOfShares,
                 'stocks.$.numberOfShares': stockToUpdate.numberOfShares,
-                'stocks.$.originalCashInvestment': purchasePrice,
-                'stocks.$.currentCashInvestment': purchasePrice,
+                'stocks.$.originalCashInvestment': stockToUpdate.currentPrice * stockToUpdate.numberOfShares,
+                'stocks.$.currentCashInvestment': stockToUpdate.currentPrice * stockToUpdate.numberOfShares,
                 'stocks.$.active': stockToUpdate.active
         }},function (err, result) {
           if (err) {
             return handleError(result, err);
           }
+
         });
     }
 
-    setPercentLeftToInvest(selectedFund);
+      setPercentLeftToInvest(selectedFund);
 
-    selectedFund.save(function (errs) {
-      if (errs) {
-        console.log(errs);
-        return res.render('500');
-      }
-      return res.send(204);
-    });
+      selectedFund.save(function (errs) {
+        if (errs) {
+          console.log(errs);
+          return res.render('500');
+        }
+        return res.send(204);
+      });
+
 
   })
 };
