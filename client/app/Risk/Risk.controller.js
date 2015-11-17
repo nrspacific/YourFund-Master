@@ -1,6 +1,10 @@
 'use strict';
 
 angular.module('yourfundFullstackApp')
-  .controller('RiskCtrl', function ($scope) {
-    $scope.message = 'Hello';
+  .controller('RiskCtrl', function ($scope, $location) {
+
+    $scope.isActive = function (viewLocation) {
+      return viewLocation === $location.path();
+    };
+
   });

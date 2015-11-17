@@ -1,16 +1,28 @@
 <div class="row">
   <div class="col-md-12">
     <table class="row-border hover" ng-table="tableParams" ng-show="selectedFund.finalized">
-      <tr ng-repeat="stock in selectedFundHistoryItems">
+      <tr ng-repeat="stock in selectedFundHistoryItems" ng-class="{ 'ymmfBackground': stock.symbol=='YMMF' } " >
         <td data-title="'Date'">{{stock.date | date:'medium'}}</td>
         <td data-title="'Symbol'">{{stock.symbol}}</td>
         <td data-title="'Company/Fund Name'">{{stock.company}}</td>
         <td data-title="'Price'">{{stock.price | currency}}</td>
-        <td data-title="'# of Shares'">{{stock.numberOfShares}}</td>
+        <td data-title="'# of Shares'">{{stock.numberOfShares | number:2}}</td>
         <!--<td data-title="'Total'" ng-show="stock.action == 'Sell' ">({{stock.total | currency}})</td>-->
-        <td data-title="'Total'">
+        <td data-title="'Total'" ng-show="(stock.symbol != 'YMMF')">
           <span ng-show="stock.action == 'Buy' || stock.action == 'Add' ">{{stock.total | currency}}</span>
           <span ng-show="stock.action == 'Sell' || stock.action == 'sell' ">({{stock.total | currency}})</span>
+        </td>
+        <td data-title="'Total'" ng-show="(stock.symbol == 'YMMF') && (stock.total != stock.numberOfShares)">
+          <span ng-show="stock.action == 'Buy' || stock.action == 'Add' ">({{stock.total | currency}})</span>
+          <span ng-show="stock.action == 'Sell' || stock.action == 'sell' ">{{stock.total | currency}}</span>
+        </td>
+        <td data-title="'Total'" ng-show="(stock.symbol == 'YMMF') && (stock.total == stock.numberOfShares) && (stock.description != 'Add money to YMMF')">
+          <span ng-show="stock.action == 'Buy' || stock.action == 'Add' ">({{stock.total | currency}})</span>
+          <span ng-show="stock.action == 'Sell' || stock.action == 'sell' ">{{stock.total | currency}}</span>
+        </td>
+        <td data-title="'Total'" ng-show="(stock.symbol == 'YMMF') && (stock.total == stock.numberOfShares) && (stock.description == 'Add money to YMMF')">
+          <span ng-show="stock.action == 'Buy' || stock.action == 'Add' ">{{stock.total | currency}}</span>
+
         </td>
         <td data-title="'Action'">{{stock.action}}</td>
         <td data-title="'Explanation'">{{stock.description}}</td>
@@ -19,17 +31,26 @@
 
 
     <table class="row-border hover" ng-table="tableParams" ng-show="!selectedFund.finalized">
-      <tr ng-repeat="stock in selectedFundHistoryItems | filter: {renderOnPreInit: true }">
+      <tr ng-repeat="stock in selectedFundHistoryItems | filter: {symbol : 'YMMF'}">
         <td data-title="'Date'">{{stock.date | date:'medium'}}</td>
         <td data-title="'Symbol'">{{stock.symbol}}</td>
         <td data-title="'Company/Fund Name'">{{stock.company}}</td>
         <td data-title="'Price'">{{stock.price | currency}}</td>
-        <td data-title="'# of Shares'">{{stock.numberOfShares}}</td>
-        <!--<td data-title="'Total'" ng-show="stock.action == 'Sell' ">({{stock.total | currency}})</td>-->
-        <td data-title="'Total'">
+        <td data-title="'# of Shares'">{{stock.numberOfShares | number:2}}</td>
+
+        <td data-title="'Total'" ng-show="(stock.symbol != 'YMMF')">
           <span ng-show="stock.action == 'Buy' || stock.action == 'Add' ">{{stock.total | currency}}</span>
-          <span ng-show="stock.action == 'Sell' || stock.action == 'sell' ">({{stock.total | currency}})</span>
+          <span ng-show="stock.action == 'Sell' || stock.action == 'sell' ">{{stock.total | currency}}</span>
         </td>
+        <td data-title="'Total'" ng-show="(stock.symbol == 'YMMF') && (stock.total != stock.numberOfShares)">
+          <span ng-show="stock.action == 'Buy' || stock.action == 'Add' ">({{stock.total | currency}})</span>
+          <span ng-show="stock.action == 'Sell' || stock.action == 'sell' ">{{stock.total | currency}}</span>
+        </td>
+        <td data-title="'Total'" ng-show="(stock.symbol == 'YMMF') && (stock.total == stock.numberOfShares) ">
+          <span ng-show="stock.action == 'Buy' || stock.action == 'Add' ">{{stock.total | currency}}</span>
+          <span ng-show="stock.action == 'Sell' || stock.action == 'sell' ">{{stock.total | currency}}</span>
+        </td>
+
         <td data-title="'Action'">{{stock.action}}</td>
         <td data-title="'Explanation'">{{stock.description}}</td>
       </tr>

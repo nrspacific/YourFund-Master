@@ -3,8 +3,8 @@
 angular.module('yourfundFullstackApp')
   .config(function ($stateProvider) {
     $stateProvider
-      .state('AboutUs', {
-        url: '/AboutUs',
+      .state('Aboutus', {
+        url: '/Aboutus',
         templateUrl: 'app/AboutUs/AboutUs.html',
         controller: 'AboutUsCtrl'
       });

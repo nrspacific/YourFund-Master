@@ -611,7 +611,8 @@ module.exports = function (grunt) {
     'cssmin',
     'uglify',
     'rev',
-    'usemin'
+    'usemin',
+    'buildcontrol:pages'
   ]);
 
   grunt.registerTask('deploy', [

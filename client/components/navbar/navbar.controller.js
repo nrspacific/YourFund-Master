@@ -1,7 +1,7 @@
 'use strict';
 
 angular.module('yourfundFullstackApp')
-  .controller('NavbarCtrl', function ($scope, $location, Auth) {
+  .controller('NavbarCtrl', function ($scope, $location, Auth, loginModal,stocklookupservice) {
     $scope.menu = [{
       'title': 'Home',
       'link': '/'
@@ -12,12 +12,49 @@ angular.module('yourfundFullstackApp')
     $scope.isAdmin = Auth.isAdmin;
     $scope.getCurrentUser = Auth.getCurrentUser;
 
-    $scope.logout = function() {
+    $scope.logout = function () {
       Auth.logout();
-      $location.path('/login');
+      $location.path('/home');
     };
 
-    $scope.isActive = function(route) {
+    $scope.login = function () {
+      loginModal();
+    };
+
+
+    $scope.getSuggestedStocks = function (val) {
+      return stocklookupservice.getHistoricalData(val, $scope.startDate, $scope.endDate)
+        .then(function ($response) {
+          var output = [];
+
+          $response.forEach(function (stock) {
+            output.push(stock);
+          });
+
+          console.log(output);
+          return output;
+        });
+    };
+
+    $scope.isGettingStartedActive = function () {
+      if ($location.path() === '/orientation' ||
+        $location.path() === '/Risk' ||
+        $location.path() === '/GoalSetting' ||
+        $location.path() === '/Pricing' ||
+        $location.path() === '/Help' ||
+        $location.path() === '/Aboutus'
+      ) {
+        return true;
+      }
+      else {
+        return false;
+      }
+    };
+
+
+    $scope.isActive = function (route) {
       return route === $location.path();
     };
+
+
   });

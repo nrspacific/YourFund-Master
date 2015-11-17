@@ -17,7 +17,8 @@ var transcations = require('../api/transaction/transaction.model');
 //      accountId: '1',
 //      stocks: [], //ticker symbol, purchase price, date, # of shares
 //      finalized: false,
-//      created: Date()
+//      created: Date(),
+//      percentLeftToInvest: 100
 //    },
 //    function () {
 //      console.log('finished populating funds');
