@@ -23,8 +23,8 @@ angular.module('yourfundFullstackApp')
     function setToFirstFund() {
       //if ($scope.CurrentUserFunds.data) {
       //  $scope.data.availableOptions = $scope.getCurrentUser().funds;
-      //  setSelectedFund($scope.getCurrentUser().funds[1]);
-      //  $scope.selectedFund = $scope.getCurrentUser().funds[1];
+      //  setSelectedFund($scope.getCurrentUser().funds[0]);
+      //  $scope.selectedFund = $scope.getCurrentUser().funds[0];
       //}
     }
 

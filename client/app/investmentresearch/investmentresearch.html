@@ -1,0 +1,317 @@
+<div id="page-wrapper">
+  <div class="row">
+    <div class="col-lg-10">
+      <h1 class="page-header dark-green">Investment Research</h1>
+    </div>
+  </div>
+  <div class="row">
+    <div class="col-lg-10">
+      <div class="panel panel-green">
+        <div class="panel-heading"></div>
+        <div class="panel-body">
+          <div id="mainContent">
+            <form class="form-horizontal">
+              <fieldset>
+                <div class="form-group">
+                  <div class="row col-lg-12">
+                    <div class="col-md-2">
+                      <label class="control-label pull-left" for="Symbol">Symbol</label>
+                      <input id="Symbol" name="Symbol" type="text" placeholder="" class="form-control input-md"
+                             ng-model="stockservice.selectedstock">
+                    </div>
+                    <div class="col-md-4">
+                      <label class=" control-label" for="WeekRange">Company, Fund or ETF</label>
+                      <input id="Company" name="Company" type="text" placeholder="" class="form-control input-md">
+                    </div>
+                    <div class="col-md-6">
+                      <div class="table">
+                        <div class="row">
+                          <div class="col-md-3">
+                            <label class="control-label" for="Change">Current Price</label>
+                            <input id="CurrentPrice" name="CurrentPrice" type="text" placeholder=""
+                                   class="form-control input-md">
+                          </div>
+                          <div class="col-md-3">
+                            <label class="control-label pull-left" for="Industry">Previous Close</label>
+                            <input id="PreviousClose" name="PreviousClose" type="text" placeholder=""
+                                   class="form-control input-md">
+                          </div>
+                          <div class="col-md-3">
+                            <label class=" control-label" for="WeekRange">52 Week Range</label>
+                            <input id="WeekRange" name="WeekRange" type="text" placeholder=""
+                                   class="form-control input-md">
+                          </div>
+                          <div class="col-md-3">
+                            <label class="control-label" for="Change">% Change</label>
+                            <input id="Change" name="Change" type="text" placeholder="" class="form-control input-md">
+                          </div>
+                        </div>
+                        <div class="row">
+                          <div class="col-md-3">
+                            <label class="control-label" for="AnnualDividend">Annual Dividend</label>
+                            <input id="AnnualDividend" name="AnnualDividend" type="text" placeholder=""
+                                   class="form-control input-md">
+                          </div>
+
+                          <div class="col-md-3">
+                            <label class="control-label pull-left" for="DividendYield">Dividend Yield</label>
+                            <input id="DividendYield" name="DividendYield" type="text" placeholder=""
+                                   class="form-control input-md">
+                          </div>
+                          <div class="col-md-3">
+                            <label class=" control-label" for="DividendDate">Dividend Date</label>
+                            <input id="DividendDate" name="DividendDate" type="text" placeholder=""
+                                   class="form-control input-md">
+                          </div>
+                          <div class="col-md-3">
+                            <label class="control-label" for="Change">Ex-Dividend Date</label>
+                            <input id="ExDividendDate" name="ExDividendDate" type="text" placeholder=""
+                                   class="form-control input-md">
+                          </div>
+                        </div>
+                      </div>
+                    </div>
+                  </div>
+                  <div class="row col-lg-12">
+                    <div class="col-md-6">
+                      <div class="table col-md-6">
+                        <div class="row">
+                          <div class="col-md-12">
+                            <label class="control-label pull-left" for="Industry:">Industry:</label>
+                            <input id="Industry:" name="Industry:" type="text" placeholder=""
+                                   class="form-control input-md">
+                          </div>
+                        </div>
+                        <div class="row">
+                          <div class="col-md-12">
+                            <label class=" control-label" for="CompanyType">Company Type:</label>
+                            <input id="CompanyType" name="CompanyType" type="text" placeholder=""
+                                   class="form-control input-md">
+                          </div>
+                        </div>
+                        <div class="row">
+                          <div class="col-md-12">
+                            <label class=" control-label" for="AssetClass">Asset Class:</label>
+                            <input id="AssetClass" name="AssetClass" type="text" placeholder=""
+                                   class="form-control input-md">
+                          </div>
+                        </div>
+                      </div>
+                    </div>
+                    <div class="col-md-6">
+                      <div class="table">
+                        <div class="row">
+                          <div class="col-md-12">
+                            <label class="control-label" for="BusinessSynopsis">Business Synopsis</label>
+                            <input id="BusinessSynopsis" name="BusinessSynopsis" type="text" placeholder=""
+                                   class="form-control input-md">
+                          </div>
+                        </div>
+                      </div>
+                    </div>
+                  </div>
+                  <div class="row col-lg-12">
+                    <div class="col-md-6">
+                      <div class="table col-md-12">
+                        <div class="row">
+                          <div class="col-md-6">
+                            <label class="control-label pull-left" for="Industry:">FUNDAMENTAL ANALYSIS</label>
+                          </div>
+                          <div class="col-md-3">
+                            <label class=" control-label" for="CompanyType">Current Year</label>
+                          </div>
+                          <div class="col-md-3">
+                            <label class=" control-label" for="AssetClass">Prior Year</label>
+                          </div>
+                        </div>
+                        <div class="row">
+                          <div class="col-md-6">
+                            Earnings Per Share
+                          </div>
+                          <div class="col-md-3">
+                            <input type="text"
+                                   placeholder=""
+                                   class="form-control">
+                          </div>
+                          <div class="col-md-3">
+                            <input type="text"
+                                   placeholder=""
+                                   class="form-control input-md">
+                          </div>
+                        </div>
+                        <div class="row">
+                          <div class="col-md-6">
+
+                            Revenue ($Million)
+
+                          </div>
+                          <div class="col-md-3">
+                            <input type="text"
+                                   placeholder=""
+                                   class="form-control input-md">
+                          </div>
+                          <div class="col-md-3">
+                            <input type="text"
+                                   placeholder=""
+                                   class="form-control input-md">
+                          </div>
+                        </div>
+                        <div class="row">
+                          <div class="col-md-6">
+                            Gross Margin %
+                          </div>
+                          <div class="col-md-3">
+                            <input type="text"
+                                   placeholder=""
+                                   class="form-control input-md">
+                          </div>
+                          <div class="col-md-3">
+                            <input type="text"
+                                   placeholder=""
+                                   class="form-control input-md">
+                          </div>
+                        </div>
+                        <div class="row">
+                          <div class="col-md-6">
+                            Net Income ($Million)
+                          </div>
+
+                          <div class="col-md-3">
+                            <input type="text"
+                                   placeholder=""
+                                   class="form-control input-md">
+                          </div>
+                          <div class="col-md-3">
+                            <input type="text"
+                                   placeholder=""
+                                   class="form-control input-md">
+                          </div>
+                        </div>
+                        <div class="row">
+                          <div class="col-md-6">
+                            Net Margin %
+                          </div>
+                          <div class="col-md-3">
+                            <input type="text"
+                                   placeholder=""
+                                   class="form-control input-md">
+                          </div>
+                          <div class="col-md-3">
+                            <input type="text"
+                                   placeholder=""
+                                   class="form-control input-md">
+                          </div>
+                        </div>
+                        <div class="row">
+                          <div class="col-md-6">
+                            1 Year Total Return
+                          </div>
+                          <div class="col-md-3">
+                            <input type="text"
+                                   placeholder=""
+                                   class="form-control input-md">
+                          </div>
+                          <div class="col-md-3">
+                            <input type="text"
+                                   placeholder=""
+                                   class="form-control input-md">
+                          </div>
+                        </div>
+                        <div class="row">
+                          <div class="col-md-6">
+                            3 Year Total Return
+                          </div>
+                          <div class="col-md-3">
+                            <input type="text"
+                                   placeholder=""
+                                   class="form-control input-md">
+                          </div>
+                          <div class="col-md-3">
+                            <input type="text"
+                                   placeholder=""
+                                   class="form-control input-md">
+                          </div>
+                        </div>
+                        <div class="row">
+                          <div class="col-md-6">
+                            Return on Equity
+                          </div>
+                          <div class="col-md-3">
+                            <input type="text"
+                                   placeholder=""
+                                   class="form-control input-md">
+                          </div>
+                          <div class="col-md-3">
+                            <input type="text"
+                                   placeholder=""
+                                   class="form-control input-md">
+                          </div>
+                        </div>
+                        <div class="row">
+                          <div class="col-md-6">
+                            Return on Assets
+                          </div>
+                          <div class="col-md-3">
+                            <input type="text"
+                                   placeholder=""
+                                   class="form-control input-md">
+                          </div>
+                          <div class="col-md-3">
+                            <input type="text"
+                                   placeholder=""
+                                   class="form-control input-md">
+                          </div>
+                        </div>
+                        <div class="row">
+                          <div class="col-md-6">
+                            Price / Earnings Ratio
+                          </div>
+                          <div class="col-md-3">
+                            <input type="text"
+                                   placeholder=""
+                                   class="form-control input-md">
+                          </div>
+                          <div class="col-md-3">
+                            <input type="text"
+                                   placeholder=""
+                                   class="form-control input-md">
+                          </div>
+                        </div>
+
+                        <div class="row">
+                          <div class="col-md-6">
+                            Standard & Poors Ranking
+                          </div>
+                          <div class="col-md-3">
+                            <input type="text"
+                                   placeholder=""
+                                   class="form-control input-md">
+                          </div>
+                          <div class="col-md-3">
+                            <input type="text"
+                                   placeholder=""
+                                   class="form-control input-md">
+                          </div>
+                        </div>
+                      </div>
+                    </div>
+                    <div class="col-md-6">
+                      <div class="table">
+                        <div class="row">
+                          <div class="col-md-12">
+                            <label class="control-label" for="BusinessSynopsis">Stock Price Graph</label>
+                          </div>
+                        </div>
+                      </div>
+                    </div>
+                  </div>
+                </div>
+              </fieldset>
+            </form>
+          </div>
+        </div>
+      </div>
+    </div>
+
+  </div>
+</div>
