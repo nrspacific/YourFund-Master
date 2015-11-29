@@ -74,61 +74,8 @@
 <!-- Page Content -->
 <div class="container">
   <div class="row">
-    <div class="col-md-2" ng-controller="NavbarCtrl">
-      <div class="list-group">
-        <a href="/gettingstarted"
-           data-toggle="collapse"
-           data-target="#demo"
-           class="list-group-item">
-          Getting Started
-          <i class="fa fa-fw fa-caret-down"></i></a>
 
-        <div id="demo" class="collapse side-nav-container">
-          <div><a href="/whatis" ng-class="{ activeSidebarNav: isActive('/Whatis')}">What is Your Fund?</a></div>
-          <div><a href="/howitworks" ng-class="{ activeSidebarNav: isActive('/Howitworks')}">How Your Fund Works?</a>
-          </div>
-          <div><a href="/whychoose" ng-class="{ activeSidebarNav: isActive('/whychoose')}">Why Choose Your Fund?</a>
-          </div>
-          <div><a href="/orientation" ng-class="{ activeSidebarNav: isActive('/orientation')}">Orientation</a></div>
-          <div><a href="/Risk" ng-class="{ activeSidebarNav: isActive('/Risk')}">Risk</a></div>
-          <div><a href="/GoalSetting" ng-class="{ activeSidebarNav: isActive('/GoalSetting')}">GoalSetting</a></div>
-          <div><a href="/Pricing" ng-class="{ activeSidebarNav: isActive('/Pricing')}">Pricing</a></div>
-          <div><a href="/Help" ng-class="{ activeSidebarNav: isActive('/Help')}">Help</a></div>
-          <div><a href="/Aboutus" ng-class="{ activeSidebarNav: isActive('/Aboutus')}">About us</a></div>
-        </div>
-        <a href="/main" class="list-group-item">Manage Your Fund</a>
-        <a ng-href="#" data-toggle="modal"
-           data-target="#investResearchModal"
-           class="list-group-item">
-          Investment Research</a>
-        <a href="/investmenttools"
-           data-toggle="collapse"
-           data-target="#investmentTools"
-           class="list-group-item">
-          Investment tools
-          <i class="fa fa-fw fa-caret-down"></i></a>
-          <div id="investmentTools" class="collapse side-nav-container">
-          <div><a href="/investmenttools">Basics & Concepts</a></div>
-          <div><a href="/typesofstocks">Types of Stocks</a></div>
-          <div><a href="/typesofbonds">Types of Bonds</a></div>
-          <div><a href="/mutualfunds">Mutual Funds</a></div>
-          <div><a href="/etfs">ETFs</a></div>
-          <div><a href="/investmentstrategies">Investment Strategies</a></div>
-          <div><a href="/financialstatements">Financial Statements</a></div>
-          <div><a href="/analyzingstatements">Analyzing Statements</a></div>
-          <div><a href="/fundamentalanalysis">Fundamental Analysis</a></div>
-          <div><a href="/technicalanalysis">Technical Analysis</a></div>
-          <div><a href="/fundamentalvstechnical">Fundamental vs. Technical</a></div>
-          <div><a href="/investingadvantages">Investing Advantages</a></div>
-          <div><a href="/assetallocation">Asset Allocation</a></div>
-          <div><a href="/inflation">Inflation</a></div>
-          <div><a href="/definitions">Definitions</a></div>
-          <div><a href="/tutorials">Tutorials</a></div>
-        </div>
-        <a href="/informationexchange" class="list-group-item"> Information Exchange</a>
-      </div>
-    </div>
-
+    <div ng-include="'components/navbar/navbar.html'" ng-controller="NavbarCtrl"></div>
     <div class="col-md-10">
       <div class="row carousel-holder">
         <div class="col-md-12">
@@ -183,6 +130,6 @@
 <script src="app/7c50827c.vendor.js"></script>
 
 
-<script src="app/50436d65.app.js"></script>
+<script src="app/73d203e8.app.js"></script>
 </body>
 </html>
