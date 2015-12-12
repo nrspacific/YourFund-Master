@@ -495,7 +495,7 @@ exports.finalize = function (req, res) {
           description: stock.action + ' ' + stock.description + ' ' + Math.floor(stock.numberOfShares * 100) / 100 + ' at $' + stock.price,
           price: 1,
           action: stock.action,
-          numberOfShares: stock.numberOfShares,
+          numberOfShares: stock.price * stock.numberOfShares,
           total: stock.price * stock.numberOfShares,
           company: 'Your Money Market Fund',
           active: true
