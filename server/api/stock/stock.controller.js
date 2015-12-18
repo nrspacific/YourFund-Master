@@ -333,7 +333,7 @@ exports.update = function (req, res) {
                 date: new Date(),
                 symbol: stockToUpdate.symbol,
                 description: stockToUpdate.action + ' ' + stockToUpdate.description + ' ' + tradeAmount + ' at $' +  stockToUpdate.currentPrice,
-                price: stockToUpdate.price,
+                price: stockToUpdate.currentPrice,
                 action: stockToUpdate.action,
                 numberOfShares: tradeShares,
                 total: tradeAmount,
