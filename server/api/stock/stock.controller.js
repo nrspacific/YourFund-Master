@@ -354,7 +354,7 @@ exports.update = function (req, res) {
                 description: stockToUpdate.action + ' ' + stockToUpdate.description + ' ' + tradeAmount + ' at $' +  stockToUpdate.currentPrice,
                 price: 1,
                 action: stockToUpdate.action,
-                numberOfShares: tradeAmount,
+                numberOfShares: tradeShares,
                 total: tradeAmount,
                 company: 'Your Money Market Fund',
                 active: true
