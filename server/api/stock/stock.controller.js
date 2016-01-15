@@ -332,7 +332,7 @@ exports.update = function (req, res) {
                 fundId: selectedFund._id,
                 date: new Date(),
                 symbol: stockToUpdate.symbol,
-                description: stockToUpdate.action + ' ' + stockToUpdate.description + ' ' + tradeAmount + ' at $' +  stockToUpdate.currentPrice,
+                description: stockToUpdate.action + ' ' + stockToUpdate.description + ' $' + tradeAmount + ' at $' +  stockToUpdate.currentPrice,
                 price: stockToUpdate.currentPrice,
                 action: stockToUpdate.action,
                 numberOfShares: tradeShares,
@@ -354,7 +354,7 @@ exports.update = function (req, res) {
                 description: stockToUpdate.action + ' ' + stockToUpdate.description + ' ' + tradeAmount + ' at $' +  stockToUpdate.currentPrice,
                 price: 1,
                 action: stockToUpdate.action,
-                numberOfShares: tradeAmount,
+                numberOfShares: tradeShares,
                 total: tradeAmount,
                 company: 'Your Money Market Fund',
                 active: true
