@@ -332,7 +332,7 @@ exports.update = function (req, res) {
                 fundId: selectedFund._id,
                 date: new Date(),
                 symbol: stockToUpdate.symbol,
-                description: stockToUpdate.action + ' ' + stockToUpdate.description + ' ' + tradeAmount + ' at $' +  stockToUpdate.currentPrice,
+                description: stockToUpdate.action + ' ' + stockToUpdate.description + ' $' + tradeAmount + ' at $' +  stockToUpdate.currentPrice,
                 price: stockToUpdate.currentPrice,
                 action: stockToUpdate.action,
                 numberOfShares: tradeShares,
