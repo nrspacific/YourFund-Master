@@ -46,7 +46,7 @@ angular.module('yourfundFullstackApp', [
     };
   })
 
-  .run(function ($rootScope, $location, Auth, loginModal, $state) {
+  .run(function ($rootScope, $location, Auth, loginModal, $state,$stateParams) {
 
 
     // Redirect to login if route requires auth and you're not logged in

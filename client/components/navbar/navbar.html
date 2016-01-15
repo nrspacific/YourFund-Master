@@ -1,81 +1,59 @@
-<!-- Navigation -->
-<nav class=" navbar-default navbar-static-top" role="navigation">
+<div class="col-md-3" >
+  <div class="list-group panel">
+    <a href="/gettingstarted"
+       data-toggle="collapse"
+       data-target="#demo"
+       class="list-group-item">
+      Getting Started
+      <i class="fa fa-fw fa-caret-down"></i></a>
 
-  <div class="navbar-header" >
-    <button type="button" class="navbar-toggle" data-toggle="collapse" data-target=".navbar-collapse">
-      <span class="sr-only">Toggle navigation</span>
-      <span class="icon-bar"></span>
-      <span class="icon-bar"></span>
-      <span class="icon-bar"></span>
-    </button>
-    <a class="navbar-brand" href="index.html">YourFund</a>
-  </div>
-  <!-- /.navbar-header -->
-
-  <ul class="nav navbar-right top-nav" ng-controller="NavbarCtrl">
-    <div style="padding:15pt;font-family: Arial, Helvetica, sans-serif;font-size: 18px;color: #37864A;">
-      <div id="hed_ban_rgt_top">
-         <span ng-hide="isLoggedIn()">
-          <a ng-href="/whatis" class="headLink">What Is It?&nbsp;</i></a>
-          &nbsp;I&nbsp;
-        </span>
-        <span ng-hide="isLoggedIn()">
-          <a ng-href="#"
-             ng-click="login()"
-             class="headLink">Log in&nbsp;<i class="fa fa-sign-in"></i></a>
-          &nbsp;I&nbsp;
-        </span>
-        <span ng-show="isLoggedIn()">
-          <a ng-href="#"
-             ng-click="logout()"
-             class="headLink">
-            Log Out&nbsp; <i class="fa fa-sign-out"></i></a>
-          &nbsp;I&nbsp;
-        </span>
-        <span ng-hide="isLoggedIn()">
-          <a ng-href="/signup"
-             class="headLink">Register&nbsp; <i class="fa fa-plus"></i></a>
-          &nbsp;I&nbsp;
-        </span>
-        <a ng-href="/Pricing" class="headLink">Pricing&nbsp;<i class="fa fa-usd"></i></a> &nbsp;I&nbsp;
-        <a ng-href="/Aboutus" class="headLink">About Us&nbsp;<i class="fa fa-user"></i></a> &nbsp;I&nbsp;
-        <a ng-href="/contact" class="headLink">Contact&nbsp;<i class="fa fa-pencil-square-o"></i></a> &nbsp;I&nbsp;
-        <a ng-href="/Help" class="headLink">Help&nbsp;<i class="fa fa-question-circle"></i></a></div>
+    <div id="demo" class="collapse side-nav-container">
+      <div ng-class="{ activeSidebarNav: isActive('/whatis')}" class="pad-10px"><a href="/whatis" >What is Your Fund?</a></div>
+      <div ng-class="{ activeSidebarNav: isActive('/howitworks')}" class="pad-10px"><a href="/howitworks" >How Your Fund Works?</a>
+      </div>
+      <div  ng-class="{ activeSidebarNav: isActive('/whychoose')}" class="pad-10px"><a href="/whychoose" >Why Choose Your Fund?</a>
+      </div>
+      <div  ng-class="{ activeSidebarNav: isActive('/orientation')}" class="pad-10px"><a href="/orientation" >Orientation</a></div>
+      <div ng-class="{ activeSidebarNav: isActive('/Risk')}" class="pad-10px"> <a href="/Risk" >Risk</a></div>
+      <div ng-class="{ activeSidebarNav: isActive('/GoalSetting')}" class="pad-10px"><a href="/GoalSetting" >Goal Setting</a></div>
+      <div ng-class="{ activeSidebarNav: isActive('/Pricing')}" class="pad-10px"><a href="/Pricing" >Pricing</a></div>
+      <div ng-class="{ activeSidebarNav: isActive('/Help')}" class="pad-10px"><a href="/Help" >Help</a></div>
+      <div ng-class="{ activeSidebarNav: isActive('/Aboutus')}" class="pad-10px"><a href="/Aboutus" >About us</a></div>
     </div>
-  </ul>
-  <!-- /.navbar-top-links -->
-
-
-  <div class="collapse navbar-collapse navbar-ex1-collapse">
-    <ul class="nav navbar-nav side-nav">
-        <li>
-          <a ng-href="/gettingstarted" style="color:#999999">
-            <i class="glyphicon glyphicon-check fa-fw" style="font-size: 25px;">
-            </i> Getting Started</span></a>
-          <div ng-include="'components/gettingstarted/sidebar.html'"></div>
-        </li>
-        <li>
-          <a ng-href="/main" style="color:#999999" ><i class="fa fa-line-chart fa-fw" style="font-size: 25px;"></i>
-            Manage Your Fund</a>
-        </li>
-        <li>
-          <a ng-href="#" data-toggle="modal"  ng-class="{ activeSidebarNav: isActive('/investmentresearch')}"
-             data-target="#investResearchModal" style="color:#999999">
-            <i class="fa fa-search fa-fw" style="font-size: 25px;"></i> Investment Research</a>
-        </li>
-        <li>
-          <a ng-href="/investmenttools" style="color:#999999">
-            <i class="fa fa-wrench fa-fw" style="font-size: 25px;"></i> Investment tools</a>
-        </li>
-        <li>
-          <a ng-href="/main" style="color:#999999"><i class="fa fa-support fa-fw" style="font-size: 25px;"></i>
-            Information Exchange</a>
-        </li>
-      </ul>
+    <a href="/main" class="list-group-item">Manage Your Fund</a>
+    <a ng-href="#" data-toggle="modal"
+       data-target="#investResearchModal"
+       class="list-group-item">
+      Investment Research</a>
+    <a href="/investmenttools"
+       data-toggle="collapse"
+       data-target="#investmentTools"
+       class="list-group-item">
+      Investment tools
+      <i class="fa fa-fw fa-caret-down"></i></a>
+    <div id="investmentTools" class="collapse side-nav-container">
+      <div ng-class="{ activeSidebarNav: isActive('/investmenttools')}" class="pad-10px"><a href="/investmenttools">Basics & Concepts</a></div>
+      <div ng-class="{ activeSidebarNav: isActive('/typesofstocks')}" class="pad-10px"> <a href="/typesofstocks">Types of Stocks</a></div>
+      <div ng-class="{ activeSidebarNav: isActive('/typesofbonds')}" class="pad-10px"><a href="/typesofbonds">Types of Bonds</a></div>
+      <div ng-class="{ activeSidebarNav: isActive('/mutualfunds')}" class="pad-10px"><a href="/mutualfunds">Mutual Funds</a></div>
+      <div ng-class="{ activeSidebarNav: isActive('/etfs')}" class="pad-10px"><a href="/etfs">ETFs</a></div>
+      <div ng-class="{ activeSidebarNav: isActive('/investmentstrategies')}" class="pad-10px"><a href="/investmentstrategies">Investment Strategies</a></div>
+      <div ng-class="{ activeSidebarNav: isActive('/financialstatements')}" class="pad-10px"><a href="/financialstatements">Financial Statements</a></div>
+      <div ng-class="{ activeSidebarNav: isActive('/analyzingstatements')}" class="pad-10px"><a href="/analyzingstatements">Analyzing Statements</a></div>
+      <div ng-class="{ activeSidebarNav: isActive('/fundamentalanalysis')}" class="pad-10px"><a href="/fundamentalanalysis">Fundamental Analysis</a></div>
+      <div ng-class="{ activeSidebarNav: isActive('/technicalanalysis')}" class="pad-10px"><a href="/technicalanalysis">Technical Analysis</a></div>
+      <div ng-class="{ activeSidebarNav: isActive('/fundamentalvstechnical')}" class="pad-10px"><a href="/fundamentalvstechnical">Fundamental vs. Technical</a></div>
+      <div ng-class="{ activeSidebarNav: isActive('/investingadvantages')}" class="pad-10px"><a href="/investingadvantages">Investing Advantages</a></div>
+      <div ng-class="{ activeSidebarNav: isActive('/assetallocation')}" class="pad-10px"><a href="/assetallocation">Asset Allocation</a></div>
+      <div ng-class="{ activeSidebarNav: isActive('/inflation')}" class="pad-10px"><a href="/inflation">Inflation</a></div>
+      <div ng-class="{ activeSidebarNav: isActive('/definitions')}" class="pad-10px"><a href="/definitions">Definitions</a></div>
+      <div ng-class="{ activeSidebarNav: isActive('/tutorials')}" class="pad-10px"><a href="/tutorials">Tutorials</a></div>
     </div>
+    <a href="/informationexchange" class="list-group-item"> Information Exchange</a>
   </div>
+</div>
 
-</nav>
+
 
 
 <div class="modal fade" id="investResearchModal"

@@ -45,6 +45,7 @@
   <link rel="stylesheet" href="app/home/home.css">
   <link rel="stylesheet" href="app/howitworks/howitworks.css">
   <link rel="stylesheet" href="app/inflation/inflation.css">
+  <link rel="stylesheet" href="app/informationexchange/informationexchange.css">
   <link rel="stylesheet" href="app/investingadvantages/investingadvantages.css">
   <link rel="stylesheet" href="app/investmentresearch/investmentresearch.css">
   <link rel="stylesheet" href="app/investmentstrategies/investmentstrategies.css">
@@ -64,18 +65,93 @@
   <!-- endbuild -->
 </head>
 <body ng-app="yourfundFullstackApp">
+
 <!--[if lt IE 7]>
 <p class="browsehappy">You are using an <strong>outdated</strong> browser. Please <a href="http://browsehappy.com/">upgrade
   your browser</a> to improve your experience.</p>
 <![endif]-->
 
 
-<!-- Add your site or application content here -->
-<div id="wrapper">
-  <div ng-include="'components/navbar/navbar.html'" ng-controller="NavbarCtrl"></div>
-  <div ui-view=""></div>
-</div>
+<!-- Navigation -->
+<nav class="navbar navbar-inverse navbar-fixed-top" role="navigation">
+  <div class="container">
+    <!-- Brand and toggle get grouped for better mobile display -->
+    <div class="navbar-header">
+      <button type="button" class="navbar-toggle" data-toggle="collapse" data-target="#bs-example-navbar-collapse-1">
+        <span class="sr-only">Toggle navigation</span>
+        <span class="icon-bar"></span>
+        <span class="icon-bar"></span>
+        <span class="icon-bar"></span>
+      </button>
+      <a class="navbar-brand" href="/">YourFund</a>
+    </div>
+    <!-- Collect the nav links, forms, and other content for toggling -->
+    <div class="collapse navbar-collapse pull-right" id="bs-example-navbar-collapse-1" ng-controller="NavbarCtrl">
+      <ul class="nav navbar-nav">
+        <li>
+          <a ng-href="/whatis" class="headLink">What Is It?&nbsp;</i></a>
+        </li>
+        <li>
+          <a ng-href="/howitworks" class="headLink">How it Works&nbsp;</i></a>
+        </li>
+        <li ng-show="isLoggedIn()">
+          <a ng-href="#"
+             ng-click="logout()"
+             class="headLink">Log Out&nbsp;<i class="fa fa-sign-out"></i></a>
+        </li>
+        <li ng-show="!isLoggedIn()">
+          <a ng-href="#"
+             ng-click="login()"
+             class="headLink">Log in&nbsp;<i class="fa fa-sign-in"></i></a>
+        </li>
+        <li ng-show="!isLoggedIn()">
+          <a ng-href="/signup">Register&nbsp; <i class="fa fa-plus"></i></a>
+        </li>
+        <li><a ng-href="/Pricing">Pricing&nbsp;<i class="fa fa-usd"></i></a></li>
+        <li><a ng-href="/Aboutus">About Us&nbsp;<i class="fa fa-user"></i></a></li>
+        <li><a ng-href="/contact">Contact&nbsp;<i class="fa fa-pencil-square-o"></i></a></li>
+        <li><a ng-href="/Help">Help&nbsp;<i class="fa fa-question-circle"></i></a></li>
+      </ul>
+    </div>
+    <!-- /.navbar-collapse -->
+  </div>
+  <!-- /.container -->
+</nav>
 
+
+<!-- TODO: Move back into NAVBAR.html" -->
+<!-- Page Content -->
+<div class="container">
+  <div class="row">
+
+    <div ng-include="'components/navbar/navbar.html'" ng-controller="NavbarCtrl"></div>
+    <div class="col-md-9">
+      <div class="row carousel-holder">
+        <div class="col-md-12">
+          <div ui-view=""></div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+</div>
+<!-- /.container -->
+
+<div class="container">
+
+  <hr>
+
+  <!-- Footer -->
+  <footer>
+    <div class="row">
+      <div class="col-lg-12">
+        <p>Copyright &copy; Your Website 2014</p>
+      </div>
+    </div>
+  </footer>
+
+</div>
+<!-- /.container -->
 <!-- Google Analytics: change UA-XXXXX-X to be your site's ID -->
 <script>
   (function (i, s, o, g, r, a, m) {
@@ -163,6 +239,8 @@
 <script src="app/howitworks/howitworks.js"></script>
 <script src="app/inflation/inflation.controller.js"></script>
 <script src="app/inflation/inflation.js"></script>
+<script src="app/informationexchange/informationexchange.controller.js"></script>
+<script src="app/informationexchange/informationexchange.js"></script>
 <script src="app/investingadvantages/investingadvantages.controller.js"></script>
 <script src="app/investingadvantages/investingadvantages.js"></script>
 <script src="app/investmentresearch/investmentresearch.controller.js"></script>

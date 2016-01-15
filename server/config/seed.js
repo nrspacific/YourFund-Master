@@ -8,7 +8,7 @@
 var User = require('../api/user/user.model');
 var funds = require('../api/fund/fund.model');
 var transcations = require('../api/transaction/transaction.model');
-
+//
 //funds.find({}).remove(function () {
 //  funds.create({
 //      name: 'Default Fund',

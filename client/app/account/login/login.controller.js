@@ -19,7 +19,7 @@ angular.module('yourfundFullstackApp')
     };
 
   })
-  .controller('LoginCtrl', function ($scope, Auth, $location, $window,$modalInstance) {
+  .controller('LoginCtrl', function ($scope, Auth, $location, $window,$modalInstance, User) {
     $scope.user = {};
     $scope.errors = {};
 
@@ -40,7 +40,9 @@ angular.module('yourfundFullstackApp')
         })
         .then( function() {
           // Logged in, redirect to home
-          $location.path('/main');
+            var funds = User.get();
+          $location.path('/');
+
             $modalInstance.dismiss('cancel');
         })
         .catch( function(err) {

@@ -3,6 +3,7 @@
 angular.module('yourfundFullstackApp')
   .factory('Auth', function Auth($location, $rootScope, $http, User, $cookieStore, $q) {
     var currentUser = {};
+
     if($cookieStore.get('token')) {
       currentUser = User.get();
     }
@@ -92,17 +93,13 @@ angular.module('yourfundFullstackApp')
         }).$promise;
       },
 
-      /**
-       * Gets all available info on authenticated user
-       *
-       * @return {Object} user
-       */
+
       getCurrentUser: function() {
         return currentUser;
       },
 
       updateCurrentUser: function() {
-        currentUser = User.get();
+        return currentUser;
       },
 
       /**

@@ -2,7 +2,8 @@
 
 angular.module('yourfundFullstackApp')
   .controller('MainCtrl',
-  function ($scope, $modal, $http, $filter, $interval, $location, socket, Auth, User, transactionService, stocklookupservice, focus) {
+  function ($scope,$state, $modal, $http, $filter, $interval, $location,socket, Auth, User, transactionService, stocklookupservice, focus) {
+
 
     $scope.getCurrentUser = Auth.getCurrentUser;
     $scope.selectedFund = null;
@@ -15,17 +16,22 @@ angular.module('yourfundFullstackApp')
       availableOptions: $scope.getCurrentUser().funds
     };
 
+    $scope.getFundData = function(){
+        //$scope.data.availableOptions =  $scope.getCurrentUser.funds;
+        //if(currentUser.funds){
+        //  setToFirstFund(currentUser.funds[0]);
+        //}
+    };
+
     $scope.onFundSelected = function() {
       setSelectedFund($scope.data.selectedFund);
     };
 
-
-    function setToFirstFund() {
-      //if ($scope.CurrentUserFunds.data) {
-      //  $scope.data.availableOptions = $scope.getCurrentUser().funds;
-      //  setSelectedFund($scope.getCurrentUser().funds[0]);
-      //  $scope.selectedFund = $scope.getCurrentUser().funds[0];
-      //}
+    function setToFirstFund(fund) {
+      if(fund){
+        setSelectedFund(fund);
+        $scope.selectedFund = fund;
+      }
     }
 
     $scope.setFocusOnFundName = function () {
@@ -35,8 +41,6 @@ angular.module('yourfundFullstackApp')
     $scope.setFocusOnSymbolName = function () {
       focus('symbolName');
     };
-
-    setToFirstFund();
 
     $scope.enableInvest = function () {
       if ($scope.stockPercentage) {
@@ -313,6 +317,7 @@ angular.module('yourfundFullstackApp')
         .then(function (response) {
           $scope.isBusy = false;
           $scope.getCurrentUser().funds = response.data.funds;
+          $scope.data.availableOptions =  response.data.funds;
           setSelectedFund(response.data.funds[response.data.funds.length - 1]);
         },
         function (response) { // optional

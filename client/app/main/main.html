@@ -1,13 +1,12 @@
-<div id="page-wrapper">
+<div id="page-wrapper" ng-init="getFundData()">
   <div class="row">
-    <div class="col-lg-10">
+    <div class="col-lg-12">
       <h1 class="page-header">Manage Your Funds</h1>
     </div>
   </div>
 
   <div class="row">
-
-    <div class="col-md-2">
+    <div class="col-md-3 pad-top-5px" >
       <button type="button" class="btn btn-primary"
               data-toggle="modal"
               ng-click="clearFundCreateVals()"
@@ -15,29 +14,29 @@
       </button>
     </div>
 
-    <!-- Begin: Fund List -->
-    <div class="col-md-5 pull-left">
+    <!-- Begin: Fund List Dropdown-->
+    <div class="col-md-9 pull-left pad-top-5px" >
       <form class="form-inline" role="form">
-      <div class="form-group">
-      <label for="email">Available Funds:</label>
-      <select name="repeatSelect"
-              class="form-control"
-              id="repeatSelect"
-              ng-model="data.selectedFund"
-              ng-change="onFundSelected()"
-              ng-options="fund as fund.name for fund in data.availableOptions">
-      </select>
-      </div></form>
+        <div class="form-group">
+          <label for="email">Available Funds:</label>
+          <select name="repeatSelect"
+                  class="form-control"
+                  id="repeatSelect"
+                  ng-model="data.selectedFund"
+                  ng-change="onFundSelected()"
+                  ng-options="fund as fund.name for fund in data.availableOptions">
+          </select>
+        </div>
+      </form>
     </div>
 
     <!-- End: Fund List -->
   </div>
 
-  <div class="row" >
-    <p></p>
-    <!-- Begin: Fund Content -->
-    <div class="col-md-10" style="background:white;min-height: 500px">
+  <div class="row pad-top-5px" >
 
+    <!-- Begin: Fund Content -->
+    <div class="col-md-12" style="background:white;min-height: 500px">
       <div class="panel panel-green" ng-show="selectedFundName != null ">
 
         <!-- Begin: Panel Header -->
@@ -63,7 +62,7 @@
 
         <!-- Begin: Fund Header Info-->
         <div class="panel-body">
-          <div class="row alert alert-success" style="color:#2f4f4f; font-size:12pt;margin:5px;">
+          <div class="row alert alert-success" style="color:#2f4f4f; ">
             <div class="col-md-3">
               Total Invested: {{totalInvested | currency}}
             </div>
@@ -131,9 +130,9 @@
               <!-- Nav tabs -->
               <ul class="nav nav-tabs" role="tablist">
                 <li role="presentation" class="active"><a href="#home" aria-controls="home" role="tab"
-                                                          data-toggle="tab">View/Change</a></li>
+                                                          data-toggle="tab"  onclick="return false;">View/Change</a></li>
                 <li role="presentation"><a href="#transactionhistory" aria-controls="transactionhistory" role="tab"
-                                           data-toggle="tab">Transaction
+                                           data-toggle="tab"  onclick="return false;">Transaction
                   History</a></li>
                 <li role="presentation"><a href="#graphView" aria-controls="profile" role="tab" data-toggle="tab"
                                            onclick="return false;">Graph
@@ -141,176 +140,176 @@
               </ul>
               <!-- Tab panes -->
               <div class="tab-content tab-container">
-                <div role="tabpanel" class="tab-pane active" id="home">
+                <div  class="tab-pane active" id="home">
                   <!-- Begin: Fund Actions -->
-                  <div class="row">
-                    <div class="col-lg-6">
-                      <table style="border:0px">
-                        <tr style="border:0px">
-                          <td style="border:0px">
-                            <button class="btn btn-primary pull-left "
-                                    type="Click to Invest"
-                                    data-toggle="modal" style="margin-left:20px;"
-                                    data-target="#investModal"
-                                    ng-click="clearInvestmentVals()">
-                              <i class="glyphicon glyphicon-plus"></i> Add Investments
-                            </button>
-                          </td>
-                          <td style="border:0px">
-                            <button class="btn btn-primary pull-left "
-                                    type="Investment Selector"
-                                    data-toggle="modal" style="margin-left:20px;"
-                                    data-target="#investSelectorModal"><i class="glyphicon glyphicon-signal"></i>
-                              Investment Selector
-                            </button>
-                          </td>
-                          <td style="border:0px">
-                            <button class="btn btn-primary pull-left "
-                                    type="Click to Invest"
-                                    data-toggle="modal" style="margin-left:20px;"
-                                    data-target="#investResearchModal"><i class="glyphicon glyphicon-education"></i>
-                              Investment Research
-                            </button>
-                          <td style="border:0px">
-                            <button class="btn btn-primary pull-left"
-                                    type="Click to Invest"
-                                    data-toggle="modal" style="margin-left:10px;"
-                                    ng-show="!selectedFund.finalized"
-                                    data-target="#finalizeModal"><i class="glyphicon glyphicon-save"></i> Initialize
-                              Investment(s)
-                            </button>
-                          </td>
-                        </tr>
-                      </table>
-                    </div>
-                  </div>
+                  <table class="table" style="border:0px">
+                    <tr style="border:0px" >
+                      <td  style="border:0px">
+                        <button class="btn btn-primary pull-left "
+                                type="Click to Invest"
+                                data-toggle="modal" style="margin-left:20px;"
+                                data-target="#investModal"
+                                ng-click="clearInvestmentVals()">
+                          <i class="glyphicon glyphicon-plus"></i> Add Investments
+                        </button>
+                      </td>
+                      <td style="border:0px">
+                        <button class="btn btn-primary pull-left "
+                                type="Investment Selector"
+                                data-toggle="modal" style="margin-left:20px;"
+                                data-target="#investSelectorModal"><i class="glyphicon glyphicon-signal"></i>
+                          Investment Selector
+                        </button>
+                      </td>
+                      <td style="border:0px">
+                        <button class="btn btn-primary pull-left "
+                                type="Click to Invest"
+                                data-toggle="modal" style="margin-left:20px;"
+                                data-target="#investResearchModal"><i class="glyphicon glyphicon-education"></i>
+                          Investment Research
+                        </button>
+                      <td style="border:0px">
+                        <button class="btn btn-primary pull-left"
+                                type="Click to Invest"
+                                data-toggle="modal" style="margin-left:10px;"
+                                ng-show="!selectedFund.finalized"
+                                data-target="#finalizeModal"><i class="glyphicon glyphicon-save"></i> Initialize
+                          Investment(s)
+                        </button>
+                      </td>
+                    </tr>
+                  </table>
+
                   <!-- End: Fund actions -->
                   <div class="row">
                     <div class="col-lg-12">
                       <div class="panel">
-                        <div class="panel-body">
-                          <div class="pull-right"
+                        <div class="panel-body"  >
+                          <div class="row">
+                            <!-- Initial Table -->
+                            <table  class="table-bordered" ng-table="tableParams" ng-show="!selectedFund.finalized">
+                              <tr ng-repeat="stock in selectedFund.stocks">
+                                <td data-title="'Symbol'" style="width:20%">{{stock.description }}</td>
+                                <td data-title="'% Allocated'">
+                                  <span ng-show="editMode">
+                                      <input type="text" ng-model="stock.originalPercentOfFund"
+                                             style="width:55px;text-align:center">
+                                      <input type="button" ng-click="updateAllocationAmountPreInit(stock)" value="Update">
+                                  </span>
+                                  <span ng-hide="editMode">{{stock.originalPercentOfFund  | number:2 }}%</span>
+                                </td>
+                                <td data-title="'Money Invested'">{{ stock.numberOfShares * stock.price | currency }}</td>
+                                <td data-title="'Current Price'">{{ stock.price | currency }}</td>
+                                <td data-title="'# Of Shares'">{{ stock.numberOfShares | number:4}}</td>
+                                <td>
+                                  <div class="btn-group">
+                                    <button type="button" class="btn btn-xs dropdown-toggle" data-toggle="dropdown">
+                                      Actions
+                                      <span class="caret"></span>
+                                    </button>
+                                    <ul class="dropdown-menu pull-right" role="menu">
+                                      <li><a href="#" ng-click="deleteStock(stock)">Delete</a></li>
+                                      <li><a href="#" ng-click="modifyStockAlloction(stock)">Change %</a></li>
+                                    </ul>
+                                  </div>
+                                </td>
+                              </tr>
+                              <tr style="background:#fffee;font-weight: 700">
+                                <td style="text-align: right;padding-right:5px">Totals:</td>
+                                <td>{{totalInvestmentPercentage | setDecimal:4}}%</td>
+                                <td>{{totalCashInvestedInFund | currency}}</td>
+                                <td colspan="3"></td>
+                              </tr>
+
+                            </table>
+
+                            <!-- Finalized Table -->
+                            <table class="table-bordered" ng-table="tableParams" ng-show="selectedFund.finalized">
+                              <tr ng-repeat="stock in selectedFund.stocks | filter: { active: true}">
+                                <td data-title="'Symbol'" >{{ stock.description }}</td>
+                                <td data-title="'Current % Allocated'">{{ stock.currentCashInvestment /
+                                  currentTotalInvestmentAmount * 100 | number:2 }}%
+                                </td>
+                                <td data-title="'Current Money Invested'">{{ stock.currentCashInvestment| currency}}
+                                </td>
+                                <td data-title="'Current Price'">{{ stock.currentPrice | currency }}</td>
+                                <td data-title="'# Of Shares'">{{ stock.currentNumberOfShares | number:4 }}</td>
+                                <td data-title="'Original % Allocated'">{{stock.originalCashInvestment /
+                                  originalMoneyInvested * 100 | number:2}}%
+                                </td>
+                                <td data-title="'Original Money Invested'">{{ stock.originalCashInvestment | currency }}
+                                </td>
+                                <td data-title="'Original Price'">{{ stock.price | currency }}</td>
+                                <td data-title="'Gain/Loss $'">{{ stock.currentCashInvestment -
+                                  stock.originalCashInvestment | currency }}
+                                </td>
+                                <td data-title="'Gain/Loss %'">{{ ((stock.numberOfShares * stock.currentPrice) -
+                                  (stock.numberOfShares * stock.price)) / (stock.numberOfShares * stock.price) * 100 |
+                                  number:4
+                                  }}%
+                                </td>
+
+                                <td>
+                                  <div class="btn-group">
+                                    <button type="button" class="btn btn-xs dropdown-toggle" data-toggle="dropdown">
+                                      Actions
+                                      <span class="caret"></span>
+                                    </button>
+                                    <ul class="dropdown-menu pull-right" role="menu">
+                                      <li><a href="#" data-toggle="modal" style="width:180px;"
+                                             data-target="#tradeStockModal"
+                                             ng-click="setSelectedStock(stock)">Trade</a></li>
+                                    </ul>
+                                  </div>
+                                </td>
+                              </tr>
+
+                              <tr ng-show="amountLeftToInvest > 0" class="ymmfBackground">
+                                <td>Cash Money Market Fund</td>
+                                <td>{{(selectedFund.cash/currentTotalInvestmentAmount) * 100 | number:2 }}%</td>
+                                <td>{{selectedFund.cash | currency}}</td>
+                                <td>$1.00</td>
+                                <td>{{selectedFund.cash| number:2}}</td>
+                                <td>{{ (selectedFund.originalCash/totalInvested) * 100 | number:2 }}%</td>
+                                <td>{{selectedFund.originalCash | currency}}</td>
+                                <td>$1.00</td>
+                                <td>{{ cMMFGainLoss | currency }}</td>
+                                <td>{{ cMMFGainLossPerecent |
+                                  number:4
+                                  }}%
+                                </td>
+                                <td></td>
+                              </tr>
+
+                              <tr style="background:#fffee;font-weight: 700">
+                                <td style="text-align: right;padding-right:5px">Totals:</td>
+                                <td>100%</td>
+                                <td>{{ currentTotalInvestmentAmount | currency}}</td>
+                                <td colspan="2"></td>
+                                <td>100%</td>
+                                <td>{{originalTotalInvestmentAmount | currency}}</td>
+                                <td></td>
+                                <td>{{totalFundGainLossCash | currency}}</td>
+                                <td>{{gainLossPercent | number:4}} %</td>
+                                <td></td>
+                              </tr>
+                            </table>
+
+                          </div>
+
+                          <div class="row pull-right"
                                style="background:#fffee;font-weight: 200;font-style:italic;font-size:8pt">Last Updated:
                             {{selectedFund.stocks[0].created | date:'MM/dd/yyyy @ h:mma'}}
                           </div>
 
-                          <!-- Initial Table -->
-                          <table class="row-border hover" ng-table="tableParams" ng-show="!selectedFund.finalized">
-                            <tr ng-repeat="stock in selectedFund.stocks">
-                              <td data-title="'Symbol'" style="width:20%">{{stock.description }}</td>
-                              <td data-title="'% Allocated'">
-                                <span ng-show="editMode">
-                                    <input type="text" ng-model="stock.originalPercentOfFund"
-                                           style="width:55px;text-align:center">
-                                    <input type="button" ng-click="updateAllocationAmountPreInit(stock)" value="Update">
-                                </span>
-                                <span ng-hide="editMode">{{stock.originalPercentOfFund  | number:2 }}%</span>
-                              </td>
-                              <td data-title="'Money Invested'">{{ stock.numberOfShares * stock.price | currency }}</td>
-                              <td data-title="'Current Price'">{{ stock.price | currency }}</td>
-                              <td data-title="'# Of Shares'">{{ stock.numberOfShares | number:4}}</td>
-                              <td>
-                                <div class="btn-group">
-                                  <button type="button" class="btn btn-xs dropdown-toggle" data-toggle="dropdown">
-                                    Actions
-                                    <span class="caret"></span>
-                                  </button>
-                                  <ul class="dropdown-menu pull-right" role="menu">
-                                    <li><a href="#" ng-click="deleteStock(stock)">Delete</a></li>
-                                    <li><a href="#" ng-click="modifyStockAlloction(stock)">Change %</a></li>
-                                  </ul>
-                                </div>
-                              </td>
-                            </tr>
-                            <tr style="background:#fffee;font-weight: 700">
-                              <td style="text-align: right;padding-right:5px">Totals:</td>
-                              <td>{{totalInvestmentPercentage | setDecimal:4}}%</td>
-                              <td>{{totalCashInvestedInFund | currency}}</td>
-                              <td colspan="3"></td>
-                            </tr>
-
-                          </table>
-
-                          <!-- Finalized Table -->
-                          <table class="row-border hover" ng-table="tableParams" ng-show="selectedFund.finalized">
-                            <tr ng-repeat="stock in selectedFund.stocks | filter: { active: true}">
-                              <td data-title="'Symbol'" style="width:20%">{{ stock.description }}</td>
-                              <td data-title="'Current % Allocated'">{{ stock.currentCashInvestment /
-                                currentTotalInvestmentAmount * 100 | number:2 }}%
-                              </td>
-                              <td data-title="'Current Money Invested'">{{ stock.currentCashInvestment| currency}}
-                              </td>
-                              <td data-title="'Current Price'">{{ stock.currentPrice | currency }}</td>
-                              <td data-title="'# Of Shares'">{{ stock.currentNumberOfShares | number:4 }}</td>
-                              <td data-title="'Original % Allocated'">{{stock.originalCashInvestment /
-                                originalMoneyInvested * 100 | number:2}}%
-                              </td>
-                              <td data-title="'Original Money Invested'">{{ stock.originalCashInvestment | currency }}
-                              </td>
-                              <td data-title="'Original Price'">{{ stock.price | currency }}</td>
-                              <td data-title="'Gain/Loss $'">{{ stock.currentCashInvestment -
-                                stock.originalCashInvestment | currency }}
-                              </td>
-                              <td data-title="'Gain/Loss %'">{{ ((stock.numberOfShares * stock.currentPrice) -
-                                (stock.numberOfShares * stock.price)) / (stock.numberOfShares * stock.price) * 100 |
-                                number:4
-                                }}%
-                              </td>
-
-                              <td>
-                                <div class="btn-group">
-                                  <button type="button" class="btn btn-xs dropdown-toggle" data-toggle="dropdown">
-                                    Actions
-                                    <span class="caret"></span>
-                                  </button>
-                                  <ul class="dropdown-menu pull-right" role="menu">
-                                    <li><a href="#" data-toggle="modal" style="width:180px;"
-                                           data-target="#tradeStockModal"
-                                           ng-click="setSelectedStock(stock)">Trade</a></li>
-                                  </ul>
-                                </div>
-                              </td>
-                            </tr>
-
-                            <tr ng-show="amountLeftToInvest > 0" class="ymmfBackground">
-                              <td>Cash Money Market Fund</td>
-                              <td>{{(selectedFund.cash/currentTotalInvestmentAmount) * 100 | number:2 }}%</td>
-                              <td>{{selectedFund.cash | currency}}</td>
-                              <td>$1.00</td>
-                              <td>{{selectedFund.cash| number:2}}</td>
-                              <td>{{ (selectedFund.originalCash/totalInvested) * 100 | number:2 }}%</td>
-                              <td>{{selectedFund.originalCash | currency}}</td>
-                              <td>$1.00</td>
-                              <td>{{ cMMFGainLoss | currency }}</td>
-                              <td>{{ cMMFGainLossPerecent |
-                                number:4
-                                }}%
-                              </td>
-                              <td></td>
-                            </tr>
-
-                            <tr style="background:#fffee;font-weight: 700">
-                              <td style="text-align: right;padding-right:5px">Totals:</td>
-                              <td>100%</td>
-                              <td>{{ currentTotalInvestmentAmount | currency}}</td>
-                              <td colspan="2"></td>
-                              <td>100%</td>
-                              <td>{{originalTotalInvestmentAmount | currency}}</td>
-                              <td></td>
-                              <td>{{totalFundGainLossCash | currency}}</td>
-                              <td>{{gainLossPercent | number:4}} %</td>
-                              <td></td>
-                            </tr>
-                          </table>
-
                           <!-- Non-Finalized Cash Available-->
-                          <div class="row" style="color:#2f4f4f; font-size:11pt;margin:5px"
+                          <div class="row" style="color:#2f4f4f; "
                                ng-show="!selectedFund.finalized">
-                            <div class="col-md-6">
+
                               *The remaining Cash ({{ selectedFund.goal - totalCashInvestedInFund | currency}}) will be
                               in a cash fund once
                               invested.
-                            </div>
+
                           </div>
 
                         </div>
@@ -320,13 +319,13 @@
 
 
                 </div>
-                <div role="tabpanel" class="tab-pane" id="transactionhistory">
+                <div  class="tab-pane" id="transactionhistory">
                   <div ng-include="'app/transactionhistory/transactionhistory.html'"></div>
                 </div>
-                <div role="tabpanel" class="tab-pane" id="graphView">
+                <div  class="tab-pane" id="graphView">
                   <div ng-include="'app/graphview/graphview.html'"></div>
                 </div>
-                <div role="tabpanel" class="tab-pane" id="settings">...</div>
+                <div class="tab-pane" id="settings">...</div>
               </div>
             </div>
             <!-- End: Tabs -->
@@ -633,18 +632,7 @@
               <input class="form-control" ng-model="numberOfShares" name="numberOfShares" readonly>
             </div>
           </div>
-          <!--<div class="form-group ">-->
-          <!--<label for="currentnumberOfShares" class="control-label col-sm-3">Current # of Shares</label>-->
-          <!--<div class="col-sm-5">-->
-          <!--<input class="form-control" value="{{selectedStock.currentNumberOfShares | number:4}}" name="currentnumberOfShares" readonly>-->
-          <!--</div>-->
-          <!--</div>-->
-          <!--<div class="form-group ">-->
-          <!--<label for="currentPercentOfFund" class="control-label col-sm-3">Current Percent of Fund</label>-->
-          <!--<div class="col-sm-5">-->
-          <!--<input class="form-control" name="currentPercentOfFund" readonly value="{{ stockToAdd.currentPercentOfFund | number:2}}">-->
-          <!--</div>-->
-          <!--</div>-->
+
           <div class="form-group ">
             <div class="col-sm-offset-6 col-sm-10">
               <button type="button" class="btn btn-default" data-dismiss="modal">Cancel</button>
@@ -656,14 +644,7 @@
               </button>
             </div>
           </div>
-          <!--<div class="form-group ">-->
-          <!--<div class="col-sm-offset-6 col-sm-10">-->
-          <!--<button type="button" class="btn btn-default" data-dismiss="modal">Cancel</button>-->
-          <!--<button type="button" class="btn btn-primary" ng-click="performTradeOnInvestment()" data-dismiss="modal">-->
-          <!--<i class="glyphicon glyphicon-plus"></i> Trade-->
-          <!--</button>-->
-          <!--</div>-->
-          <!--</div>-->
+
       </div>
       </form>
     </div>
