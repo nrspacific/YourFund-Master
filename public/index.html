@@ -15,10 +15,52 @@
   <meta name="description" content="">
   <meta name="viewport" content="width=device-width">
   <!-- Place favicon.ico and apple-touch-icon.png in the root directory -->
-
-  <link rel="stylesheet" href="styles/de28eb3d.vendor.css" />
-  <link rel="stylesheet" href="app/vendor.css"/>
-  <link rel="stylesheet" href="app/fb68af45.app.css"/>
+  <!-- build:css(client) app/vendor.css -->
+  <!-- bower:css -->
+  <link rel="stylesheet" href="bower_components/bootstrap/dist/css/bootstrap.css" />
+  <link rel="stylesheet" href="bower_components/ng-table/ng-table.css" />
+  <!-- endbower -->
+  <!-- endbuild -->
+  <!-- build:css({.tmp,client}) app/app.css -->
+  <link rel="stylesheet" href="app/app.css">
+  <!-- injector:css -->
+  <link rel="stylesheet" href="app/AboutUs/AboutUs.css">
+  <link rel="stylesheet" href="app/GoalSetting/GoalSetting.css">
+  <link rel="stylesheet" href="app/Help/Help.css">
+  <link rel="stylesheet" href="app/Pricing/Pricing.css">
+  <link rel="stylesheet" href="app/Risk/Risk.css">
+  <link rel="stylesheet" href="app/account/login/login.css">
+  <link rel="stylesheet" href="app/admin/admin.css">
+  <link rel="stylesheet" href="app/analyzingstatements/analyzingstatements.css">
+  <link rel="stylesheet" href="app/app.css">
+  <link rel="stylesheet" href="app/assetallocation/assetallocation.css">
+  <link rel="stylesheet" href="app/definitions/definitions.css">
+  <link rel="stylesheet" href="app/etfs/etfs.css">
+  <link rel="stylesheet" href="app/financialstatements/financialstatements.css">
+  <link rel="stylesheet" href="app/fundamentalanalysis/fundamentalanalysis.css">
+  <link rel="stylesheet" href="app/fundamentalvstechnical/fundamentalvstechnical.css">
+  <link rel="stylesheet" href="app/gettingstarted/gettingstarted.css">
+  <link rel="stylesheet" href="app/graphview/graphview.css">
+  <link rel="stylesheet" href="app/home/home.css">
+  <link rel="stylesheet" href="app/howitworks/howitworks.css">
+  <link rel="stylesheet" href="app/inflation/inflation.css">
+  <link rel="stylesheet" href="app/investingadvantages/investingadvantages.css">
+  <link rel="stylesheet" href="app/investmentresearch/investmentresearch.css">
+  <link rel="stylesheet" href="app/investmentstrategies/investmentstrategies.css">
+  <link rel="stylesheet" href="app/investmenttools/investmenttools.css">
+  <link rel="stylesheet" href="app/main/main.css">
+  <link rel="stylesheet" href="app/mutualfunds/mutualfunds.css">
+  <link rel="stylesheet" href="app/orientation/orientation.css">
+  <link rel="stylesheet" href="app/technicalanalysis/technicalanalysis.css">
+  <link rel="stylesheet" href="app/transactionhistory/transactionhistory.css">
+  <link rel="stylesheet" href="app/tutorials/tutorials.css">
+  <link rel="stylesheet" href="app/typesofbonds/typesofbonds.css">
+  <link rel="stylesheet" href="app/typesofstocks/typesofstocks.css">
+  <link rel="stylesheet" href="app/whatis/whatis.css">
+  <link rel="stylesheet" href="app/whychoose/whychoose.css">
+  <link rel="stylesheet" href="components/modal/modal.css">
+  <!-- endinjector -->
+  <!-- endbuild -->
 </head>
 <body ng-app="yourfundFullstackApp">
 
@@ -101,30 +143,14 @@
   <footer>
     <div class="row">
       <div class="col-lg-12">
-        <p>Copyright &copy; YourFund 2016</p>
+        <p>Copyright &copy; Your Website 2014</p>
       </div>
     </div>
   </footer>
 
 </div>
 <!-- /.container -->
-<!-- Google Analytics: change UA-XXXXX-X to be your site's ID -->
-<script>
-  (function (i, s, o, g, r, a, m) {
-    i['GoogleAnalyticsObject'] = r;
-    i[r] = i[r] || function () {
-      (i[r].q = i[r].q || []).push(arguments)
-    }, i[r].l = 1 * new Date();
-    a = s.createElement(o),
-      m = s.getElementsByTagName(o)[0];
-    a.async = 1;
-    a.src = g;
-    m.parentNode.insertBefore(a, m)
-  })(window, document, 'script', '//www.google-analytics.com/analytics.js', 'ga');
 
-  ga('create', 'UA-XXXXX-X');
-  ga('send', 'pageview');
-</script>
 
 <!--[if lt IE 9]>
 <script src="bower_components/es5-shim/es5-shim.js"></script>
@@ -132,11 +158,109 @@
 <![endif]-->
 
 
-<script src="js/7c50827c.vendor.js"></script>
+<!-- build:js({client,node_modules}) app/vendor.js -->
+<!-- bower:js -->
+<script src="bower_components/jquery/dist/jquery.js"></script>
+<script src="bower_components/angular/angular.js"></script>
+<script src="bower_components/angular-resource/angular-resource.js"></script>
+<script src="bower_components/angular-cookies/angular-cookies.js"></script>
+<script src="bower_components/angular-sanitize/angular-sanitize.js"></script>
+<script src="bower_components/angular-bootstrap/ui-bootstrap-tpls.js"></script>
+<script src="bower_components/lodash/dist/lodash.compat.js"></script>
+<script src="bower_components/angular-socket-io/socket.js"></script>
+<script src="bower_components/angular-ui-router/release/angular-ui-router.js"></script>
+<script src="bower_components/ng-table/ng-table.js"></script>
+<!-- endbower -->
+<script src="bower_components/bootstrap/dist/js/bootstrap.min.js"></script>
+<script src="socket.io-client/socket.io.js"></script>
+<script src="bower_components/bootbox/bootbox.js"></script>
 
-<script src="app/e84ff7e9.vendor.js"></script>
+<!-- endbuild -->
 
 
-<script src="app/166017eb.app.js"></script>
+<!-- build:js({.tmp,client}) app/app.js -->
+<script src="app/app.js"></script>
+<!-- injector:js -->
+<script src="app/AboutUs/AboutUs.controller.js"></script>
+<script src="app/AboutUs/AboutUs.js"></script>
+<script src="app/GoalSetting/GoalSetting.controller.js"></script>
+<script src="app/GoalSetting/GoalSetting.js"></script>
+<script src="app/Help/Help.controller.js"></script>
+<script src="app/Help/Help.js"></script>
+<script src="app/Pricing/Pricing.controller.js"></script>
+<script src="app/Pricing/Pricing.js"></script>
+<script src="app/Risk/Risk.controller.js"></script>
+<script src="app/Risk/Risk.js"></script>
+<script src="app/account/account.js"></script>
+<script src="app/account/login/login.controller.js"></script>
+<script src="app/account/settings/settings.controller.js"></script>
+<script src="app/account/signup/signup.controller.js"></script>
+<script src="app/admin/admin.controller.js"></script>
+<script src="app/admin/admin.js"></script>
+<script src="app/analyzingstatements/analyzingstatements.controller.js"></script>
+<script src="app/analyzingstatements/analyzingstatements.js"></script>
+<script src="app/assetallocation/assetallocation.controller.js"></script>
+<script src="app/assetallocation/assetallocation.js"></script>
+<script src="app/definitions/definitions.controller.js"></script>
+<script src="app/definitions/definitions.js"></script>
+<script src="app/etfs/etfs.controller.js"></script>
+<script src="app/etfs/etfs.js"></script>
+<script src="app/financialstatements/financialstatements.controller.js"></script>
+<script src="app/financialstatements/financialstatements.js"></script>
+<script src="app/fundamentalanalysis/fundamentalanalysis.controller.js"></script>
+<script src="app/fundamentalanalysis/fundamentalanalysis.js"></script>
+<script src="app/fundamentalvstechnical/fundamentalvstechnical.controller.js"></script>
+<script src="app/fundamentalvstechnical/fundamentalvstechnical.js"></script>
+<script src="app/gettingstarted/gettingstarted.controller.js"></script>
+<script src="app/gettingstarted/gettingstarted.js"></script>
+<script src="app/graphview/graphview.controller.js"></script>
+<script src="app/graphview/graphview.js"></script>
+<script src="app/home/home.controller.js"></script>
+<script src="app/home/home.js"></script>
+<script src="app/howitworks/howitworks.controller.js"></script>
+<script src="app/howitworks/howitworks.js"></script>
+<script src="app/inflation/inflation.controller.js"></script>
+<script src="app/inflation/inflation.js"></script>
+<script src="app/investingadvantages/investingadvantages.controller.js"></script>
+<script src="app/investingadvantages/investingadvantages.js"></script>
+<script src="app/investmentresearch/investmentresearch.controller.js"></script>
+<script src="app/investmentresearch/investmentresearch.js"></script>
+<script src="app/investmentstrategies/investmentstrategies.controller.js"></script>
+<script src="app/investmentstrategies/investmentstrategies.js"></script>
+<script src="app/investmenttools/investmenttools.controller.js"></script>
+<script src="app/investmenttools/investmenttools.js"></script>
+<script src="app/main/main.controller.js"></script>
+<script src="app/main/main.js"></script>
+<script src="app/mutualfunds/mutualfunds.controller.js"></script>
+<script src="app/mutualfunds/mutualfunds.js"></script>
+<script src="app/orientation/orientation.controller.js"></script>
+<script src="app/orientation/orientation.js"></script>
+<script src="app/technicalanalysis/technicalanalysis.controller.js"></script>
+<script src="app/technicalanalysis/technicalanalysis.js"></script>
+<script src="app/transactionhistory/transactionhistory.controller.js"></script>
+<script src="app/transactionhistory/transactionhistory.js"></script>
+<script src="app/tutorials/tutorials.controller.js"></script>
+<script src="app/tutorials/tutorials.js"></script>
+<script src="app/typesofbonds/typesofbonds.controller.js"></script>
+<script src="app/typesofbonds/typesofbonds.js"></script>
+<script src="app/typesofstocks/typesofstocks.controller.js"></script>
+<script src="app/typesofstocks/typesofstocks.js"></script>
+<script src="app/whatis/whatis.controller.js"></script>
+<script src="app/whatis/whatis.js"></script>
+<script src="app/whychoose/whychoose.controller.js"></script>
+<script src="app/whychoose/whychoose.js"></script>
+<script src="components/auth/auth.service.js"></script>
+<script src="components/auth/user.service.js"></script>
+<script src="components/filters/setDecimal.js"></script>
+<script src="components/modal/modal.service.js"></script>
+<script src="components/mongoose-error/mongoose-error.directive.js"></script>
+<script src="components/navbar/navbar.controller.js"></script>
+<script src="components/socket/socket.service.js"></script>
+<script src="components/stocklookup/stocklookupservice.service.js"></script>
+<script src="components/transaction/transaction.service.js"></script>
+<!-- endinjector -->
+
+
+<!-- endbuild -->
 </body>
 </html>
