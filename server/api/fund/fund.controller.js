@@ -482,11 +482,12 @@ exports.finalize = function (req, res) {
 
       var description = stock.action + ' ' + stock.description + ' ' + Math.floor(stock.numberOfShares * 100) / 100 + ' at $' + stock.price;
 
-      var datePlusOneSecond = new Date();
-      datePlusOneSecond.setSeconds(datePlusOneSecond.getSeconds() + i);
 
-      var datePlusFiveSecond = new Date();
-      datePlusFiveSecond.setSeconds(datePlusOneSecond.getSeconds() + 5);
+      var datePlusOneSecond = new Date(stock.created);
+      datePlusOneSecond.setSeconds(datePlusOneSecond.getSeconds() + i++);
+
+      var datePlusTwoSecond = new Date();
+      datePlusTwoSecond.setSeconds(datePlusOneSecond.getSeconds() + i++);
 
       transaction.create(
         {
@@ -509,7 +510,7 @@ exports.finalize = function (req, res) {
           transaction.create(
             {
               fundId: updatedFund._id,
-              date: datePlusFiveSecond,
+              date: datePlusTwoSecond,
               symbol: 'YMMF',
               description: stock.action + ' ' + stock.description + ' ' + Math.floor(stock.numberOfShares * 100) / 100 + ' at $' + stock.price,
               price: 1,
