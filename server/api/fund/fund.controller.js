@@ -480,7 +480,7 @@ exports.finalize = function (req, res) {
 
       i++;
 
-      var description = stock.action + ' ' + stock.description + ' ' + Math.floor(stock.numberOfShares * 100) / 100 + ' at $' + stock.price;
+      var description = stock.action + ' ' + stock.description + ' ' + Math.floor(stock.numberOfShares * 100) / 100 + ' shares at $' + stock.price;
 
 
       var datePlusOneSecond = new Date(stock.created);
@@ -512,7 +512,7 @@ exports.finalize = function (req, res) {
               fundId: updatedFund._id,
               date: datePlusTwoSecond,
               symbol: 'YMMF',
-              description: stock.action + ' ' + stock.description + ' ' + Math.floor(stock.numberOfShares * 100) / 100 + ' at $' + stock.price,
+              description: stock.action + ' ' + stock.description + ' ' + Math.floor(stock.numberOfShares * 100) / 100 + ' shares at $' + stock.price,
               price: 1,
               action: stock.action,
               numberOfShares: stock.price * stock.numberOfShares,
