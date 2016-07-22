@@ -153,7 +153,7 @@ exports.create = function (req, res) {
 
             console.log('stock:' + req.body.symbol + ' has been added to fund: ' + req.body.fundId);
 
-            var description = stock.action + ' ' + stock.description + ' ' + stock.numberOfShares.toFixedDown(2) + ' at $' +  stock.price;
+            var description = stock.action + ' ' + stock.description + ' ' + stock.numberOfShares.toFixedDown(2) + ' shares at $' +  stock.price;
 
             if(stock.action == 'buy' || stock.action == 'Buy'){
               stock.action = 'Buy'
@@ -323,7 +323,6 @@ exports.update = function (req, res) {
               tradeAmount = stockToUpdate.currentNumberOfShares.toFixedDown(2);
             }
 
-
             var datePlusOneSecond = new Date();
             datePlusOneSecond.setSeconds(datePlusOneSecond.getSeconds() + 1);
 
@@ -332,7 +331,7 @@ exports.update = function (req, res) {
                 fundId: selectedFund._id,
                 date: new Date(),
                 symbol: stockToUpdate.symbol,
-                description: stockToUpdate.action + ' ' + stockToUpdate.description + ' $' + tradeAmount + ' at $' +  stockToUpdate.currentPrice,
+                description: stockToUpdate.action + ' ' + stockToUpdate.description + ' ' + tradeShares.toFixedDown(2) + ' shares at $' +  stockToUpdate.currentPrice,
                 price: stockToUpdate.currentPrice,
                 action: stockToUpdate.action,
                 numberOfShares: tradeShares,
@@ -351,7 +350,7 @@ exports.update = function (req, res) {
                 fundId: selectedFund._id,
                 date: datePlusOneSecond,
                 symbol: 'YMMF',
-                description: stockToUpdate.action + ' ' + stockToUpdate.description + ' ' + tradeAmount + ' at $' +  stockToUpdate.currentPrice,
+                description: stockToUpdate.action + ' ' + stockToUpdate.description + ' ' + tradeShares.toFixedDown(2)  + ' shares at $' +  stockToUpdate.currentPrice,
                 price: 1,
                 action: stockToUpdate.action,
                 numberOfShares: tradeShares,

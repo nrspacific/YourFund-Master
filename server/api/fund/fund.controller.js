@@ -482,24 +482,27 @@ exports.finalize = function (req, res) {
 
       var description = stock.action + ' ' + stock.description + ' ' + Math.floor(stock.numberOfShares * 100) / 100 + ' at $' + stock.price;
 
-      var datePlusOneSecond = new Date();
-      datePlusOneSecond.setSeconds(datePlusOneSecond.getSeconds() + i);
 
-      var ymmfAction = "Sell";
+      var datePlusOneSecond = new Date(stock.created);
+      datePlusOneSecond.setSeconds(datePlusOneSecond.getSeconds() + i++);
+
+      var datePlusTwoSecond = new Date();
+      datePlusTwoSecond.setSeconds(datePlusOneSecond.getSeconds() + i++);
 
       transaction.create(
         {
           fundId: updatedFund._id,
           date: datePlusOneSecond,
-          symbol: 'YMMF',
-          description: stock.action + ' ' + stock.description + ' ' + Math.floor(stock.numberOfShares * 100) / 100 + ' at $' + stock.price,
-          price: 1,
+          symbol: stock.symbol,
+          description: description,
+          price: stock.price,
           action: stock.action,
-          numberOfShares: stock.price * stock.numberOfShares,
+          numberOfShares: stock.numberOfShares,
           total: stock.price * stock.numberOfShares,
-          company: 'Your Money Market Fund',
+          company: stock.description,
           active: true
-        },
+        }
+      ,
         function (err, result) {
           if (err) {
             return handleError(result, err);
@@ -507,16 +510,17 @@ exports.finalize = function (req, res) {
           transaction.create(
             {
               fundId: updatedFund._id,
-              date: datePlusOneSecond,
-              symbol: stock.symbol,
-              description: description,
-              price: stock.price,
+              date: datePlusTwoSecond,
+              symbol: 'YMMF',
+              description: stock.action + ' ' + stock.description + ' ' + Math.floor(stock.numberOfShares * 100) / 100 + ' at $' + stock.price,
+              price: 1,
               action: stock.action,
-              numberOfShares: stock.numberOfShares,
+              numberOfShares: stock.price * stock.numberOfShares,
               total: stock.price * stock.numberOfShares,
-              company: stock.description,
+              company: 'Your Money Market Fund',
               active: true
-            },
+            }
+          ,
             function (err, result) {
               if (err) {
                 return handleError(result, err);
