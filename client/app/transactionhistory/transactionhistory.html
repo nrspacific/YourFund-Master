@@ -1,7 +1,7 @@
 <div class="row">
   <div class="col-md-12">
     <table class="row-border hover" ng-table="tableParams" ng-show="selectedFund.finalized">
-      <tr ng-repeat="stock in selectedFundHistoryItems" ng-class="{ 'ymmfBackground': stock.symbol=='YMMF' } " >
+      <tr ng-repeat="stock in selectedFundHistoryItems | orderBy : '-date'" ng-class="{ 'ymmfBackground': stock.symbol=='YMMF' } " >
         <td data-title="'Date'">{{stock.date | date:'medium'}}</td>
         <td data-title="'Symbol'">{{stock.symbol}}</td>
         <td data-title="'Company/Fund Name'">{{stock.company}}</td>
@@ -28,14 +28,14 @@
         <td data-title="'Total'" ng-show="(stock.symbol == 'YMMF') && (stock.total == stock.numberOfShares) && (stock.description != 'Add money to YMMF')">
           <span ng-show="stock.action == 'Buy'">({{stock.total | currency}})</span>
           <span ng-show="stock.action == 'Add' ">{{stock.total | currency}}</span>
-          <span ng-show="stock.action == 'Sell' || stock.action == 'sell' ">{{stock.total | currency}}</span>
+          <span ng-show="stock.action == 'Sell' || stock.action == 'sell' ">({{stock.total | currency}})</span>
         </td>
         <td data-title="'Total'" ng-show="(stock.symbol == 'YMMF') && (stock.total == stock.numberOfShares) && (stock.description == 'Add money to YMMF')">
           <span ng-show="stock.action == 'Buy' || stock.action == 'Add' ">{{stock.total | currency}}</span>
 
         </td>
         <td data-title="'Action'">{{stock.action}}</td>
-        <td data-title="'Explanation'">{{stock.description}}</td>
+        <td data-title="'Explanation'" style="max-width: 150px">{{stock.description}}</td>
       </tr>
     </table>
 
