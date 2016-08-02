@@ -222,6 +222,7 @@ function logFundCashUpdate(updatedFund, action, cashDifference, res) {
       return handleError(res, err);
     }
     else {
+      var total = Math.abs(cashDifference);
       transaction.create(
         {
           fundId: updatedFund._id,
@@ -231,7 +232,7 @@ function logFundCashUpdate(updatedFund, action, cashDifference, res) {
           price: 1,
           action: action,
           numberOfShares: cashDifference,
-          total: cashDifference,
+          total: total,
           company: 'Your Money Market Fund',
           active: true,
           renderOnPreInit: true
@@ -474,20 +475,22 @@ exports.finalize = function (req, res) {
 
   function createFinalizedTransactions(res, updatedFund) {
 
-    var i = 0;
+    var sec = 0;
+
 
     updatedFund.stocks.forEach(function (stock) {
 
-      i++;
+      var description = stock.action + ' ' + stock.description + ' ' + Math.floor(stock.numberOfShares * 100) / 100 + ' shares at $' + stock.price;
 
-      var description = stock.action + ' ' + stock.description + ' ' + Math.floor(stock.numberOfShares * 100) / 100 + ' at $' + stock.price;
+      ++sec;
 
+      var datePlusOneSecond = new Date();
+      datePlusOneSecond.setSeconds(sec);
 
-      var datePlusOneSecond = new Date(stock.created);
-      datePlusOneSecond.setSeconds(datePlusOneSecond.getSeconds() + i++);
+      ++sec;
 
       var datePlusTwoSecond = new Date();
-      datePlusTwoSecond.setSeconds(datePlusOneSecond.getSeconds() + i++);
+      datePlusTwoSecond.setSeconds(sec);
 
       transaction.create(
         {
@@ -501,39 +504,31 @@ exports.finalize = function (req, res) {
           total: stock.price * stock.numberOfShares,
           company: stock.description,
           active: true
-        }
-      ,
-        function (err, result) {
-          if (err) {
-            return handleError(result, err);
-          }
-          transaction.create(
-            {
-              fundId: updatedFund._id,
-              date: datePlusTwoSecond,
-              symbol: 'YMMF',
-              description: stock.action + ' ' + stock.description + ' ' + Math.floor(stock.numberOfShares * 100) / 100 + ' at $' + stock.price,
-              price: 1,
-              action: stock.action,
-              numberOfShares: stock.price * stock.numberOfShares,
-              total: stock.price * stock.numberOfShares,
-              company: 'Your Money Market Fund',
-              active: true
-            }
-          ,
-            function (err, result) {
-              if (err) {
-                return handleError(result, err);
-              }
-            });
+        },function (err, result) {}
+      );
 
-          console.log('saving YMMF transaction for stock purchase');
-        });
+      transaction.create(
+        {
+          fundId: updatedFund._id,
+          date: datePlusTwoSecond,
+          symbol: 'YMMF',
+          description: stock.action + ' ' + stock.description + ' ' + Math.floor(stock.numberOfShares * 100) / 100 + ' shares at $' + stock.price,
+          price: 1,
+          action: stock.action,
+          numberOfShares: stock.price * stock.numberOfShares,
+          total: stock.price * stock.numberOfShares,
+          company: 'Your Money Market Fund',
+          active: true
+        },
+        function (err, result) {}
+      );
+
+      console.log('saving YMMF transaction for stock purchase');
+
     });
 
     return res.send(204);
-  };
-
+  }
 
 };
 

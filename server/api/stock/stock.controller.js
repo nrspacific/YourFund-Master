@@ -193,7 +193,7 @@ exports.create = function (req, res) {
                   fundId: selectedFund._id,
                   date: datePlusOneSecond,
                   symbol: 'YMMF',
-                  description: stock.action + ' ' + stock.description + ' ' + stock.numberOfShares.toFixedDown(2) + ' at $' +  stock.price,
+                  description: stock.action + ' ' + stock.description + ' ' + stock.numberOfShares.toFixedDown(2) + ' shares at $' +  stock.price,
                   price: 1,
                   action: stock.action,
                   numberOfShares: stock.price * stock.numberOfShares,
