@@ -222,6 +222,7 @@ function logFundCashUpdate(updatedFund, action, cashDifference, res) {
       return handleError(res, err);
     }
     else {
+      var total = Math.abs(cashDifference);
       transaction.create(
         {
           fundId: updatedFund._id,
@@ -231,7 +232,7 @@ function logFundCashUpdate(updatedFund, action, cashDifference, res) {
           price: 1,
           action: action,
           numberOfShares: cashDifference,
-          total: cashDifference,
+          total: total,
           company: 'Your Money Market Fund',
           active: true,
           renderOnPreInit: true
