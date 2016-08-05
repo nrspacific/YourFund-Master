@@ -231,7 +231,7 @@ function logFundCashUpdate(updatedFund, action, cashDifference, res) {
           description: action + ' funds to/from YMMF',
           price: 1,
           action: action,
-          numberOfShares: cashDifference,
+          numberOfShares: total,
           total: total,
           company: 'Your Money Market Fund',
           active: true,
