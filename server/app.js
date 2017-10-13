@@ -12,10 +12,7 @@ var mongoose = require('mongoose');
 var config = require('./config/environment');
 
 // Connect to database
-mongoose.createConnection(config.mongo.uri, {
-  useMongoClient: true
-
-});
+mongoose.connect(config.mongo.uri, config.mongo.options);
 
 // Populate DB with sample data
 if(config.seedDB) { require('./config/seed'); }
@@ -35,10 +32,7 @@ require('./config/express')(app);
 require('./routes')(app);
 
 // Start server
-
-
 server.listen(config.port, config.ip, function () {
-
   console.log('Express server listening on %d, in %s mode', config.port, app.get('env'));
 });
 
